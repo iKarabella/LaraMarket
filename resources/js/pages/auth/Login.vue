@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -8,14 +8,15 @@ import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { PhoneFormat } from '@/Mixins/PhoneFormat.js';
 
-defineProps<{
-    status?: string;
-    canResetPassword: boolean;
-}>();
+defineProps({
+    status: {type: String, default: null},
+    canResetPassword: {type: Boolean, default:false},
+});
 
 const form = useForm({
-    email: '',
+    phone: '',
     password: '',
     remember: false,
 });
@@ -28,8 +29,8 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthBase title="Log in to your account" description="Enter your email and password below to log in">
-        <Head title="Log in" />
+    <AuthBase title="Вход в аккаунт" description="Введите свой телефон и пароль">
+        <Head title="Вход в аккаунт" />
 
         <div v-if="status" class="mb-4 text-center text-sm font-medium text-green-600">
             {{ status }}
@@ -38,25 +39,26 @@ const submit = () => {
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
+                    <Label for="phone">Телефон</Label>
                     <Input
-                        id="email"
-                        type="email"
+                        id="phone"
+                        type="phone"
                         required
                         autofocus
                         :tabindex="1"
-                        autocomplete="email"
-                        v-model="form.email"
-                        placeholder="email@example.com"
+                        v-on:keyup="form.phone=PhoneFormat(form.phone)"
+                        autocomplete="phone"
+                        v-model="form.phone"
+                        placeholder="+7 000 000 0000"
                     />
-                    <InputError :message="form.errors.email" />
+                    <InputError :message="form.errors.phone" />
                 </div>
 
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <Label for="password">Password</Label>
+                        <Label for="password">Пароль</Label>
                         <TextLink v-if="canResetPassword" :href="route('password.request')" class="text-sm" :tabindex="5">
-                            Forgot password?
+                            Забыли пароль?
                         </TextLink>
                     </div>
                     <Input
@@ -74,19 +76,19 @@ const submit = () => {
                 <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
                         <Checkbox id="remember" v-model="form.remember" :tabindex="3" />
-                        <span>Remember me</span>
+                        <span>Запомнить меня</span>
                     </Label>
                 </div>
 
                 <Button type="submit" class="mt-4 w-full" :tabindex="4" :disabled="form.processing">
                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                    Log in
+                    Войти
                 </Button>
             </div>
 
             <div class="text-center text-sm text-muted-foreground">
-                Don't have an account?
-                <TextLink :href="route('register')" :tabindex="5">Sign up</TextLink>
+                Нет аккаунта?
+                <TextLink :href="route('register')" :tabindex="5">Зарегистрироваться</TextLink>
             </div>
         </form>
     </AuthBase>

@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('phone')->unique();
             $table->string('nickname', 50);
-            $table->string('name', 50);
-            $table->string('patronymic', 50);
-            $table->string('surname', 50);
+            $table->string('name', 50)->nullable();
+            $table->string('patronymic', 50)->nullable();
+            $table->string('surname', 50)->nullable();
             $table->date('birthday')->nullable();
-            $table->string('email', 50)->unique();
+            $table->string('email', 50)->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
