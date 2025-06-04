@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Home\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
