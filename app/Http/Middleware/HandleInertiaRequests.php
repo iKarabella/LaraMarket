@@ -51,6 +51,19 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'catalogMenu' => [ //TODO формировать автоматом
+                ['title'=>'Компьютеры', 'link'=>'/a'],
+                ['title'=>'Ноутбуки', 'link'=>'/b', 'children'=>[
+                    ['title'=>'Большие', 'link'=>'/aa'],
+                    ['title'=>'Средние', 'link'=>'/bb'],
+                    ['title'=>'Маленькие', 'link'=>'/cc', 'children'=>[
+                        ['title'=>'Сломанные', 'link'=>'/aaa']
+                    ]]
+                ]],
+                ['title'=>'Мониторы', 'link'=>'/c'],
+                ['title'=>'Аксессуары', 'link'=>'/d'],
+                ['title'=>'Разное', 'link'=>'/e'],
+            ],
         ];
     }
 }

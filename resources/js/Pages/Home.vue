@@ -1,11 +1,12 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import FullLayout from '../Layouts/FullLayout.vue';
 </script>
 
 <template>
     <Head title="Laramarket">
     </Head>
-    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+    <FullLayout>
         asdf
-    </div>
+    </FullLayout>
 </template>

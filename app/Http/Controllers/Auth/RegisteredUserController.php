@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Master;
+use App\Models\Apprentice;
+use App\Models\UsersSubscriptions;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,11 +19,21 @@ use Inertia\Response;
 class RegisteredUserController extends Controller
 {
     /**
-     * Show the registration page.
+     * Display the registration view.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('auth/Register');
+        if($request->server('HTTP_REFERER'))
+        {
+            $checkhost = parse_url($request->server('HTTP_REFERER'));
+            
+            if($checkhost && $checkhost['host']==env('APP_URL') && $request->server('HTTP_REFERER')!=route('login') && $request->server('HTTP_REFERER')!=route('register'))
+            {
+                $request->session()->put('backto', $request->server('HTTP_REFERER'));
+            }
+        }
+
+        return Inertia::render('Auth/Register');
     }
 
     /**
@@ -34,7 +47,7 @@ class RegisteredUserController extends Controller
             'phone' => 'required|numeric|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-        
+
         $user = User::create([
             'phone' => $request->phone,
             'nickname' => 'user'.rand(1111,9999).User::count(),
@@ -44,7 +57,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
-
-        return to_route('dashboard');
+        
+        return redirect()->route('home'); //return redirect()->route('verification.phone');
     }
 }
