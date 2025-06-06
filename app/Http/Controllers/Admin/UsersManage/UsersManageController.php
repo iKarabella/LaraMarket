@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin\UsersManage;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UsersManage\GetListRequest;
+use App\Http\Requests\Admin\UsersManage\UserStoreRequest;
 use App\Http\Resources\Admin\UsersManage\UsersResource;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -29,7 +31,19 @@ class UsersManageController extends Controller
         if ($request->surname) $users->where('surname','like','%'.$request->surname.'%');
         
         return Inertia::render('Admin/UsersManage/Users', [
-            'users'=>UsersResource::collection($users->paginate($request->perPage?intval($request->perPage):25)->withQueryString())
+            'users'=>UsersResource::collection($users->paginate($request->perPage?intval($request->perPage):25)->withQueryString()),
+            'roles'=>Role::all(),
         ]);
+    }
+
+    public function store(UserStoreRequest $request)
+    {
+        $validated=$request->validated();
+
+        $user=User::where('id', $request->id)->firstOrFail();
+        
+        $user->fill($validated)->save();
+
+        //set_user_roles($request->id, $validated['roles']);
     }
 }
