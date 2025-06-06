@@ -33,7 +33,7 @@ class GetListRequest extends FormRequest
             'name' => $this->name?$this->name:'',
             'surname' => $this->surname?$this->surname:'',
             'login' => $this->login?$this->login:'',
-            'perPage' => $this->perPage?$this->perPage:1,
+            'perPage' => $this->perPage?$this->perPage:25,
             'order' => $this->order,
             'desc' =>(bool) $this->desc
         ]);
