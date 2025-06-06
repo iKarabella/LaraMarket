@@ -23,7 +23,7 @@ class UsersManageController extends Controller
             if ($request->desc) $users->orderByDesc($request->order);
             else $users->orderBy($request->order);
         }
-        if ($request->login)   $users->where('login', 'like', '%'.$request->login.'%');
+        if ($request->nickname)   $users->where('nickname', 'like', '%'.$request->login.'%');
         if ($request->phone)   $users->where('phone', 'like', '%'.$request->phone.'%');
         if ($request->name)    $users->where('name',  'like', '%'.$request->name.'%');
         if ($request->surname) $users->where('surname','like','%'.$request->surname.'%');

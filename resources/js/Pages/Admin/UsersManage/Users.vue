@@ -21,24 +21,35 @@ const params = useForm({
     phone: props.filter.phone??'',
     name: props.filter.name??'',
     surname: props.filter.surname??'',
-    login: props.filter.login??'',
+    nickname: props.filter.nickname??'',
     order: props.filter.order??'',
     desc: props.filter.desc??false,
     page: props.filter.page??null
 });
 
+
+const userEdit = (e)=>{
+    console.log('userEdit', e);
+};
+
+const updateFilters = ()=>{
+    params.page=null;
+    reloadList();
+};
+
 const emitPaginate = (e)=>{
     params.page=e;
+    reloadList();
+};
+
+const reloadList = ()=>{
     params.post(route('admin.users.manage'), {
         preserveScroll: true,
         //onSuccess: () => console.log('response'),
         // onError: () => {
-        //     console.log('error response', this.editAchievementForm.errors);
+        //     console.log('error response');
         // }
     });
-}
-const userEdit = (e)=>{
-    console.log('userEdit', e);
 }
 
 </script>

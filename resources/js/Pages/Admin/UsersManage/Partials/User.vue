@@ -50,8 +50,8 @@ const updFilts = () => {emit('updateParams');};
                     placeholder="Фамилия"/>
             </td>
             <td class="text-center">
-                <TextInput v-model="params.login" 
-                    :keyup="params.login=TextTranslit(params.login, true)"
+                <TextInput v-model="params.nickname" 
+                    :keyup="params.nickname=TextTranslit(params.nickname, true)"
                     v-on:change="updFilts"
                     placeholder="Псевдоним"/>
             </td>
