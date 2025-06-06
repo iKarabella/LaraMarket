@@ -14,6 +14,7 @@ Route::get('dashboard', function () {
 
 // Route::middleware('permission:users_manage')->group(function () {
     Route::get('admin/users', [UsersManageController::class, 'index'])->name('admin.users.manage');
+    Route::post('admin/users', [UsersManageController::class, 'index']);
 // });
 
 require __DIR__.'/auth.php';
