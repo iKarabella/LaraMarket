@@ -1,34 +1,7 @@
 <?php
 
-use App\Models\Permission;
-use App\Models\RolesHasPermission;
-use App\Models\UsersHasRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
-if (! function_exists('set_role_permissions')) {
-    /**
-     * Установить разрешения для роли
-     * @param int $role_id ID роли
-     * @param array $permissions<mixed, Item> список разрешений
-     */
-    function set_role_permissions(int $role_id, array $permissions):void
-    {
-        //
-    }
-}
-
-if (! function_exists('set_user_roles')) {
-    /**
-     * Установить роли для пользователя
-     * @param int $user_id ID пользователя
-     * @param array $actualRoles<mixed, Item> список ролей пользоваля [[role_id=>int, user_id=>int, school_id=>int]]
-     */
-    function set_user_roles(int $user_id, array $actualRoles=[]):void
-    {
-        //
-    }
-}
 
 if (! function_exists('access_rights')) {
     /**

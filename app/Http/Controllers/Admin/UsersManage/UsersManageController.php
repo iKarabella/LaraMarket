@@ -44,6 +44,8 @@ class UsersManageController extends Controller
         
         $user->fill($validated)->save();
 
-        //set_user_roles($request->id, $validated['roles']);
+        if($validated['roles']){
+            $user->roles()->sync(array_column($validated['roles'], 'id'));
+        }
     }
 }

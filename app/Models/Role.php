@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Role extends Model
 {
     protected $fillable = [
-        'name',       //Название
-        'description',//описание
+        'name',        //Название
+        'description', //описание
     ];
 
     function permissions(){
-        return $this->hasMany(RolesHasPermission::class, 'role_id', 'id');
+        return $this->belongsToMany(Permission::class, 'roles_has_permissions');
     }
 }

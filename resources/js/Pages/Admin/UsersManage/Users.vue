@@ -90,13 +90,12 @@ const closeModal = ()=>{
 const setRole = (rid)=>{
     if (editForm.id===null) return false;
 
-    let index = editForm.roles.findIndex(f => f.role_id == rid);
+    let index = editForm.roles.findIndex(f => f.id == rid);
 
     if (index>=0) editForm.roles.splice(index, 1);
     else{
         editForm.roles.push({
-            role_id:rid,
-            user_id: editForm.id
+            id:rid
         });
     }
 };
@@ -179,7 +178,7 @@ const setRole = (rid)=>{
                     <div class="md:grid md:grid-cols-3">
                         <div v-for="role in roles" class="p-2 rounded hover:bg-gray-200">
                             <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">
-                                <Checkbox :checked="editForm.roles.findIndex(f=>f.role_id == role.id)>=0" 
+                                <Checkbox :checked="editForm.roles.findIndex(f=>f.id == role.id)>=0" 
                                           @change="setRole(role.id)"
                                           class="mr-4" /> 
                                 {{ role.name }}

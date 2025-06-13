@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\RolesAndPermissions\RolesAndPermissionsController;
 use App\Http\Controllers\Admin\UsersManage\UsersManageController;
 use App\Http\Controllers\Home\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,10 @@ Route::get('dashboard', function () {
     Route::get('admin/users', [UsersManageController::class, 'index'])->name('admin.users.manage');
     Route::post('admin/users', [UsersManageController::class, 'index']);
     Route::patch('/admin/users', [UsersManageController::class, 'store'])->name('admin.users.update');
+
+    Route::get('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'index'])->name('admin.roles_and_permissions');
+    Route::patch('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'store'])->name('admin.roles_and_permissions.update');
+    Route::delete('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'delete'])->name('admin.roles_and_permissions.delete');
 // });
 
 require __DIR__.'/auth.php';

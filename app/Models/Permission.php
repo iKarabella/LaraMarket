@@ -11,4 +11,9 @@ class Permission extends Model
         'code',        // код-строка
         'description' // Описание 
     ];
+
+    
+    function roles(){
+        return $this->belongsToMany(Role::class, 'roles_has_permissions');
+    }
 }
