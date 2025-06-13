@@ -10,86 +10,67 @@ import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
 import { ref } from 'vue';
 //import MediaManage from './Partials/MediaManage.vue';
-</script>
-<script>
-    export default {
-        props:{
-            rights: {type:Array, default:[]},
-            product: {type:Object, default:{}},
-            categories: {type:Array, default:[]},
-            entities: {type:Array, default:[]}
-        },
-        data(){
-            return {
-                product:this.product,
-                productForm: useForm({
-                    id:this.product.id??null,
-                    title:this.product.title??null,
-                    link:this.product.link??'',
-                    description:this.product.description??null,
-                    visibility:this.product.visibility??false,
-                    offersign:this.product.offersign??'',
-                    categories:this.product.categories??[],
-                    measure:this.product.measure??null,
-                    media:this.product.media??[],
-                    short_description:this.product.short_description??''
-                }),
-                selectedCatForAdd:null,
-            }
-        },
-        computed:{
-            cats_in_select:function(){
-                return this.reCat();
-            }
-        },
-        methods: {
-            reCat: function(parent=null, level=0){
-                let ret = [];
-                this.categories.filter(arr=>arr.parent==parent).sort(function(a,b){return a.sort-b.sort;}).forEach(cat=>{
-                    ret.push({id:cat.id, title:cat.title, level:level});
-                    let child = this.reCat(cat.id, level+1);
-                    if (child.length>0) ret.push(...child);
-                });
-                return ret;
-            },
-            addCat(){
-                if (this.selectedCatForAdd == null || this.productForm.categories.findIndex(a=>a.id==this.selectedCatForAdd)>-1) return false;
-                let find = this.categories.find(arr=>arr.id==this.selectedCatForAdd);
 
-                this.productForm.categories.push({id:find.id, title:find.title});
-            },
-            delCat(e){
-                let index = this.productForm.categories.findIndex(a=>a.id==e);
-                if (index>-1) this.productForm.categories.splice(index,1);
-            },
-            updateContent: function(content){
-                this.productForm.description=content;
-            },
-            storeProduct: function(){
-                this.productForm.post(route('market.manage.storeProduct'), {
-                    preserveScroll:true,
-                    onSuccess:(e)=>{
-                        this.productForm=useForm({
-                            id:this.product.id??null,
-                            title:this.product.title??null,
-                            link:this.product.link??'',
-                            description:this.product.description??null,
-                            visibility:this.product.visibility??false,
-                            offersign:this.product.offersign??'',
-                            categories:this.product.categories??[],
-                            measure:this.product.measure??null,
-                            media:this.product.media??[]
-                        });
-                    }, 
-                    onError:(e)=>console.log(e)
-                });
-            }
-        }
-    }
+const props = defineProps({
+    navigation: {type:Array, default:[]},
+    categories: {type:Array, default:[]},
+    product: {type:Object, default:{}},
+    measures: {type:Array, default:[]}
+});
+
+const productForm = useForm({
+    id:props.product.id??null,
+    title:props.product.title??null,
+    link:props.product.link??'',
+    description:props.product.description??null,
+    visibility:props.product.visibility??false,
+    offersign:props.product.offersign??'',
+    categories:props.product.categories??[],
+    measure:props.product.measure??null,
+    short_description:props.product.short_description??''
+});
+
+const selectedCatForAdd = ref(null);
+
+const reCat = (parent=null, level=0)=>{
+    let ret = [];
+    props.categories.filter(arr=>arr.parent==parent).sort(function(a,b){return a.sort-b.sort;}).forEach(cat=>{
+        ret.push({id:cat.id, title:cat.title, level:level});
+        let child = reCat(cat.id, level+1);
+        if (child.length>0) ret.push(...child);
+    });
+    return ret;
+};
+
+const addCat = ()=>{
+    if (selectedCatForAdd.value == null || productForm.categories.findIndex(a=>a.id==selectedCatForAdd.value)>-1) return false;
+    let find = props.categories.find(arr=>arr.id==selectedCatForAdd.value);
+
+    productForm.categories.push({id:find.id, title:find.title});
+};
+            
+const delCat = (e)=>{
+    let index = productForm.categories.findIndex(a=>a.id==e);
+    if (index>-1) productForm.categories.splice(index,1);
+};
+
+const updateContent = (content)=>{
+    productForm.description=content;
+};
+            
+const storeProduct = ()=>{
+    productForm.post(route('admin.products.store'), {
+        preserveScroll:true,
+        onSuccess:(e)=>{
+            productForm.reset();
+        }, 
+        onError:(e)=>console.log(e)
+    });
+};
 </script>
 
 <template>
-    <MarketLayout :rights="rights" :section="section" :header="product.id?'Редактирование продукта':'Создание продукта'">
+    <MarketLayout :navigation="navigation">
         <Head title="Products" />
         <div>
             <div class="md:grid md:grid-cols-2 md:gap-2">
@@ -129,7 +110,7 @@ import { ref } from 'vue';
                                     id="categories"
                                     v-model="selectedCatForAdd"
                             >
-                                <option v-for="cat in cats_in_select" :key="cat.id" :value="cat.id">
+                                <option v-for="cat in reCat()" :key="cat.id" :value="cat.id">
                                     <span v-for="n in cat.level">-</span>
                                     {{cat.title}}
                                 </option>
@@ -171,7 +152,7 @@ import { ref } from 'vue';
                             v-model="productForm.measure"
                             id="measure" name="measure"
                     >
-                        <option v-for="entity in entities" :key="entity.id" :value="entity.id" :title="entity.description">{{ entity.value }}</option>
+                        <option v-for="entity in measures" :key="entity.id" :value="entity.id" :title="entity.description">{{ entity.value }}</option>
                     </select>
                     <InputError class="ml-2" :message="productForm.errors.measure" />
                 </div>
@@ -233,7 +214,7 @@ import { ref } from 'vue';
                 </div>
             </div>
             <div class="text-right mt-2">
-                <Link :href="route('market.manage.catalog')" class="mr-2">
+                <Link :href="route('admin.catalog.manage')" class="mr-2">
                     <SecondaryButton>В каталог</SecondaryButton>
                 </Link>
                 <PrimaryButton @click="storeProduct">Сохранить</PrimaryButton>

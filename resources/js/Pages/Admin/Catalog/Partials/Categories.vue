@@ -156,7 +156,7 @@ const openCatDelete = () =>{
                         </div>
                     </div>
                     <div class="text-right">
-                        <Link :href="route('admin.products.manage')" :data="{'id':null, 'category':selectedCat}">
+                        <Link :href="route('admin.products.manage')" :data="{'category':selectedCat}">
                             <PrimaryButton class="mr-2" title="Добавить товар">
                                 <i class="ri-add-line mr-2"></i> Добавить товар
                             </PrimaryButton>

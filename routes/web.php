@@ -33,6 +33,7 @@ Route::middleware('permission:catalog_manage')->group(function () {
     Route::post('admin/catalog/sorting_category', [AdminCatalogController::class, 'sortingCategory'])->name('admin.catalog.catsSortManage');
 
     Route::get('admin/catalog/products/edit', [AdminCatalogController::class, 'products'])->name('admin.products.manage');
+    Route::post('admin/catalog/products/store', [AdminCatalogController::class, 'storeProduct'])->name('admin.products.store');
 });
 
 require __DIR__.'/auth.php';
