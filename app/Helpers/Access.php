@@ -3,6 +3,14 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+/**
+  0 => "users_manage"
+  1 => "catalog_manage"
+  2 => "warehouses_manage"
+  3 => "roles_and_permissions"
+  4 => "orders_manage"
+ */
+
 if (! function_exists('access_rights')) {
     /**
      * Список разрешений для пользователя
@@ -25,8 +33,8 @@ if (! function_exists('access_rights')) {
             {
                 $get_permissions = DB::table('roles_has_permissions')
                                 ->leftJoin('permissions', 'permissions.id', '=', 'roles_has_permissions.permission_id')
-                                ->whereRaw('(`roles_has_permissions`.`role_id`, `roles_has_permissions`.`school_id`) IN (SELECT `role_id`, `school_id` FROM `users_has_roles` WHERE `user_id` = ?)', $user->id)
-                                ->get(['permissions.code', 'roles_has_permissions.school_id']);
+                                ->whereRaw('(`roles_has_permissions`.`role_id`) IN (SELECT `role_id` FROM `users_has_roles` WHERE `user_id` = ?)', $user->id)
+                                ->get(['permissions.code']);
                     
                 foreach ($get_permissions as $permission) $cache['rights'][] = $permission->code;
             }

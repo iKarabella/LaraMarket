@@ -19,6 +19,6 @@ class PermissionMiddleware
 
         return $next($request);
 
-        //TODO return count(!access_rights($permission) ? $next($request) : redirect()->route('home');
+        //return access_rights($permission) ? $next($request) : redirect()->route('home');
     }
 }

@@ -13,14 +13,16 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-// Route::middleware('permission:users_manage')->group(function () {
+Route::middleware('permission:users_manage')->group(function () {
     Route::get('admin/users', [UsersManageController::class, 'index'])->name('admin.users.manage');
     Route::post('admin/users', [UsersManageController::class, 'index']);
     Route::patch('/admin/users', [UsersManageController::class, 'store'])->name('admin.users.update');
+});
 
+Route::middleware('permission:roles_and_permissions')->group(function () {
     Route::get('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'index'])->name('admin.roles_and_permissions');
     Route::patch('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'store'])->name('admin.roles_and_permissions.update');
     Route::delete('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'delete'])->name('admin.roles_and_permissions.delete');
-// });
+});
 
 require __DIR__.'/auth.php';
