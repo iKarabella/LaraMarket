@@ -12,7 +12,7 @@
             type:Boolean,
             default:false,
         },
-        disable:{ //TODO у SecondaryButton и PrimaryButton этот пропс должен быть одинаковым
+        disabled:{
             type:Boolean,
             default:false
         },
@@ -39,7 +39,7 @@
 <template>
     <button
         :type="type"
-        :class="classes+(disable ? ifDisable : (selected ? ifSelected : ifNot))"
+        :class="classes+(disabled ? ifDisable : (selected ? ifSelected : ifNot))"
     >
         <slot />
     </button>

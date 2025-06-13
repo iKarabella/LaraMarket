@@ -13,9 +13,6 @@ use Inertia\Response;
 
 class UsersManageController extends Controller
 {
-    /**
-     * Show the login page.
-     */
     public function index(GetListRequest $request): Response
     {
         $users = User::with(['roles']);

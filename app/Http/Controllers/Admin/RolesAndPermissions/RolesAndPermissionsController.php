@@ -12,9 +12,6 @@ use Inertia\Response;
 
 class RolesAndPermissionsController extends Controller
 {
-    /**
-     * Show the login page.
-     */
     public function index(Request $request): Response
     {
         $permissions = Permission::all(['id', 'name']);
