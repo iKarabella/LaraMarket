@@ -181,7 +181,7 @@ const storeProduct = ()=>{
             <div v-if="product.id && product.link" class="mt-2">
                 <div>
                     Торговые предложения:
-                    <Link :href="route('market.manage.product.newOffer', [product.link])">
+                    <Link :href="route('admin.products.newOffer', [product.link])">
                         <SecondaryButton title="Добавить предложение"><i class="ri-add-line"></i></SecondaryButton>
                     </Link>
                 </div>
@@ -206,7 +206,7 @@ const storeProduct = ()=>{
                         <div>{{ offer.art }}</div>
                         <div class="text-center">
                             <i :class="{'ri-eye-line':offer.visibility, 'ri-eye-off-line':!offer.visibility}"></i>
-                            <Link :href="route('market.manage.product.offer', [product.link, offer.id])" class="ml-2" title="Редактировать">
+                            <Link :href="route('admin.products.editOffer', [product.link, offer.id])" class="ml-2" title="Редактировать">
                                 <SecondaryButton><i class="ri-edit-2-fill"></i></SecondaryButton>
                             </Link>
                         </div>

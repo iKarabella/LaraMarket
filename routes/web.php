@@ -28,12 +28,17 @@ Route::middleware('permission:roles_and_permissions')->group(function () {
 
 Route::middleware('permission:catalog_manage')->group(function () {
     Route::get('admin/catalog', [AdminCatalogController::class, 'index'])->name('admin.catalog.manage');
-    Route::post('admin/catalog', [AdminCatalogController::class, 'storeCat']);
-    Route::delete('admin/catalog', [AdminCatalogController::class, 'deleteCat']);
-    Route::post('admin/catalog/sorting_category', [AdminCatalogController::class, 'sortingCategory'])->name('admin.catalog.catsSortManage');
+    Route::post('admin/catalog', [AdminCatalogController::class, 'index']);
+    Route::post('admin/catalog/categories', [AdminCatalogController::class, 'storeCat'])->name('admin.catalog.catsManage');
+    Route::delete('admin/catalog/categories', [AdminCatalogController::class, 'deleteCat']);
+    Route::post('admin/catalog/categories/sorting_category', [AdminCatalogController::class, 'sortingCategory'])->name('admin.catalog.catsSortManage');
 
     Route::get('admin/catalog/products/edit', [AdminCatalogController::class, 'products'])->name('admin.products.manage');
+    Route::get('admin/catalog/products/edit/{link}', [AdminCatalogController::class, 'products'])->name('admin.products.edit');
     Route::post('admin/catalog/products/store', [AdminCatalogController::class, 'storeProduct'])->name('admin.products.store');
+    Route::get('/market/manage/products/{link}/offers/{offer_id}', [AdminCatalogController::class, 'offer'])->name('admin.products.editOffer');
+    Route::get('/market/manage/products/{link}/offers/', [AdminCatalogController::class, 'offer'])->name('admin.products.newOffer');
+    Route::post('admin/catalog/products/offers/store', [AdminCatalogController::class, 'storeOffer'])->name('admin.products.offers.store');
 });
 
 require __DIR__.'/auth.php';

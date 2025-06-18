@@ -72,7 +72,7 @@ const closeModal = () => {
 };
 
 const deleteCat = ()=>{
-    deleteCatForm.delete(route('admin.catalog.manage'), {
+    deleteCatForm.delete(route('admin.catalog.catsManage'), {
         preserveScroll: true,
         onSuccess:()=>{
             closeModal();
@@ -86,14 +86,14 @@ const deleteCat = ()=>{
 };
 
 const editCat = ()=>{
-    editCatForm.post(route('admin.catalog.manage'), {
+    editCatForm.post(route('admin.catalog.catsManage'), {
         preserveScroll: true,
         onSuccess:()=>closeModal()
     });
 };
 
 const newCat = ()=>{
-    newCatForm.post(route('admin.catalog.manage'), {
+    newCatForm.post(route('admin.catalog.catsManage'), {
         preserveScroll: true,
         onSuccess:()=>{
             closeModal();
