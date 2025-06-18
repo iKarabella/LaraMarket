@@ -24,7 +24,7 @@ class Product extends Model
     
     public function offers()
     {
-      return $this->hasMany(Offer::class, 'product_id', 'id');
+      return $this->hasMany(Offer::class, 'product_id', 'id')->with(['stocks']);
     }
 
     public function categories()

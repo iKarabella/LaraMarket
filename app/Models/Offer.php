@@ -30,4 +30,9 @@ class Offer extends Model
     {
       return $this->hasOne(Product::class, 'id', 'product_id')->with('measure_value');
     }
+
+    public function stocks()
+    {
+        return $this->hasMany(Stocks::class, 'offer_id', 'id')->where('quantity', '>', 0);
+    }
 }
