@@ -10,8 +10,20 @@ use Illuminate\Support\Facades\DB;
 
 class CatalogMenu 
 {
+    /**
+     * Массив с полученными из БД категориями
+     */
     private array $categories = [];
+
+    /**
+     * Кэшированное меню
+     */
     private ?array $cashed = null;
+
+    /**
+     * Массив условий для запроса категорий в БД
+     */
+    private array $where = [];
 
     public function __construct()
     {
@@ -19,15 +31,20 @@ class CatalogMenu
         //если есть вносим в $this->cashed
         //если нет -- запрашиваем категории.
 
-        $where = config('app.catalog.show_categories_without_products', false) ? '' : 'WHERE id IN (SELECT DISTINCT category_id FROM product_categories)';
+        if(!config('app.catalog.show_categories_without_products', false)) $this->where[] = 'id IN (SELECT DISTINCT category_id FROM product_categories)';
+        if(!access_rights('catalog_manage')) $this->where[] = 'visibility = 1';
 
-        $this->categories = DB::select("WITH RECURSIVE CatsTree AS (
-                                        SELECT id, title, code, parent FROM categories $where
-                                        UNION ALL
-                                        SELECT c.id, c.title, c.code, c.parent FROM categories c
-                                        JOIN CatsTree ON c.id = CatsTree.parent
-                                    )
-                                    SELECT DISTINCT id, title, code, parent FROM CatsTree");
+        $where = (count($this->where)) ? 'WHERE '.implode(' AND ', $this->where) : '';
+
+        $this->categories = DB::select(
+            "WITH RECURSIVE CatsTree AS (
+                SELECT id, title, code, parent FROM categories $where
+                UNION ALL
+                SELECT c.id, c.title, c.code, c.parent FROM categories c
+                JOIN CatsTree ON c.id = CatsTree.parent
+             )
+             SELECT DISTINCT id, title, code, parent FROM CatsTree"
+        );
     }
 
     /**
@@ -66,7 +83,7 @@ class CatalogMenu
             {
                 $return = [
                     'title'=>$a->title,
-                    'link'=>$a->code,
+                    'link'=>route('catalog', [$a->code]),
                 ];
                 
                 $children = array_filter($this->categories, function($b) use ($a){return $b->parent==$a->id;});
