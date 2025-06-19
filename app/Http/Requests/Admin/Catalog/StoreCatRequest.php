@@ -19,8 +19,8 @@ class StoreCatRequest extends FormRequest
      */
     public function rules(): array
     {
-        if ($this->id) $rule = Rule::unique(Category::class)->where(fn (Builder $query) => $query->where('parent', $this->parent))->ignore($this->id);
-        else $rule = Rule::unique(Category::class)->where(fn (Builder $query) => $query->where('parent', $this->parent));//unique:categories,code';
+        if ($this->id) $rule = ['string','required', 'min:3', 'max:25', Rule::unique(Category::class)->ignore($this->id)];
+        else $rule = 'string|required|min:3|max:25|unique:categories,code';
 
         return [
             'id'=>'numeric|nullable|exists:categories',
