@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'catalog' => [ // настройки каталога
+        'show_categories_without_products' => true, //отображать в меню категории без продуктов
+    ],
+
 ];

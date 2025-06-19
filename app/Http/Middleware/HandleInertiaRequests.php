@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 // use Illuminate\Foundation\Inspiring;
+
+use App\Services\CatalogMenu;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 // use Tighten\Ziggy\Ziggy;
@@ -48,19 +50,8 @@ class HandleInertiaRequests extends Middleware
             //     ...(new Ziggy)->toArray(),
             //     'location' => $request->url(),
             // ],
-            'catalogMenu' => [ //TODO формировать автоматом
-                ['title'=>'Компьютеры', 'link'=>'/a'],
-                ['title'=>'Ноутбуки', 'link'=>'/b', 'children'=>[
-                    ['title'=>'Большие', 'link'=>'/aa'],
-                    ['title'=>'Средние', 'link'=>'/bb'],
-                    ['title'=>'Маленькие', 'link'=>'/cc', 'children'=>[
-                        ['title'=>'Сломанные', 'link'=>'/aaa']
-                    ]]
-                ]],
-                ['title'=>'Мониторы', 'link'=>'/c'],
-                ['title'=>'Аксессуары', 'link'=>'/d'],
-                ['title'=>'Разное', 'link'=>'/e'],
-            ],
+            'catalogMenu' => (new CatalogMenu())->get(),
+
         ];
     }
 }
