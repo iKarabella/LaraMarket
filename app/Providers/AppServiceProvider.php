@@ -24,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
 
+        $this->app['request']->server->set('HTTPS','on'); // добавил, т.к. eloquent->paginate генерировал ссылки пагинации c http протоколом
+
         URL::forceScheme('https');
 
         setlocale(LC_ALL, 'ru_RU.utf8');
