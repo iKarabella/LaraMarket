@@ -27,6 +27,13 @@ class Product extends Model
       return $this->hasMany(Offer::class, 'product_id', 'id')->with(['stocks']);
     }
 
+    public function publicOffersWithRel()
+    {
+        return $this->hasMany(Offer::class, 'product_id', 'id')
+                    ->whereRaw('visibility = true') // AND id IN (SELECT stocks_balances.offer_id FROM stocks_balances WHERE stocks_balances.offer_id=product_offers.id)
+                    ->with(['stocks']);
+    }
+
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_id');
