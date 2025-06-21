@@ -17,7 +17,7 @@ trait MarketControllerTrait
         ],
         [
             'name'=>'Склады',
-            'link'=>'admin.catalog.manage',
+            'link'=>'admin.warehouses.manage',
             'key'=>'warehouses'
         ],
         [

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Catalog\CatalogController as AdminCatalogControll
 use App\Http\Controllers\Admin\Catalog\ProductMediaController as AdminProductMediaController;
 use App\Http\Controllers\Admin\RolesAndPermissions\RolesAndPermissionsController;
 use App\Http\Controllers\Admin\UsersManage\UsersManageController;
+use App\Http\Controllers\Admin\Warehouses\WarehouseController;
 use App\Http\Controllers\Catalog\CatalogController;
 use App\Http\Controllers\Catalog\ProductController;
 use App\Http\Controllers\Home\HomeController;
@@ -50,6 +51,12 @@ Route::middleware('permission:catalog_manage')->group(function () {
     Route::post('admin/catalog/media/store', [AdminProductMediaController::class, 'storeProductMedia'])->name('admin.products.media');
     Route::post('admin/catalog/media/sort', [AdminProductMediaController::class, 'storeProductMediaSorting'])->name('admin.products.media.sorting');
     Route::post('admin/catalog/media/remove', [AdminProductMediaController::class, 'removeProductMedia'])->name('admin.products.media.remove');
+});
+
+Route::middleware('permission:warehouses_manage')->group(function () {
+    Route::get('admin/warehouses', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
+    Route::get('admin/warehouses/edit/{wh?}', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');
+    Route::post('admin/warehouses/store', [WarehouseController::class, 'store'])->name('admin.warehouses.store');
 });
 
 require __DIR__.'/auth.php';

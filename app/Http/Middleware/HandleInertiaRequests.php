@@ -42,7 +42,7 @@ class HandleInertiaRequests extends Middleware
         // [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         return [
-            // ...parent::share($request),
+            ...parent::share($request),
             'auth' => [
                 'user' => $request->user(), //TODO обернуть в ресурс для пользователя и админа
             ],

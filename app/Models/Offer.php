@@ -33,7 +33,7 @@ class Offer extends Model
 
     public function stocks()
     {
-        return $this->hasMany(Stocks::class, 'offer_id', 'id')->where('quantity', '>', 0);
+        return $this->hasMany(StockBalance::class, 'offer_id', 'id')->where('quantity', '>', 0);
     }
 
     public function media()

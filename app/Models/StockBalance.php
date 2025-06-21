@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Stocks extends Model
+class StockBalance extends Model
 {
     protected $fillable = [
         'warehouse_id', // id склада
