@@ -16,6 +16,7 @@ class ProductController extends Controller
 
     public function index(Request $request, string $code): Response
     {
-        dd($code);
+        $product = Product::whereCode($code)->with(['offers', 'media', 'measure_value', 'categories'])->firstOrFail();
+        dd($product->toArray());
     }
 }

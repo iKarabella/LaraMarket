@@ -180,7 +180,7 @@ const saveOffer = () => {
                 <MediaManage :media="offer.media" :offer="offer.id"/>
             </div>
             <div class="text-right mt-2">
-                <Link class="mr-2" :href="route('admin.products.edit', [props.product.link])">
+                <Link class="mr-2" :href="route('admin.products.edit', [props.product.code])">
                     <SecondaryButton>Отменить</SecondaryButton>
                 </Link>
                 <PrimaryButton class="mr-2" @click="saveOffer()">Сохранить</PrimaryButton>

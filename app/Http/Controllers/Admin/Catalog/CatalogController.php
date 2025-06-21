@@ -59,9 +59,9 @@ class CatalogController extends Controller
         Category::whereId($request->id)->update(['sort' => $request->sort]);
     }
 
-    public function products(Request $request, $link=null): Response
+    public function products(Request $request, $code=null): Response
     {
-        if ($link!=null) $product=Product::whereLink($link)->with(['categories', 'offers', 'media'])->firstOrFail();
+        if ($code!=null) $product=Product::whereCode($code)->with(['categories', 'offers', 'media'])->firstOrFail();
         else
         {
             $product=[
@@ -95,12 +95,12 @@ class CatalogController extends Controller
         $product->fill($request->validated())->save();
         $product->categories()->sync(collect($request->categories)->pluck('id'));
 
-        return redirect()->route('admin.products.edit', [$product->link]);
+        return redirect()->route('admin.products.edit', [$product->code]);
     }
 
-    public function offer(Request $request, $link, $offer_id=null):Response
+    public function offer(Request $request, $code, $offer_id=null):Response
     {
-        $product=Product::whereLink($link)->with(['categories'])->firstOrFail();
+        $product=Product::whereCode($code)->with(['categories'])->firstOrFail();
 
         if ($offer_id) $offer = Offer::whereId($offer_id)->firstOrFail();
         else $offer= (object) [
@@ -124,9 +124,9 @@ class CatalogController extends Controller
 
     public function storeOffer(StoreOfferRequest $request):RedirectResponse
     {
-        $product = Product::whereId($request->product_id)->first(['link']);
+        $product = Product::whereId($request->product_id)->first(['code']);
         $offer = Offer::whereId($request->id)->firstOrNew();
         $offer->fill($request->validated())->save();
-        return redirect()->route('admin.products.edit', [$product->link]);
+        return redirect()->route('admin.products.edit', [$product->code]);
     }
 }

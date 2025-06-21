@@ -87,7 +87,7 @@
             </div>
         </div>
         <div class="mx-4 mt-4">
-            <Link :href="route('catalog.product', [position.link])">
+            <Link :href="route('catalog.product', [position.code])">
                 <p class="block font-sans text-base antialiased font-medium leading-relaxed text-blue-gray-900">
                     {{ position.title }}
                 </p>
@@ -133,7 +133,7 @@
         </div>
         <!--Link v-if="position.canEdit" class="absolute top-0 right-0 mr-1 opacity-25 hover:opacity-90 cursor-pointer" 
               title="Редактировать"
-              :href="route('market.manage.product.link', [position.link])" 
+              :href="route('market.manage.product.link', [position.code])" 
         >
             <i class="ri-edit-2-fill"></i>
         </Link-->

@@ -8,7 +8,7 @@ class Product extends Model
 {
     protected $fillable = [
         'title',         //название
-        'link',         //символьная ссылка для url
+        'code',         //символьная ссылка для url
         'short_description', //краткое описание
         'description', //описание
         'visibility', //видимость на сайте

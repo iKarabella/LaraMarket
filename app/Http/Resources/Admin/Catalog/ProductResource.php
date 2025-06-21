@@ -19,7 +19,7 @@ class ProductResource extends JsonResource
         return [
             'id' => $this->id,               // id продукта
             'title' => $this->title,         // Название
-            'link'  => $this->link, //линк
+            'code'  => $this->code, //линк
             'short_description'=>$this->short_description,
             'description' => $this->description,     // Описание
             'visibility' => $this->visibility, // Видимость

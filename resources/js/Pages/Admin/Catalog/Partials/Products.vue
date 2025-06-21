@@ -44,7 +44,7 @@ const offerStocks = (index)=>{
                 <div>{{ offerStocks(index) }}</div>
                 <div class="text-right pr-2">
                     <i :class="{'ri-eye-line':product.visibility, 'ri-eye-off-line':!product.visibility}"></i>
-                    <Link :href="route('admin.products.edit', [product.link])" class="ml-2" title="Редактировать">
+                    <Link :href="route('admin.products.edit', [product.code])" class="ml-2" title="Редактировать">
                         <SecondaryButton><i class="ri-edit-2-fill"></i></SecondaryButton>
                     </Link>
                 </div>

@@ -41,11 +41,11 @@ Route::middleware('permission:catalog_manage')->group(function () {
     Route::post('admin/catalog/categories/sorting_category', [AdminCatalogController::class, 'sortingCategory'])->name('admin.catalog.catsSortManage');
 
     Route::get('admin/catalog/product/edit', [AdminCatalogController::class, 'products'])->name('admin.products.manage');
-    Route::get('admin/catalog/product/edit/{link}', [AdminCatalogController::class, 'products'])->name('admin.products.edit');
+    Route::get('admin/catalog/product/edit/{code}', [AdminCatalogController::class, 'products'])->name('admin.products.edit');
     Route::post('admin/catalog/product/store', [AdminCatalogController::class, 'storeProduct'])->name('admin.products.store');
     Route::post('admin/catalog/product/offers/store', [AdminCatalogController::class, 'storeOffer'])->name('admin.products.offers.store');
-    Route::get('admin/catalog/products/{link}/offers/{offer_id}', [AdminCatalogController::class, 'offer'])->name('admin.products.editOffer');
-    Route::get('admin/catalog/products/{link}/offers/', [AdminCatalogController::class, 'offer'])->name('admin.products.newOffer');
+    Route::get('admin/catalog/products/{code}/offers/{offer_id}', [AdminCatalogController::class, 'offer'])->name('admin.products.editOffer');
+    Route::get('admin/catalog/products/{code}/offers/', [AdminCatalogController::class, 'offer'])->name('admin.products.newOffer');
 
     Route::post('admin/catalog/media/store', [AdminProductMediaController::class, 'storeProductMedia'])->name('admin.products.media');
     Route::post('admin/catalog/media/sort', [AdminProductMediaController::class, 'storeProductMediaSorting'])->name('admin.products.media.sorting');

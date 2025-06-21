@@ -21,7 +21,7 @@ const props = defineProps({
 const productForm = useForm({
     id:props.product.id??null,
     title:props.product.title??null,
-    link:props.product.link??'',
+    code:props.product.code??'',
     description:props.product.description??null,
     visibility:props.product.visibility??false,
     offersign:props.product.offersign??'',
@@ -89,17 +89,17 @@ const storeProduct = ()=>{
                     <InputError class="ml-2" :message="productForm.errors.title" />
                 </div>
                 <div class="mt-2">
-                    <InputLabel for="link" value="Символьная ссылка" />
+                    <InputLabel for="code" value="Символьная ссылка" />
                     <TextInput
                         type="text"
-                        id="link"
-                        name="link"
+                        id="code"
+                        name="code"
                         class="w-full mt-1 block"
                         required
-                        v-model="productForm.link"
+                        v-model="productForm.code"
                         autocomplete="off"
                     />
-                    <InputError class="ml-2" :message="productForm.errors.link" />
+                    <InputError class="ml-2" :message="productForm.errors.code" />
                 </div>
             </div>
             <div class="mt-2">
@@ -179,10 +179,10 @@ const storeProduct = ()=>{
             <div class="mt-2">
                 <MediaManage :media="productForm.media" :product="product.id"/>
             </div>
-            <div v-if="product.id && product.link" class="mt-2">
+            <div v-if="product.id && product.code" class="mt-2">
                 <div>
                     Торговые предложения:
-                    <Link :href="route('admin.products.newOffer', [product.link])">
+                    <Link :href="route('admin.products.newOffer', [product.code])">
                         <SecondaryButton title="Добавить предложение"><i class="ri-add-line"></i></SecondaryButton>
                     </Link>
                 </div>
@@ -207,7 +207,7 @@ const storeProduct = ()=>{
                         <div>{{ offer.art }}</div>
                         <div class="text-center">
                             <i :class="{'ri-eye-line':offer.visibility, 'ri-eye-off-line':!offer.visibility}"></i>
-                            <Link :href="route('admin.products.editOffer', [product.link, offer.id])" class="ml-2" title="Редактировать">
+                            <Link :href="route('admin.products.editOffer', [product.code, offer.id])" class="ml-2" title="Редактировать">
                                 <SecondaryButton><i class="ri-edit-2-fill"></i></SecondaryButton>
                             </Link>
                         </div>
