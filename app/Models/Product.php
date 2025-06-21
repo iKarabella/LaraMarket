@@ -31,6 +31,11 @@ class Product extends Model
     {
         return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_id');
     }
+
+    public function media()
+    {
+        return $this->hasMany(ProductMedia::class, 'product_id', 'id')->orderBy('sort');
+    }
     
     public function measure_value()
     {
