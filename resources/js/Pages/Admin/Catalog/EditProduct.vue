@@ -9,7 +9,7 @@ import Tiptap from '@/Components/Tiptap/Tiptap.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
 import { ref } from 'vue';
-//import MediaManage from './Partials/MediaManage.vue';
+import MediaManage from './Partials/MediaManage.vue';
 
 const props = defineProps({
     navigation: {type:Array, default:[]},
@@ -27,7 +27,8 @@ const productForm = useForm({
     offersign:props.product.offersign??'',
     categories:props.product.categories??[],
     measure:props.product.measure??null,
-    short_description:props.product.short_description??''
+    short_description:props.product.short_description??'',
+    media:props.product.media??[],
 });
 
 const selectedCatForAdd = ref(null);

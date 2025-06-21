@@ -27,7 +27,7 @@ class CatalogController extends Controller
 
     public function index(ManageRequest $request): Response
     {
-        $products = Product::with(['offers', 'categories', 'offers']);
+        $products = Product::with(['offers', 'categories', 'offers', 'media']);
 
         if($request->category) {
             $request->session()->put('catalogManage.filters.category', $request->category);
@@ -61,7 +61,7 @@ class CatalogController extends Controller
 
     public function products(Request $request, $link=null): Response
     {
-        if ($link!=null) $product=Product::whereLink($link)->with(['categories', 'offers'])->firstOrFail();
+        if ($link!=null) $product=Product::whereLink($link)->with(['categories', 'offers', 'media'])->firstOrFail();
         else
         {
             $product=[

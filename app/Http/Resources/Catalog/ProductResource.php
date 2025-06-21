@@ -1,9 +1,7 @@
 <?php
 
-namespace App\Http\Resources\Admin\Catalog;
+namespace App\Http\Resources\Catalog;
 
-use App\Http\Resources\Catalog\ProductMediaResource;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,14 +20,12 @@ class ProductResource extends JsonResource
             'link'  => $this->link, //линк
             'short_description'=>$this->short_description,
             'description' => $this->description,     // Описание
-            'visibility' => $this->visibility, // Видимость
+            'visibility'=> $this->visibility, // Видимость
             'offersign' => $this->offersign, 
-            'categories' => $this->categories, //категории
+            'categories'=> $this->categories, //категории
             'offers'    => $this->offers??[],
-            'media' => $this->media?ProductMediaResource::collection($this->media):[], //медиа
             'measure'   => $this->measure??null,
-            'created' => new Carbon($this->created_at)->format('d.m.Y H:i:s'), //создан
-            'updated' => new Carbon($this->updated_at)->format('d.m.Y H:i:s'), //обновлен
+            'media' => $this->media?ProductMediaResource::collection($this->media):[], //медиа
         ];
     }
 }
