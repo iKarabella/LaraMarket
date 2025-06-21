@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Traits\BreadcrumbTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,6 +21,8 @@ class CatalogController extends Controller
 
         if($category) 
         {
+            if (!Category::whereCode($category)->exists()) abort(404);
+
             $products->whereRaw("id IN (SELECT product_id FROM product_categories WHERE category_id IN (
                 WITH RECURSIVE CatsTree AS (
                     SELECT id, parent FROM categories WHERE id = (SELECT id FROM categories WHERE code = ?)

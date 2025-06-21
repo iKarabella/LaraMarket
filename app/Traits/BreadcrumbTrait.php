@@ -36,20 +36,16 @@ trait BreadcrumbTrait
         }
         else
         {
-            $where = ["code = '$cat'"];
-
-            $where = implode(' AND ', $where);
-
             $rawSql="WITH RECURSIVE Tree AS (
-                    SELECT id, parent, title, code, sort FROM categories WHERE $where
+                    SELECT id, parent, title, code, sort FROM categories WHERE code = ?
                     UNION ALL
                     SELECT cc.id, cc.parent, cc.title, cc.code, cc.sort FROM categories cc
                     JOIN Tree ON cc.id = Tree.parent
                 )
-                SELECT * FROM Tree WHERE id != '$cat';";
+                SELECT * FROM Tree";
 
-            $catsTree = DB::select($rawSql);
-            
+            $catsTree = DB::select($rawSql, [$cat]);
+
             $getCats = Category::where(function(Builder $query) use ($catsTree){
                 $query->whereNull('parent');
                 if (count($catsTree)) $query->orWhereIn('parent', array_column($catsTree, 'id'));

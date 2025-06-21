@@ -23,7 +23,7 @@ const props = defineProps({
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg mb-2 pb-2">
                     <Breadcrumb :breadcrumb="breadcrumb"/>
-                    <div v-if="products.data">
+                    <div v-if="products.data && products.data.length">
                         <Positions :positions="products.data" 
                                    :userCart="userCart"
                                    @changeCart="changeCart"
@@ -35,7 +35,7 @@ const props = defineProps({
                         />
                     </div>
                     <div v-else>
-                        Товаров не найдено
+                        В этой категории пока нет товаров
                     </div>
                 </div>
             </div>
