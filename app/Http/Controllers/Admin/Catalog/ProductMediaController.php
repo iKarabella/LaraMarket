@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin\Catalog;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Catalog\StoreProductMediaRequest;
+use App\Http\Requests\Admin\Catalog\RemoveMediaRequest;
+use App\Http\Requests\Admin\Catalog\StoreProductMediaSortingRequest;
 use App\Models\ProductMedia;
 use App\Traits\MarketControllerTrait;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -21,7 +24,7 @@ class ProductMediaController extends Controller
         
         foreach($validated['files'] as $file)
         {
-            if (!Storage::disk('public')->exists($dir)) dd(Storage::disk('public')->makeDirectory($dir));
+            if (!Storage::disk('public')->exists($dir)) Storage::disk('public')->makeDirectory($dir);
 
             $image = Image::read($file);
             $filename  = uniqid().'.'.$file->getClientOriginalExtension();
@@ -40,13 +43,25 @@ class ProductMediaController extends Controller
         }
     }
 
-    public function storeProductMediaSorting()
-    {
-        //storeProductMedia
+    public function storeProductMediaSorting(StoreProductMediaSortingRequest $request)
+    {   
+        $validated = $request->validated();
+
+        DB::transaction(function() use ($validated) 
+        {
+            foreach ($validated['files'] as $file) 
+            {
+                ProductMedia::whereId($file['id'])->update(['sort'=>$file['sort']]);
+            }
+        });
     }
 
-    public function removeProductMedia()
+    public function removeProductMedia(RemoveMediaRequest $request)
     {
-        //storeProductMedia
+        $file = ProductMedia::whereId($request->id)->first();
+
+        Storage::disk('public')->delete([$file->path, $file->preview]);
+
+        $file->delete();
     }
 }

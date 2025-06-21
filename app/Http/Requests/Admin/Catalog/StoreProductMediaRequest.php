@@ -18,7 +18,7 @@ class StoreProductMediaRequest extends FormRequest
     {
         return [
             'product_id'=>'numeric|required_without:offer_id|nullable|exists:products,id',
-            'offer_id'=>'numeric|required_without:product_id|nullable|exists:product_offers,id',
+            'offer_id'=>'numeric|required_without:product_id|nullable|exists:offers,id',
             'files'=>'array|min:1',
             'files.*'=>File::image()->max('5mb')->dimensions(Rule::dimensions()->minWidth(350)->minHeight(350)->maxWidth(3500)->maxHeight(3500))
         ];

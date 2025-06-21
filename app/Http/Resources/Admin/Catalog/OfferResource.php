@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Admin\Catalog;
 
-use App\Http\Resources\Market\ProductMediaResource;
+use App\Http\Resources\Catalog\ProductMediaResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -29,6 +29,7 @@ class OfferResource extends JsonResource
             'length' => $this->length??null, //категории
             'height'    => $this->height??null,
             'width'    => $this->width??null,
+            'media'=>ProductMediaResource::collection($this->media)->resolve(),
             'created' => new Carbon($this->created_at??null)->format('d.m.Y H:i:s'), //создан
             'updated' => new Carbon($this->updated_at??null)->format('d.m.Y H:i:s'), //обновлен
         ];

@@ -7,6 +7,7 @@ import InputError from '@/Components/UI/InputError.vue';
 import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
+import MediaManage from './Partials/MediaManage.vue';
 
 const props = defineProps({
     product: {type: Object, default:{}},
@@ -28,6 +29,7 @@ const tradeOfferForm = useForm({
     length:props.offer.length??null,
     height:props.offer.height??null,
     width:props.offer.width??null,
+    media:props.offer.media??[],
 });
 
 const saveOffer = () => {

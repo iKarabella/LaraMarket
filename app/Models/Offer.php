@@ -17,7 +17,7 @@ class Offer extends Model
         'weight',
         'length',
         'width',
-        'height'
+        'height',
     ];
 
     protected $casts = [
@@ -34,5 +34,10 @@ class Offer extends Model
     public function stocks()
     {
         return $this->hasMany(Stocks::class, 'offer_id', 'id')->where('quantity', '>', 0);
+    }
+
+    public function media()
+    {
+        return $this->hasMany(ProductMedia::class, 'offer_id', 'id')->orderBy('sort');
     }
 }

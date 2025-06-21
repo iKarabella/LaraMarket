@@ -64,24 +64,27 @@ class CatalogController extends Controller
         if ($code!=null) $product=Product::whereCode($code)->with(['categories', 'offers', 'media'])->firstOrFail();
         else
         {
-            $product=[
+            $product = (object) [
                 'id'=>null,
                 'title'=>'',
                 'description'=>'',
+                'code'=>'',
+                'short_description'=>'',
                 'visibility'=>false,
                 'categories'=>[],
+                'media'=>[],
+                'offersign'=>'',
+                'categories'=>[],
+                'measure'=>null,
                 'created_at'=>null,
                 'updated_at'=>null,
             ];
 
-            if ($request->category) {
-                $product['categories'][]=Category::whereId($request->category)->first();
-            }
-            $product=collect($product);
+            if ($request->category) $product->categories[] = Category::whereId($request->category)->first();
         }
-        
+
         return Inertia::render('Admin/Catalog/EditProduct', [
-            'product'=>$product->toArray(),
+            'product'=>ProductResource::make($product)->resolve(),
             'categories'=>Category::all(),
             'navigation'=>$this->getNavigation('categories'),
             'measures'=>EntityValue::whereEntity(1)->get()->toArray()
