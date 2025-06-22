@@ -1,57 +1,57 @@
 <script setup>
-    import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
-    import { Link } from '@inertiajs/vue3';
-</script>
-<script>
-    export default {
-        props:{
-            position: {type:Object, default:{}}, 
-            usercart:{type:Array, default:[]}
-        },
-        emits:{addToCart:null},
-        data(){
-            return {
-                currentImage:0,
-                currentOffer:0,
-            }
-        },
-        computed:{
-            inCart: function(){
-                let find = this.usercart.find(a=>a.position == this.position.id && a.offer == this.position.offers[this.currentOffer].id);
-                return find?find:{};
-            },
-            inStock: function(){
-                return this.position.offers[this.currentOffer].stocks.map(function (arr){return arr.quantity}).reduce((partialSum, a) => partialSum + a, 0);
-            },
-            noMore: function(){
-                return this.inCart.quantity>=this.inStock;
-            }
-        },
-        methods: 
-        {
-            moveImg(next){
-                if(next){
-                    if (this.currentImage == this.position.media.length-1) this.currentImage = 0;
-                    else this.currentImage++;
-                }
-                else {
-                    if (this.currentImage==0) this.currentImage = this.position.media.length-1;
-                    else this.currentImage--;
-                }
-            },
-            toCart(){
-                if (this.noMore) return false;
-                this.$emit('addToCart', {position:this.position.id, offer:this.position.offers[this.currentOffer].id});
-            },
-            rfCart(){
-                this.$emit('removeFromCart', {position:this.position.id, offer:this.position.offers[this.currentOffer].id});
-            },
-            notifyAboutAdmission(){
-                this.$emit('notifyAboutAdmission', {position:this.position.id, offer:this.position.offers[this.currentOffer].id});
-            },
-        }
+import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
+import { Link } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+    position: {type:Object, default:{}}, 
+    usercart:{type:Array, default:[]}
+});
+
+const emit = defineEmits(['addToCart', 'removeFromCart', 'notifyAboutAdmission']);
+
+const currentImage = ref(0);
+const currentOffer = ref(0);
+
+const inCart = computed(() => {
+    if(!props.usercart) return {};
+    let find = props.usercart.find(a=>a.position == props.position.id && a.offer == props.position.offers[currentOffer.value].id);
+    return find?find:{};
+});
+
+const inStock = computed(() => {
+    return props.position.offers[currentOffer.value].stocks.map(function (arr){return arr.quantity}).reduce((partialSum, a) => partialSum + a, 0);
+});
+
+const noMore = computed(() => {
+    return inCart.quantity>=inStock;
+});
+
+const moveImg = (next) => {
+    if(next){
+        if (currentImage.value == props.position.media.length-1) currentImage.value = 0;
+        else currentImage.value++;
     }
+    else {
+        if (currentImage.value==0) currentImage.value = props.position.media.length-1;
+        else currentImage.value--;
+    }
+};
+
+const toCart = () => {
+    if (noMore.value) return false;
+    emit('addToCart', {position:props.position.id, offer:props.position.offers[currentOffer.value].id});
+};
+            
+const rfCart = () => {
+    emit('removeFromCart', {position:props.position.id, offer:props.position.offers[currentOffer.value].id});
+};
+
+const notifyAboutAdmission = () => {
+    emit('notifyAboutAdmission', {position:props.position.id, offer:props.position.offers[currentOffer.value].id});
+};
 </script>
+
 <template>
     <div class="relative flex flex-col justify-between text-gray-700 bg-gray-50 shadow-md bg-clip-border rounded-xl w-96 mx-auto my-2">
         <div class="relative mx-4 mt-4 overflow-hidden text-gray-700 bg-clip-border rounded-xl h-96">

@@ -1,10 +1,8 @@
 <script setup>
-import { ref } from 'vue';
 import Positions from './Partials/Positions.vue';
 import Pagination from '@/Components/Pagination';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
-import { useForm } from '@inertiajs/vue3';
-import FullLayout from '../../Layouts/FullLayout.vue';
+import FullLayout from '@/Layouts/FullLayout.vue';
 
 const props = defineProps({
     products:{type:Array, default:[]},
@@ -26,7 +24,6 @@ const props = defineProps({
                     <div v-if="products.data && products.data.length">
                         <Positions :positions="products.data" 
                                    :userCart="userCart"
-                                   @changeCart="changeCart"
                         />
                         <Pagination lineClass="w-full flex justify-center mb-2 mt-2" 
                                     v-show="products.meta" 

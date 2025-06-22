@@ -1,6 +1,16 @@
 <script setup>
 import ApplicationLogo from '@/Components/UI/ApplicationLogo.vue';
 import { Link } from '@inertiajs/vue3';
+import { createGlobalState, useStorage } from '@vueuse/core'
+
+// const user_cart = useStorage('user_cart', []);
+
+const global_user_cart = createGlobalState(
+  () => useStorage('user_cart', []),
+);
+
+const user_cart = global_user_cart();
+
 </script>
 <template>
     <div class="max-w-7xl mx-auto">
@@ -16,7 +26,7 @@ import { Link } from '@inertiajs/vue3';
                 search
             </div>
             <div>
-                basket
+                basket: {{ user_cart.length }}
             </div>
         </div>
     </div>

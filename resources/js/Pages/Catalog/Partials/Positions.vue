@@ -1,5 +1,4 @@
 <script setup>
-import axios from 'axios';
 import Position from './Position.vue';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -9,98 +8,67 @@ import TextInput from '@/Components/UI/TextInput.vue';
 import InputError from '@/Components/UI/InputError.vue';
 import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
-</script>
-<script>
-    export default {
-        props:{
-            positions:{type:Array, default:[]},
-            userCart:{type:Array, default:[]}
-        },
-        emits:{changeCart:null},
-        data(){
-            return {
-                products:{},
-                filters:{
-                    category:null,
-                },
-                usercart:[],
-                showNotifyAboutAdmission: ref(false),
-                notifyAboutAdmissionForm: useForm({
-                    product_id:null,
-                    offer_id:null,
-                    name:'',
-                    email:'',
-                })
-            }
-        },
-        mounted(){
-            if (localStorage.getItem('user_cart')) {
-                try {
-                    this.usercart = JSON.parse(localStorage.getItem('user_cart'));
-                } catch(e) {
-                    localStorage.removeItem('user_cart');
-                }
-            }
+import { createGlobalState, useStorage } from '@vueuse/core'
 
-            if (!this.usercart.length && Array.isArray(this.userCart) && this.userCart.length) this.usercart = this.userCart;
-        },
-        methods: 
-        {
-            addToCart(i)
-            {
-                let find = this.usercart.findIndex(a=>a.position == i.position && a.offer == i.offer);
+const props = defineProps({positions:{type:Array, default:[]}});
 
-                if (find>-1) this.usercart[find].quantity++;
-                else this.usercart.push({position:i.position, offer:i.offer, quantity:1});
+const global_user_cart = createGlobalState(
+    () => useStorage('user_cart', []),
+);
 
-                this.saveCart();
-            },
-            removeFromCart(i)
-            {
-                let find = this.usercart.findIndex(a=>a.position == i.position && a.offer == i.offer);
+const usercart = global_user_cart();
 
-                if (find>-1) {
-                    if (this.usercart[find].quantity>1) this.usercart[find].quantity--;
-                    else this.usercart.splice(find, 1);
-                }
+const addToCart = (i) => {
+    let find = usercart.value.findIndex(a=>a.position == i.position && a.offer == i.offer);
 
-                this.saveCart();
-            },
-            saveCart()
-            {
-                const parsed = JSON.stringify(this.usercart);
-                localStorage.setItem('user_cart', parsed);
-                //axios.post(route('catalog.saveCart'), {cart:this.usercart});
-                this.$emit('changeCart');
-            },
-            closeModal()
-            {
-                this.notifyAboutAdmissionForm.reset();
-                this.showNotifyAboutAdmission=false;
-            },
-            notifyAboutAdmission(i)
-            {
-                if (!i.offer || !i.position) return false;
+    if (find>-1) usercart.value[find].quantity++;
+    else usercart.value.push({position:i.position, offer:i.offer, quantity:1});
+};
 
-                this.notifyAboutAdmissionForm.offer_id = i.offer;
-                this.notifyAboutAdmissionForm.product_id = i.position;
+const removeFromCart = (i)=>{ 
+    let find = usercart.value.findIndex(a=>a.position == i.position && a.offer == i.offer);
 
-                if (this.$page.props.auth && this.$page.props.auth.user.id) this.notifyFormSend();
-                else this.showNotifyAboutAdmission = true;
-            },
-            notifyFormSend(){
-                this.notifyAboutAdmissionForm.post(route('catalog.notifyAboutAdmission'), {
-                    preserveScroll:true,
-                    onSuccess:(e)=>{
-                        this.notifyAboutAdmissionForm.reset();
-                        this.closeModal();
-                    }, 
-                    onError:(e)=>console.log(e)
-                });
-            },
-        }
+    if (find>-1) {
+        if (usercart.value[find].quantity>1) usercart.value[find].quantity--;
+        else usercart.value.splice(find, 1);
     }
+};
+
+const showNotifyAboutAdmission = ref(false);
+
+const notifyAboutAdmissionForm = useForm({
+    product_id:null,
+    offer_id:null,
+    name:'',
+    email:'',
+});
+
+const closeModal = () => {
+    notifyAboutAdmissionForm.reset();
+    showNotifyAboutAdmission.value=false;
+};
+
+const notifyAboutAdmission = (i) => {
+    if (!i.offer || !i.position) return false;
+
+    notifyAboutAdmissionForm.offer_id = i.offer;
+    notifyAboutAdmissionForm.product_id = i.position;
+
+    showNotifyAboutAdmission = true; //TODO если пользователь авторизован -- отправлять сразу, без формы
+};
+            
+const notifyFormSend = () => {
+    notifyAboutAdmissionForm.post(route('catalog.notifyAboutAdmission'), {
+        preserveScroll:true,
+        onSuccess:(e)=>{
+            notifyAboutAdmissionForm.reset();
+            closeModal();
+        }, 
+        onError:(e)=>console.log(e)
+    });
+};
 </script>
+
 <template>
     <div class="p-2 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-2">
         <Position v-for="position in positions" 
