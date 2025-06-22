@@ -54,9 +54,13 @@ Route::middleware('permission:catalog_manage')->group(function () {
 });
 
 Route::middleware('permission:warehouses_manage')->group(function () {
-    Route::get('admin/warehouses', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
-    Route::get('admin/warehouses/edit/{wh?}', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');
-    Route::post('admin/warehouses/store', [WarehouseController::class, 'store'])->name('admin.warehouses.store');
+    Route::post('admin/warehouse/store', [WarehouseController::class, 'store'])->name('admin.warehouses.store');
+    Route::post('admin/warehouse/search_product', [WarehouseController::class, 'searchProduct'])->name('admin.warehouses.searchProduct');
+    Route::get('admin/warehouse/new', [WarehouseController::class, 'edit'])->name('admin.warehouses.new');
+    Route::put('admin/warehouse/storeReceipt', [WarehouseController::class, 'storeReceipt'])->name('admin.warehouse.storeReceipt');
+    Route::get('admin/warehouses/{code?}', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
+    Route::get('admin/warehouses/{code?}/edit', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');
+    Route::get('admin/warehouses/{code}/receipt', [WarehouseController::class, 'receipt'])->name('admin.warehouses.receipt');
 });
 
 require __DIR__.'/auth.php';
