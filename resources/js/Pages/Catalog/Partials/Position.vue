@@ -105,7 +105,7 @@ const notifyAboutAdmission = () => {
             </div>
         </div>
         <div v-show="inStock" class="m-4 bg-white">
-            <PrimaryButton v-show="!inCart.quantity" title="Добавить в корзину" @click="toCart()" class="w-full">
+            <PrimaryButton v-show="!inCart.quantity" title="Добавить в корзину" @click="changeCart()" class="w-full">
                 <i class="ri-shopping-basket-2-line mr-2"></i> Добавить
             </PrimaryButton>
             <div v-show="inCart.quantity" class="flex justify-between items-center relative whitespace-nowrap font-semibold tracking-widest transition ease-in-out duration-150">
