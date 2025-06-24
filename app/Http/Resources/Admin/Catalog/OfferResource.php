@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Admin\Catalog;
 
-use App\Http\Resources\Catalog\ProductMediaResource;
+use App\Http\Resources\Admin\Catalog\ProductMediaResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

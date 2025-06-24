@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Catalog;
+namespace App\Http\Resources\Admin\Catalog;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,6 +15,9 @@ class ProductMediaResource extends JsonResource
     public function toArray(Request $request)
     {
         return [
+            'id' => $this->id??null,
+            'product_id' => $this->product_id??null,
+            'offer_id' => $this->offer_id??null,
             'preview' => empty($this->preview)?'':url('storage/'.$this->preview),      //preview media
             'path' => empty($this->path)?'':url('storage/'.$this->path),         //full media path
             'type' => $this->type??null,         //mime type

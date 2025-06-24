@@ -24,7 +24,7 @@ const inStock = computed(() => {
 });
 
 const noMore = computed(() => {
-    return inCart.quantity>=inStock;
+    return inCart.value.quantity>=inStock.value;
 });
 
 const moveImg = (next) => {
@@ -38,14 +38,10 @@ const moveImg = (next) => {
     }
 };
 
-const toCart = () => {
-    if (noMore.value) return false;
-    emit('addToCart', {position:props.position.id, offer:props.position.offers[currentOffer.value].id});
-};
-            
-const rfCart = () => {
-    emit('removeFromCart', {position:props.position.id, offer:props.position.offers[currentOffer.value].id});
-};
+const changeCart = (remove=false) => {
+    if(!remove && noMore.value) return false;
+    emit(remove?'removeFromCart':'addToCart', {position:props.position.id, offer:props.position.offers[currentOffer.value].id});
+}
 
 const notifyAboutAdmission = () => {
     emit('notifyAboutAdmission', {position:props.position.id, offer:props.position.offers[currentOffer.value].id});
@@ -113,14 +109,16 @@ const notifyAboutAdmission = () => {
                 <i class="ri-shopping-basket-2-line mr-2"></i> Добавить
             </PrimaryButton>
             <div v-show="inCart.quantity" class="flex justify-between items-center relative whitespace-nowrap font-semibold tracking-widest transition ease-in-out duration-150">
-                <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center bg-indigo-200 text-indigo-700 hover:bg-indigo-100" @click="rfCart()" title="-1">
+                <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center bg-indigo-200 text-indigo-700 hover:bg-indigo-100" 
+                    @click="changeCart(true)" title="-1"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M5 11a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2z"></path></svg>
                 </div>
                 <span>{{ inCart.quantity }}</span>
                 <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center"
                      title="+1"
                     :class="{'bg-gray-100 text-gray-500':noMore, 'bg-indigo-200 hover:bg-indigo-100 text-indigo-700':!noMore}"
-                    @click="toCart()"
+                    @click="changeCart()"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M12 4a1 1 0 0 0-1 1v6H5a1 1 0 1 0 0 2h6v6a1 1 0 1 0 2 0v-6h6a1 1 0 1 0 0-2h-6V5a1 1 0 0 0-1-1"></path></svg>
                 </div>

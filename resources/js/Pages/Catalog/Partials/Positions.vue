@@ -8,31 +8,9 @@ import TextInput from '@/Components/UI/TextInput.vue';
 import InputError from '@/Components/UI/InputError.vue';
 import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
-import { createGlobalState, useStorage } from '@vueuse/core'
+import { usercart, addToCart, removeFromCart } from '@/Mixins/UserCart.js';
 
 const props = defineProps({positions:{type:Array, default:[]}});
-
-const global_user_cart = createGlobalState(
-    () => useStorage('user_cart', []),
-);
-
-const usercart = global_user_cart();
-
-const addToCart = (i) => {
-    let find = usercart.value.findIndex(a=>a.position == i.position && a.offer == i.offer);
-
-    if (find>-1) usercart.value[find].quantity++;
-    else usercart.value.push({position:i.position, offer:i.offer, quantity:1});
-};
-
-const removeFromCart = (i)=>{ 
-    let find = usercart.value.findIndex(a=>a.position == i.position && a.offer == i.offer);
-
-    if (find>-1) {
-        if (usercart.value[find].quantity>1) usercart.value[find].quantity--;
-        else usercart.value.splice(find, 1);
-    }
-};
 
 const showNotifyAboutAdmission = ref(false);
 

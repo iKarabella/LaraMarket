@@ -6,7 +6,9 @@ use App\Http\Controllers\Admin\RolesAndPermissions\RolesAndPermissionsController
 use App\Http\Controllers\Admin\UsersManage\UsersManageController;
 use App\Http\Controllers\Admin\Warehouses\WarehouseController;
 use App\Http\Controllers\Catalog\CatalogController;
+use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Catalog\ProductController;
+use App\Http\Controllers\Catalog\UserCartController;
 use App\Http\Controllers\Home\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,7 +21,12 @@ Route::get('dashboard', function () {
 
 Route::get('catalog/{category?}', [CatalogController::class, 'index'])->name('catalog');
 Route::get('products/{code?}', [ProductController::class, 'index'])->name('catalog.product');
-Route::post('/catalog/actions/notifyAboutAdmission', [CatalogController::class, 'notifyAboutAdmission'])->name('catalog.notifyAboutAdmission');
+Route::post('catalog/actions/notifyAboutAdmission', [CatalogController::class, 'notifyAboutAdmission'])->name('catalog.notifyAboutAdmission');
+Route::get('cart', function () {return Inertia::render('Catalog/UserCart');})->name('user.cart');
+Route::post('cart/get_positions', [UserCartController::class, 'getCartPositions'])->name('catalog.usercart.getPosition');
+Route::post('cart/check', [UserCartController::class, 'check'])->name('catalog.usercart.check');
+
+Route::post('order/new', [OrderController::class, 'create'])->name('order.create');
 
 
 Route::middleware('permission:users_manage')->group(function () {
