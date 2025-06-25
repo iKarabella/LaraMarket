@@ -26,7 +26,9 @@ Route::get('cart', function () {return Inertia::render('Catalog/UserCart');})->n
 Route::post('cart/get_positions', [UserCartController::class, 'getCartPositions'])->name('catalog.usercart.getPosition');
 Route::post('cart/check', [UserCartController::class, 'check'])->name('catalog.usercart.check');
 
-Route::post('order/new', [OrderController::class, 'create'])->name('order.create');
+Route::get('order/new', [OrderController::class, 'create'])->name('order.create');
+Route::post('order/new', [OrderController::class, 'create']);
+Route::post('order/store', [OrderController::class, 'store'])->name('order.store');
 
 
 Route::middleware('permission:users_manage')->group(function () {
