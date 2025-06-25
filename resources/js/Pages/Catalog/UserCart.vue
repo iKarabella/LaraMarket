@@ -4,7 +4,7 @@ import UserCartPosition from './Partials/UserCartPosition.vue';
 import FullLayout from '@/Layouts/FullLayout.vue'; 
 import { ref, onMounted, computed, watch } from 'vue';
 import axios from 'axios';
-import { usercart, addToCart, removeFromCart } from '@/Mixins/UserCart.js';
+import { usercart, addToCart, removeFromCart, selected_count, positions_count_string } from '@/Mixins/UserCart.js';
 import { useForm } from '@inertiajs/vue3';
 
 const cartPositions = ref([]);
@@ -31,10 +31,6 @@ const getCartPositions = () => {
     .then(e=>cartPositions.value = e.data);
 };
 
-const selected_count = computed(()=>{
-    return usercart.value.filter(arr=>arr.toOrder).length;
-});
-
 const total_summ = computed(()=>{
     let total = 0;
     usercart.value.filter(arr=>arr.toOrder).forEach(p=>{
@@ -42,19 +38,6 @@ const total_summ = computed(()=>{
         if (offer) total+=offer.price*p.quantity;
     });
     return total.toFixed(2);
-});
-
-const positions_count_string = computed(()=>{
-    let ret = '0 товаров', pos = usercart.value.filter(arr=>arr.toOrder);
-
-    if(pos.length){
-        let ld = pos.length % 10;
-        if (ld>5 || ld==0 || (pos.length>10 && pos.length<16)) ret = pos.length+' товаров';
-        else if (ld>1 && ld <5) ret = pos.length+' товара';
-        else ret = pos.length+' товар'
-    }
-
-    return ret;
 });
 
 const orderCreate = ()=>{

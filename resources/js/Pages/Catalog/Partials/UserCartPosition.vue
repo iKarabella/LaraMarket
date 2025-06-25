@@ -15,6 +15,10 @@ const changeCart = (remove=false) => {
     emit(remove?'removeFromCart':'addToCart', {position:position.value.product_id, offer:position.value.id});
 }
 
+const noMore = computed(()=>{
+    return position.value.stocks<=props.cartItem.quantity;
+});
+
 const position = computed(()=>{
     let find = props.positions.find(arr=>{return arr.id == props.cartItem.offer;});
 
@@ -62,7 +66,8 @@ const position = computed(()=>{
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M5 11a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2z"></path></svg>
                 </div>
                 <span>{{ cartItem.quantity }}</span>
-                <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center bg-indigo-200 text-indigo-700 hover:bg-indigo-100" 
+                <div class="rounded-md w-9 h-9 flex justify-center items-center"
+                    :class="{'bg-gray-100 text-gray-500':noMore, 'bg-indigo-200 hover:bg-indigo-100 text-indigo-700 cursor-pointer':!noMore}"
                     @click="changeCart()" title="+1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M12 4a1 1 0 0 0-1 1v6H5a1 1 0 1 0 0 2h6v6a1 1 0 1 0 2 0v-6h6a1 1 0 1 0 0-2h-6V5a1 1 0 0 0-1-1"></path></svg>
                 </div>
