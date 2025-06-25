@@ -14,7 +14,6 @@ onMounted(() => {
         positions:usercart.value
     }).then(e=>{
         usercart.value = e.data;
-        getCartPositions();
     });
 });
 
