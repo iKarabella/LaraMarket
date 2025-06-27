@@ -17,7 +17,7 @@ const props = defineProps({
 const errorModal = ref(props.create_order_failed);
 
 onMounted(() => {
-    if (!usercart && !usercart.value && usercart.value.length)
+    if (usercart && usercart.value && usercart.value.length)
     {
         axios.post(route('catalog.usercart.check'), {
             positions:usercart.value
