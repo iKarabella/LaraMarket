@@ -19,12 +19,8 @@ const inCart = computed(() => {
     return find?find:{};
 });
 
-const inStock = computed(() => {
-    return props.position.offers[currentOffer.value].stocks.map(function (arr){return arr.quantity}).reduce((partialSum, a) => partialSum + a, 0);
-});
-
 const noMore = computed(() => {
-    return inCart.value.quantity>=inStock.value;
+    return inCart.value.quantity>=props.position.offers[currentOffer.value].available;
 });
 
 const moveImg = (next) => {
@@ -104,7 +100,7 @@ const notifyAboutAdmission = () => {
                 <div class="whitespace-nowrap">{{ offer.price}} ₽</div>
             </div>
         </div>
-        <div v-show="inStock" class="m-4 bg-white">
+        <div v-show="position.offers[currentOffer].available" class="m-4 bg-white">
             <PrimaryButton v-show="!inCart.quantity" title="Добавить в корзину" @click="changeCart()" class="w-full">
                 <i class="ri-shopping-basket-2-line mr-2"></i> Добавить
             </PrimaryButton>
@@ -124,7 +120,7 @@ const notifyAboutAdmission = () => {
                 </div>
             </div>
         </div>
-        <div v-show="!inStock" class="m-4 bg-white">
+        <div v-show="!position.offers[currentOffer].available" class="m-4 bg-white">
             <PrimaryButton title="Сообщить, как только товар появится в продаже" class="w-full" @click="notifyAboutAdmission">
                 <i class="ri-notification-2-line mr-2"></i> Сообщить
             </PrimaryButton>

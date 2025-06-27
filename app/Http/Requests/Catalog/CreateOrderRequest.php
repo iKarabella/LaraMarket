@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Catalog;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class CreateOrderRequest extends FormRequest
 {
@@ -13,10 +14,12 @@ class CreateOrderRequest extends FormRequest
     {
         if(!$this->positions)
         {
-            $saved_data = $this->session()->get('user.order_create', []);
-            $this->merge([
+            $saved_data = $this->session()->get('user.order_create', false);
+
+            if($saved_data) $this->merge([
                 'positions' => $saved_data['positions']
             ]);
+            else abort(204);
         }
     }
 

@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Catalog;
 
-use Illuminate\Contracts\Database\Query\Builder;
+use App\Models\Offer;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class StoreOrderRequest extends FormRequest
 {
@@ -16,13 +16,35 @@ class StoreOrderRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $saved_data = $this->session()->get('user.order_create', false);
+        $errors=[];
+        $total=0;
 
-        if(!$saved_data){}
-            
-        $this->merge([
-            'total_sum' => $saved_data['total_sum'],
-            'positions' => $saved_data['positions']
-        ]);
+        if (!$saved_data) $errors[]=['order'=>['Нет данных о заказе']];
+        else 
+        {    
+            $offers = Offer::whereIn('id', array_column($saved_data['positions'], 'offer'))->whereVisibility(true)->with(['product', 'media'])->get();
+    
+            foreach ($saved_data['positions'] as $key=>$pos) 
+            {
+                $offer = $offers->first(function($offer) use ($pos){return $offer->id==$pos['offer'] && $offer->product_id==$pos['position'];});
+    
+                if (!$offer) $errors["positions.{$key}.offer"]=['Предложение не найдено'];
+                else if ($offer->available < $pos['quantity']) $errors["positions.{$key}.quantity"]=['Количество больше доступного для заказа'];
+                else $total += $offer->price*$pos['quantity'];
+            }
+
+            if(!$errors && $total!=$saved_data['total_sum']) $errors['total']=['Сумма заказа отличается от расчетной'];
+            else $this->merge([
+                'total_sum' => $saved_data['total_sum'],
+                'positions' => $saved_data['positions'],
+                'user_id'   => $this->user()->id??null
+            ]);
+        }
+
+        if ($errors) {
+            $this->session()->put('create_order_failed', $errors);
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     /**
@@ -33,15 +55,17 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id' => 'numeric|nullable',
             'total_sum'=>'numeric|required',
             'positions'=>'array|nullable|min:1',
-            'positions.*.position'=>['numeric','required', Rule::exists('products', 'id')->where(function (Builder $query) {
-                return $query->whereVisibility(1);
-            })],
-            'positions.*.offer'=>['numeric','required', Rule::exists('offers', 'id')->where(function (Builder $query) {
-                return $query->whereVisibility(1);
-            })],
+            'positions.*.position'=>['numeric','required'],
+            'positions.*.offer'=>['numeric','required'],
             'positions.*.quantity'=>'integer|required|min:1',
+            'positions.*.product_title'=>'string|nullable',
+            'positions.*.offer_title'=>'string|nullable',
+            'positions.*.measure'=>'string|nullable',
+            'positions.*.price'=>'numeric|nullable',
+            'positions.*.total'=>'numeric|nullable',
             'customer'=>'array|required',
             'customer.name'=>'string|min:2|max:25',
             'customer.patronymic'=>'nullable|string|max:25',

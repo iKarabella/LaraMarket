@@ -22,13 +22,14 @@ Route::get('dashboard', function () {
 Route::get('catalog/{category?}', [CatalogController::class, 'index'])->name('catalog');
 Route::get('products/{code?}', [ProductController::class, 'index'])->name('catalog.product');
 Route::post('catalog/actions/notifyAboutAdmission', [CatalogController::class, 'notifyAboutAdmission'])->name('catalog.notifyAboutAdmission');
-Route::get('cart', function () {return Inertia::render('Catalog/UserCart');})->name('user.cart');
+Route::get('cart', [UserCartController::class, 'index'])->name('user.cart');
 Route::post('cart/get_positions', [UserCartController::class, 'getCartPositions'])->name('catalog.usercart.getPosition');
 Route::post('cart/check', [UserCartController::class, 'check'])->name('catalog.usercart.check');
 
-Route::get('order/new', [OrderController::class, 'create'])->name('order.create');
-Route::post('order/new', [OrderController::class, 'create']);
-Route::post('order/store', [OrderController::class, 'store'])->name('order.store');
+Route::get('orders/new', [OrderController::class, 'create'])->name('order.create');
+Route::post('orders/new', [OrderController::class, 'create']);
+Route::post('orders/store', [OrderController::class, 'store'])->name('order.store');
+Route::get('order/{uuid}', [OrderController::class, 'show'])->name('order.show');
 
 
 Route::middleware('permission:users_manage')->group(function () {

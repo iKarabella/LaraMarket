@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * Главное меню
  */
-
 class CatalogMenu 
 {
     /**

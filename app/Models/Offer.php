@@ -26,6 +26,8 @@ class Offer extends Model
         'price'=>'float:2'
     ];
 
+    protected $appends = ['available'];
+
     public function product()
     {
       return $this->hasOne(Product::class, 'id', 'product_id')->with(['measure_value', 'media']);
@@ -39,5 +41,15 @@ class Offer extends Model
     public function media()
     {
         return $this->hasMany(ProductMedia::class, 'offer_id', 'id')->orderBy('sort');
+    }
+
+    public function stocks_reserve(){
+        return $this->hasMany(StockReserve::class, 'offer_id', 'id');
+    }
+
+    public function getAvailableAttribute()
+    {
+        $count = $this->stocks->sum('quantity')-$this->stocks_reserve()->sum('quantity');
+        return $count > 0 ? $count : 0;
     }
 }

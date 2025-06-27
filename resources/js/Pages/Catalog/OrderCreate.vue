@@ -6,9 +6,25 @@ import TextInput from '@/Components/UI/TextInput.vue';
 import FullLayout from '@/Layouts/FullLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 import {PhoneFormat} from '@/Mixins/PhoneFormat.js';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
+import { Head, router } from '@inertiajs/vue3';
+import { usercart } from '@/Mixins/UserCart.js';
 
-const props = defineProps({order:{type:Object}});
+const props = defineProps({
+    order:{type:Object},
+    order_uuid:{type:String, default:null},
+    remove_from_cart:{type:Array, default:[]}
+});
+
+watch(props, async () => {
+    if (props.remove_from_cart && props.remove_from_cart.length)
+    {
+        usercart.value = usercart.value.filter((arr)=>{
+            return !props.remove_from_cart.includes(arr.offer);
+        });
+    }
+    if (props.order_uuid!=null) router.get(route('order.show', [props.order_uuid]));
+});
 
 const orderForm = useForm({
     delivery:{
@@ -16,6 +32,7 @@ const orderForm = useForm({
         city:props.order.delivery.city??'',
         street:props.order.delivery.street??'',
         house:props.order.delivery.house??'',
+        apartment:props.order.delivery.apartment??'',
         comment:props.order.delivery.comment??'',
     },
     customer:{
@@ -51,18 +68,18 @@ const createOrder = ()=>{
     if (checkFields.value) return false;
     orderForm.post(route('order.store'), {
         preserveScroll:true,
-        onSuccess:(e)=>console.log(e), 
-        onError:(e)=>console.log(e)
+        onError:(e)=>router.get(route('user.cart'))
     });
 };
 </script>
 <template>
-    <Head title="Marketzone" />
+    <Head title="Создание заказа" />
 
     <FullLayout>
         <div class="py-12">
             <div class="sm:px-6 lg:px-8">
-                <div class="md:flex md:min-w-[80rem] mx-auto w-fit">
+                {{ order_uuid }} {{ remove_from_cart }}
+                <div class="md:flex md:min-w-[80rem] mx-auto w-fit" v-if="order">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-2 md:w-9/12 md:mr-2">
                         <div class="p-2 border border-gray-200 rounded-md relative mb-2">
                             <span class="px-2 absolute -top-2 left-4 rounded bg-white text-sm text-gray-500 font-semibold italic">Адрес для доставки:</span>
