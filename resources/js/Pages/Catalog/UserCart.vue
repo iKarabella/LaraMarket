@@ -6,15 +6,25 @@ import { ref, onMounted, computed, watch } from 'vue';
 import axios from 'axios';
 import { usercart, addToCart, removeFromCart, selected_count, positions_count_string } from '@/Mixins/UserCart.js';
 import { useForm } from '@inertiajs/vue3';
+import Modal from '@/Components/Modals/MainModal.vue';
 
 const cartPositions = ref([]);
 
+const props = defineProps({
+    create_order_failed:{type:Array, default:null}
+});
+
+const errorModal = ref(props.create_order_failed);
+
 onMounted(() => {
-    axios.post(route('catalog.usercart.check'), {
-        positions:usercart.value
-    }).then(e=>{
-        usercart.value = e.data;
-    });
+    if (!usercart && !usercart.value && usercart.value.length)
+    {
+        axios.post(route('catalog.usercart.check'), {
+            positions:usercart.value
+        }).then(e=>{
+            usercart.value = e.data;
+        });
+    }
 });
 
 watch(usercart, async () => {
@@ -51,6 +61,9 @@ const orderCreate = ()=>{
     });
 };
 
+const modalClose = ()=>{
+    errorModal.value=null;
+};
 </script>
 <template>
     <Head title="Marketzone" />
@@ -67,7 +80,7 @@ const orderCreate = ()=>{
                                          @addToCart="addToCart"
                                          @removeFromCart="removeFromCart"
                         />
-                        <div v-if="cartPositions.length<1">
+                        <div v-if="usercart.length<1">
                             В корзине пока нет товаров :-(
                         </div>
                     </div>
@@ -96,5 +109,13 @@ const orderCreate = ()=>{
                 </div>
             </div>
         </div>
+        <Modal :show="errorModal" ref="modalWindow" @close="modalClose">
+            <div class="p-6">
+                <div>При создании заказа произошла ошибка.</div>
+                <div class="text-center mt-2">
+                    <PrimaryButton @click="modalClose">Закрыть</PrimaryButton>
+                </div>
+            </div>
+        </Modal>
     </FullLayout>
 </template>

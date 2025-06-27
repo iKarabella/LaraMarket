@@ -20,7 +20,7 @@ class UserCartResource extends JsonResource
             'price'  => $this->price,
             'art'=>$this->art,
             'media' => $this->media?ProductMediaResource::collection($this->media):[], //медиа
-            'stocks' => $this->stocks->max('quantity'),
+            'available' => $this->available,
             'product' => UserCartOfferProductResource::make($this->product)
         ];
     }

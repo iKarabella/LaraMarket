@@ -11,12 +11,12 @@ const props = defineProps({
 const emit = defineEmits(['addToCart', 'removeFromCart']);
 
 const changeCart = (remove=false) => {
-    if(!remove && position.value.stocks<=props.cartItem.quantity) return false;
+    if(!remove && position.value.available<=props.cartItem.quantity) return false;
     emit(remove?'removeFromCart':'addToCart', {position:position.value.product_id, offer:position.value.id});
 }
 
 const noMore = computed(()=>{
-    return position.value.stocks<=props.cartItem.quantity;
+    return position.value.available<=props.cartItem.quantity;
 });
 
 const position = computed(()=>{
@@ -34,7 +34,7 @@ const position = computed(()=>{
         product_offersign:find.product.offersign,
         price:find.price,
         measure:find.product.measure.value,
-        stocks:find.stocks
+        available:find.available
     };
 });
 </script>
@@ -44,14 +44,14 @@ const position = computed(()=>{
         <div v-if="position.media" class="max-w-[100px]">
             <label class="relative">
                 <img :src="position.media[0].preview" width="100"/>
-                <Checkbox v-model="cartItem.toOrder" class="absolute top-0 left-0" :checked="cartItem.toOrder==true"/>
+                <Checkbox v-model="cartItem.toOrder" name="checkToOrder" class="absolute top-0 left-0" :checked="cartItem.toOrder==true"/>
             </label>
         </div>
         <div class="w-full md:col-span-3">
             <Link :href="route('catalog.product', [position.product_code])">
                 {{ position.product_title }}
             </Link>
-            <div>{{ position.product_offersign }}: {{ position.title }}</div>
+            <div>{{ position.product_offersign }}: {{ position.title }} xx{{ position.available }}xx</div>
         </div>
         <div>
             {{ (position.price*cartItem.quantity).toFixed(2) }} ₽
