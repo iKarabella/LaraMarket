@@ -78,7 +78,6 @@ const createOrder = ()=>{
     <FullLayout>
         <div class="py-12">
             <div class="sm:px-6 lg:px-8">
-                {{ order_uuid }} {{ remove_from_cart }}
                 <div class="md:flex md:min-w-[80rem] mx-auto w-fit" v-if="order">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-2 md:w-9/12 md:mr-2">
                         <div class="p-2 border border-gray-200 rounded-md relative mb-2">
