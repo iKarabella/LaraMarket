@@ -46,7 +46,7 @@ const total_summ = computed(()=>{
         let offer = cartPositions.value.find(arr=>arr.id==p.offer);
         if (offer) total+=offer.price*p.quantity;
     });
-    return total.toFixed(2);
+    return total%100 != 0 ? (total/100).toFixed(2) : total/100;
 });
 
 const orderCreate = ()=>{

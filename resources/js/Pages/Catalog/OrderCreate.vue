@@ -45,6 +45,10 @@ const orderForm = useForm({
     code:props.order.code??''
 });
 
+const order_total_sum = computed(()=>{
+    return props.order.total_sum%100 != 0 ? (props.order.total_sum/100).toFixed(2) : props.order.total_sum/100;
+});
+
 const positions_count_string = computed(()=>{
     let ld = props.order.positions.length % 10;
                     
@@ -163,7 +167,7 @@ const createOrder = ()=>{
                             </div>                            
                         </div>
                         <div class="p-2 border border-gray-200 relative rounded-md">
-                            <span class="px-2 absolute -top-2 left-4 rounded bg-white text-sm text-gray-500 font-semibold italic">Заказчик:</span>
+                            <span class="px-2 absolute -top-2 left-4 rounded bg-white text-sm text-gray-500 font-semibold italic">Получатель:</span>
                             <div class="md:grid md:grid-cols-2 md:gap-2">
                                 <div class="mt-4">
                                     <InputLabel for="phone" value="Телефон" />
@@ -240,7 +244,7 @@ const createOrder = ()=>{
                             </div>
                             <div class="flex whitespace-nowrap justify-between">
                                 <div>Товары ({{ order.positions.length }})</div>
-                                <div>{{ order.total_sum }} ₽</div>
+                                <div>{{ order_total_sum }} ₽</div>
                             </div>
                             <InputError class="text-right" :message="orderForm.errors['order']"/>
                         </div>

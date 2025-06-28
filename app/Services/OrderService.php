@@ -83,8 +83,8 @@ class OrderService
             $uuid = DB::transaction(function() use ($validated) 
             {
                 $order = Order::create([
-                    'user_id'   => $validated['user_id'],
-                    'amount'    => intval($validated['total_sum']*100),
+                    'user_id'   => (int) $validated['user_id'],
+                    'amount'    => (int) $validated['total_sum'],
                     'body'      => $validated['positions'],
                     'customer'  => $validated['customer'],
                     'delivery'  => $validated['delivery']

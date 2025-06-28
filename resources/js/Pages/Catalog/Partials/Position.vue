@@ -2,6 +2,7 @@
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import { Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
+import OfferString from './OfferString.vue';
 
 const props = defineProps({
     position: {type:Object, default:{}}, 
@@ -89,16 +90,12 @@ const notifyAboutAdmission = () => {
             </p>
         </div>
         <div class="mx-4 mt-4">
-            <div v-for="(offer, index) in position.offers" 
+            <OfferString v-for="(offer, index) in position.offers" 
                 :key="offer.id" 
-                :class="{'border-gray-200':currentOffer==index, 'border-gray-200/10':currentOffer!=index}"
-                 class="flex items-center justify-between p-1 mb-2 hover:bg-gray-200 rounded border cursor-pointer"
-                 title="Выбрать"
+                :offer="offer"
+                :active="currentOffer==index"
                 @click="currentOffer=index" 
-            >
-                <div>{{ offer.title }}</div>
-                <div class="whitespace-nowrap">{{ offer.price}} ₽</div>
-            </div>
+            />
         </div>
         <div v-show="position.offers[currentOffer].available" class="m-4 bg-white">
             <PrimaryButton v-show="!inCart.quantity" title="Добавить в корзину" @click="changeCart()" class="w-full">

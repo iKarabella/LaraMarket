@@ -37,6 +37,11 @@ const position = computed(()=>{
         available:find.available
     };
 });
+
+const total_pos = computed(()=>{
+    let total = position.value.price*props.cartItem.quantity;
+    return total%100 != 0 ? (total/100).toFixed(2) : (total/100);
+});
 </script>
 
 <template>
@@ -51,10 +56,10 @@ const position = computed(()=>{
             <Link :href="route('catalog.product', [position.product_code])">
                 {{ position.product_title }}
             </Link>
-            <div>{{ position.product_offersign }}: {{ position.title }} xx{{ position.available }}xx</div>
+            <div>{{ position.product_offersign }}: {{ position.title }}</div>
         </div>
         <div>
-            {{ (position.price*cartItem.quantity).toFixed(2) }} ₽
+            {{ total_pos }} ₽
         </div>
         <div>
             <div class="flex justify-between items-center relative whitespace-nowrap font-semibold tracking-widest 

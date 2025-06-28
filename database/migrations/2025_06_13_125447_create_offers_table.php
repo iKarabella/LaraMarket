@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->string('title');
-            $table->float('baseprice', 8, 2)->nullable();
-            $table->float('price', 8, 2);
+            $table->integer('baseprice')->nullable();
+            $table->integer('price');
             $table->string('barcode')->nullable();
             $table->string('art')->nullable();
             $table->boolean('visibility')->default(true);
