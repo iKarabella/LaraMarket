@@ -202,8 +202,8 @@ const storeProduct = ()=>{
                             <span class="mr-2">{{index+1}}</span>
                             {{ offer.title }}
                         </div>
-                        <div>{{ offer.price }}₽</div>
-                        <div>{{ offer.baseprice }}₽</div>
+                        <div>{{ (offer.price/100).toFixed(2) }}₽</div>
+                        <div>{{ (offer.baseprice/100).toFixed(2) }}₽</div>
                         <div>{{ offer.art }}</div>
                         <div class="text-center">
                             <i :class="{'ri-eye-line':offer.visibility, 'ri-eye-off-line':!offer.visibility}"></i>

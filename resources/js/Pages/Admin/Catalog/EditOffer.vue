@@ -19,8 +19,8 @@ const tradeOfferForm = useForm({
     id:props.offer.id??null,
     product_id:props.offer.product_id??null,
     title:props.offer.title??'',
-    baseprice:props.offer.baseprice??'',
-    price:props.offer.price??'',
+    baseprice:((props.offer.baseprice??0)/100).toFixed(2),
+    price:((props.offer.price??0)/100).toFixed(2),
     barcode:props.offer.barcode??'',
     art:props.offer.art??'',
     visibility:props.offer.visibility??true,
@@ -32,7 +32,13 @@ const tradeOfferForm = useForm({
     media:props.offer.media??[],
 });
 
+const toFloat = (val)=>{
+    return parseFloat(val).toFixed(2);
+};
+
 const saveOffer = () => {
+    tradeOfferForm.price = parseInt(tradeOfferForm.price*100);
+    tradeOfferForm.baseprice = parseInt(tradeOfferForm.baseprice*100);
     tradeOfferForm.post(route('admin.products.offers.store'), {
         preserveScroll:true,
         onSuccess:(e)=>console.log(e), 
@@ -110,6 +116,7 @@ const saveOffer = () => {
                         required
                         v-model="tradeOfferForm.baseprice"
                         autocomplete="off"
+                        v-on:keyup="tradeOfferForm.baseprice=toFloat(tradeOfferForm.baseprice)"
                     />
                     <InputError class="ml-2" :message="tradeOfferForm.errors.baseprice" />
                 </div>
@@ -123,6 +130,7 @@ const saveOffer = () => {
                         class="w-full mt-1 block"
                         required
                         v-model="tradeOfferForm.price"
+                        v-on:keyup="tradeOfferForm.price=toFloat(tradeOfferForm.price)"
                         autocomplete="off"
                     />
                     <InputError class="ml-2" :message="tradeOfferForm.errors.price" />
