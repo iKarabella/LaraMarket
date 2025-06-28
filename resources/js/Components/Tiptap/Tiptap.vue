@@ -79,7 +79,7 @@
         </div>
     </div>
 </template>
-<style>
+<style scoped>
 .ProseMirror{
   padding: 0 10px;
   outline: none;
