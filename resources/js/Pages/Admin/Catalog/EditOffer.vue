@@ -41,8 +41,8 @@ const saveOffer = () => {
     tradeOfferForm.baseprice = parseInt(tradeOfferForm.baseprice*100);
     tradeOfferForm.post(route('admin.products.offers.store'), {
         preserveScroll:true,
-        onSuccess:(e)=>console.log(e), 
-        onError:(e)=>console.log(e)
+        // onSuccess:(e)=>console.log(e), 
+        // onError:(e)=>console.log(e)
     });
 };
 </script>

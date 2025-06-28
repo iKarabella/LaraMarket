@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Order;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Catalog\CreateOrderRequest;
 use App\Http\Requests\Catalog\StoreOrderRequest;
+use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class OrderController extends Controller
 {
     public function create(CreateOrderRequest $request, OrderService $service):Response
     {
-        return Inertia::render('Catalog/OrderCreate', [
+        return Inertia::render('Order/OrderCreate', [
             'order'  => $service->makeOrder($request),
         ]);
     }
@@ -26,7 +27,7 @@ class OrderController extends Controller
         $order = $request->session()->get('user.order_create', []);
         $request->session()->forget('user.order_create');
         
-        return Inertia::render('Catalog/OrderCreate', [
+        return Inertia::render('Order/OrderCreate', [
             'order' => $order,
             'order_uuid'  => $uuid,
             'remove_from_cart' => array_column($order['positions'], 'offer')
@@ -39,6 +40,8 @@ class OrderController extends Controller
 
         if ($order->user_id && ($request->user()==null || $order->user_id != $request->user()->id)) abort(404);
 
-        dd('show', $order->toArray());
+        return Inertia::render('Order/Order', [
+            'order' => OrderResource::make($order)->resolve()
+        ]);
     }
 }
