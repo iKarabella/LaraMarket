@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Entity;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +13,33 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        if(!Entity::whereId(1)->exists())
+        {
+            $entity = Entity::create(['name' => 'Единицы измерения', 'description' => 'Единицы измерения']);
+        
+            DB::table('entity_values')->insert([
+                ['id'=>1, 'entity' => $entity->id, 'value' => 'г.', 'description'=>'Граммы', 'available'=>true],
+                ['id'=>2, 'entity' => $entity->id, 'value' => 'кг.', 'description'=>'Килограммы', 'available'=>true],
+                ['id'=>3, 'entity' => $entity->id, 'value' => 'шт.', 'description'=>'Количество', 'available'=>true],
+                ['id'=>4, 'entity' => $entity->id, 'value' => 'л.', 'description'=>'Литр', 'available'=>true],
+            ]);
+        }
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if(!Entity::whereId(2)->exists())
+        {
+            $entity = Entity::create(['name' => 'Статус заказа', 'description' => 'Статусы заказа']);
+        
+            DB::table('entity_values')->insert([
+                ['id'=>5, 'entity' => $entity->id, 'value' => 'Создан', 'description'=>'Создан', 'available'=>true],
+                ['id'=>6, 'entity' => $entity->id, 'value' => 'Принят', 'description'=>'Принят', 'available'=>true],
+                ['id'=>7, 'entity' => $entity->id, 'value' => 'Ожидает оплаты', 'description'=>'Ожидает оплаты', 'available'=>true],
+                ['id'=>8, 'entity' => $entity->id, 'value' => 'Оплачен', 'description'=>'Оплачен', 'available'=>true],
+                ['id'=>9, 'entity' => $entity->id, 'value' => 'В сборке', 'description'=>'В сборке', 'available'=>true],
+                ['id'=>10, 'entity' => $entity->id, 'value' => 'Отправлен', 'description'=>'Отправлен', 'available'=>true],
+                ['id'=>11, 'entity' => $entity->id, 'value' => 'Готов к выдаче', 'description'=>'Готов к выдаче', 'available'=>true],
+                ['id'=>12, 'entity' => $entity->id, 'value' => 'Получен', 'description'=>'Получен', 'available'=>true],
+                ['id'=>13, 'entity' => $entity->id, 'value' => 'Отменен', 'description'=>'Отменен', 'available'=>true],
+            ]);
+        }
     }
 }
