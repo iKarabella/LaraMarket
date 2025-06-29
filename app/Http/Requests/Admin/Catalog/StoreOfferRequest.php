@@ -24,6 +24,7 @@ class StoreOfferRequest extends FormRequest
             'art'=>'string|nullable',
             'visibility'=>'boolean',
             'to_caschier'=>'boolean',
+            'coeff'=>'integer|required',
             'weight'=>'integer|nullable',
             'length'=>'integer|nullable',
             'height'=>'integer|nullable',

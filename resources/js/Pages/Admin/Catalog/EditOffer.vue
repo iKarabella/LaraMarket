@@ -25,6 +25,7 @@ const tradeOfferForm = useForm({
     art:props.offer.art??'',
     visibility:props.offer.visibility??true,
     to_caschier:props.offer.to_caschier??false,
+    coeff:props.offer.coeff??0,
     weight:props.offer.weight??null,
     length:props.offer.length??null,
     height:props.offer.height??null,
@@ -34,6 +35,10 @@ const tradeOfferForm = useForm({
 
 const toFloat = (val)=>{
     return parseFloat(val).toFixed(2);
+};
+const toInt = (val)=>{
+    if (!val) return 0;
+    return parseInt(val);
 };
 
 const saveOffer = () => {
@@ -101,6 +106,20 @@ const saveOffer = () => {
                         <Checkbox name="sendToCaschier" id="sendToCaschier" v-model="tradeOfferForm.to_caschier" :checked="tradeOfferForm.to_caschier" title="Передавать информацию о позиции в кассовую систему"/>
                         <InputLabel class="ml-2" for="sendToCaschier" value=" - Передавать в кассу"/>
                         <InputError class="ml-2" :message="tradeOfferForm.errors.sendToCaschier" />
+                    </div>
+                    <div class="mt-2 pt-6 md:ml-2 flex whitespace-nowrap" title="Коэффициент отпускной цены">
+                        <InputLabel for="coeff" value="Коэф.%"/>
+                        <TextInput
+                            type="text"
+                            id="coeff"
+                            name="coeff"
+                            class="w-full mt-1 block"
+                            required
+                            v-model="tradeOfferForm.coeff"
+                            v-on:keyup="tradeOfferForm.coeff=toInt(tradeOfferForm.coeff)"
+                            autocomplete="off"
+                        />
+                        <InputError class="ml-2" :message="tradeOfferForm.errors.coeff" />
                     </div>
                 </div>
             </div>

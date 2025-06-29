@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('barcode')->nullable();
             $table->string('art')->nullable();
             $table->boolean('visibility')->default(true);
+            $table->smallInteger('coeff')->default(0);
             $table->integer('weight')->nullable();
             $table->integer('length')->nullable();
             $table->integer('width')->nullable();

@@ -22,6 +22,7 @@ class ProductOfferResource extends JsonResource
             'title' => $this->title??'',
             'baseprice' => $this->baseprice?number_format($this->baseprice, 2, '.', ''):0,
             'price' => $this->price?number_format($this->price, 2, '.', ''):'',
+            'coeff' => $this->coeff??0,
             'measure_val' => $this->measure_val
         ];
     }

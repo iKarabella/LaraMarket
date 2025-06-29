@@ -25,6 +25,7 @@ class OfferResource extends JsonResource
             'barcode'=>$this->barcode??'',
             'art'=>$this->art??'',
             'visibility' => $this->visibility??true, // Видимость
+            'coeff'=> $this->coeff??0,
             'weight' => $this->weight??null, 
             'length' => $this->length??null, //категории
             'height'    => $this->height??null,

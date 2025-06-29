@@ -81,6 +81,7 @@ class WarehouseController extends Controller
                         'offers.title',
                         'offers.baseprice',
                         'offers.price',
+                        'offers.coeff',
                         'entity_values.value as measure_val'
                     ])
                     ->leftJoin('products', 'products.id', '=', 'offers.product_id')

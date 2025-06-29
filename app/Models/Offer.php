@@ -14,6 +14,7 @@ class Offer extends Model
         'barcode',
         'art',
         'visibility',
+        'coeff',
         'weight',
         'length',
         'width',

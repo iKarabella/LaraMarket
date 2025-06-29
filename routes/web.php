@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\Catalog\CatalogController as AdminCatalogController;
 use App\Http\Controllers\Admin\Catalog\ProductMediaController as AdminProductMediaController;
+use App\Http\Controllers\Admin\Orders\OrderStatusController;
+use App\Http\Controllers\Admin\Orders\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\RolesAndPermissions\RolesAndPermissionsController;
 use App\Http\Controllers\Admin\UsersManage\UsersManageController;
 use App\Http\Controllers\Admin\Warehouses\WarehouseController;
@@ -10,10 +12,13 @@ use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Catalog\ProductController;
 use App\Http\Controllers\Catalog\UserCartController;
 use App\Http\Controllers\Home\HomeController;
+use App\Http\Controllers\User\PublicPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/@{nick}', [PublicPageController::class, 'page'])->name('user.page');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
@@ -42,6 +47,17 @@ Route::middleware('permission:roles_and_permissions')->group(function () {
     Route::get('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'index'])->name('admin.roles_and_permissions');
     Route::patch('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'store'])->name('admin.roles_and_permissions.update');
     Route::delete('admin/roles_and_permissions', [RolesAndPermissionsController::class, 'delete'])->name('admin.roles_and_permissions.delete');
+});
+
+Route::middleware('permission:orders_manage')->group(function () {
+    Route::get('admin/orders', [AdminOrderController::class, 'manage'])->name('admin.orders.manage');
+    Route::post('admin/orders', [AdminOrderController::class, 'manage']);
+    Route::post('admin/orders/set_status/waitingPayment', [OrderStatusController::class, 'waitingPayment'])->name('admin.order.waitingPayment');
+    Route::post('admin/orders/set_status/cancel', [OrderStatusController::class, 'cancel'])->name('admin.order.cancel');
+    Route::post('admin/orders/set_status/orderToAssembly', [OrderStatusController::class, 'orderToAssembly'])->name('admin.order.toAssembly');
+    Route::post('admin/order/{uuid}/editPosition', [AdminOrderController::class, 'editPosition'])->name('admin.order.editPosition');
+    Route::get('admin/order/{uuid}', [AdminOrderController::class, 'edit'])->name('admin.order.manage');
+    Route::post('admin/order/{uuid}/add_сomment', [AdminOrderController::class, 'addComment'])->name('admin.order.addComment');
 });
 
 Route::middleware('permission:catalog_manage')->group(function () {

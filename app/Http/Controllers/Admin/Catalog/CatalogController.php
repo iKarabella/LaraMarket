@@ -112,6 +112,7 @@ class CatalogController extends Controller
             'title'=>'',
             'baseprice'=>'0.00',
             'price'=>'0.00',
+            'coeff'=>'0',
             'barcode'=>'',
             'art'=>'',
             'media'=>[],

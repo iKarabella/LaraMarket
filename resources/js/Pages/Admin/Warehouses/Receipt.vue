@@ -31,6 +31,8 @@ const addItemForm = ref({
     title:'',
     offer_id:null,
     price:null,
+    coeff:0,
+    oldPrice:null,
     quantity:'',
     measure_val:'',
 });
@@ -40,10 +42,12 @@ const receiptForm = useForm({
     items:[]
 });
 
-const addItem = (id, title, measure_val) => {
+const addItem = (id, title, measure_val, coeff, price) => {
     addItemForm.value.offer_id = id;
     addItemForm.value.title = title;
     addItemForm.value.measure_val = measure_val;
+    addItemForm.value.coeff = coeff;
+    addItemForm.value.oldPrice = (price/100).toFixed(2);
     searchItemStr.value='';
     listItems.value=[];
     addItemFormModal.value = true;
@@ -53,8 +57,16 @@ const addItem = (id, title, measure_val) => {
 };
 
 const addItemToReceipt = () => {
-    receiptForm.items.push(Object.assign({}, addItemForm.value));
+    let item = Object.assign({}, addItemForm.value);
+    let price = parseFloat(item.price);
+
+    if (parseInt(item.coeff)>0) item.newPrice = (price+(price/parseInt(item.coeff))).toFixed(2);
+    else item.newPrice = price;
+    
+    receiptForm.items.push(item);
+
     modalClose();
+
     nextTick(() => {
         searchInput.value.focus();
     });
@@ -100,6 +112,11 @@ const modalClose = ()=>{
     addItemForm.value.quantity=null;
     addItemForm.value.measure_val = null;
     addItemForm.value.price = null;
+    addItemForm.value.coeff = 0;
+};
+
+const toFloat = (val)=>{
+    return parseFloat(val).toFixed(2);
 };
 </script>
 
@@ -137,7 +154,7 @@ const modalClose = ()=>{
                             <li class="cursor-pointer px-4 py-2 m-1 hover:bg-gray-200"
                                 v-for="item in listItems" 
                                 title="'Добавить"
-                                @click="addItem(item.id, `${item.product_title}, ${item.title}`, item.measure_val)">
+                                @click="addItem(item.id, `${item.product_title}, ${item.title}`, item.measure_val, item.coeff, item.price)">
                                 {{ item.product_title }}, {{ item.title }}
                             </li>
                         </ul>
@@ -146,12 +163,25 @@ const modalClose = ()=>{
             </div>
         </div>
         <div class="mt-2">
-            <div v-for="(item, index) in receiptForm.items" :key="item.id" class="grid grid-cols-9 gap-2 m-1 hover:bg-gray-100 rounded">
+            <div class="grid grid-cols-10 gap-2 m-1 hover:bg-gray-100 rounded">
+                <div>#</div>
+                <div class="col-span-4">Название</div>
+                <div>Цена (зак.)</div>
+                <div>Количество</div>
+                <div>Стоимость</div>
+                <div title="Рекомендуемая розничная цена (текущая розничная цена): Цена (зак) * Коэфф.">Цена (рек.)</div>
+                <div></div>
+            </div>
+            <div v-for="(item, index) in receiptForm.items" :key="item.id" class="grid grid-cols-10 gap-2 m-1 hover:bg-gray-100 rounded">
                 <div>{{ index+1 }}</div>
                 <div class="col-span-4">{{ item.title }}</div>
                 <div>{{ item.price }}₽</div>
                 <div>{{ item.quantity }} {{ item.measure_val }}</div>
                 <div>{{ (item.price*item.quantity).toFixed(2) }}₽</div>
+                <div title="Рекомендуемая розничная цена (текущая розничная цена): Цена (зак) * Коэфф.">
+                    {{item.newPrice}}
+                    ({{ item.oldPrice }})
+                </div>
                 <div>
                     <div class="w-fit rounded-full hover:bg-red-700 hover:text-white text-red-800 cursor-pointer py-1" 
                         title="Убрать" 
@@ -180,6 +210,7 @@ const modalClose = ()=>{
                             class="w-full mt-1 block"
                             required
                             v-model="addItemForm.price"
+                            @change="addItemForm.price=toFloat(addItemForm.price)"
                             autocomplete="off"
                         />
                     </div>

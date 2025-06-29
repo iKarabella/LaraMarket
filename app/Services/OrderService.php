@@ -2,15 +2,19 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Admin\Orders\OrderEditPositionRequest;
 use App\Http\Requests\Catalog\CreateOrderRequest;
 use App\Http\Requests\Catalog\StoreOrderRequest;
+use App\Models\EntityValue;
 use App\Models\Offer;
 use App\Models\Order;
+use App\Models\OrderComment;
 use App\Models\StockReserve;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -102,5 +106,87 @@ class OrderService
         catch(Exception $e){}
 
         return $uuid;
+    }
+
+    /**
+     * Установить статус
+     *
+     * @param $order Order|int Модель или ID заказа 
+     * @param $statusId integer ID entity_value Entyty 2
+     */
+    public static function setStatus(Order|int $order, int $statusId, $title=null, $comment=null):array
+    {
+        if (is_int($order)) $order = Order::whereId($order)->with(['status_info'])->firstOrFail();
+
+        $return = ['result'=>true, 'message'=>''];
+        $isSaved=false;
+        $title='';
+        
+        if ($order->status_info) $old = $order->status_info->value;
+        else $old = '';
+
+        $new = EntityValue::whereId($statusId)->firstOrFail(['value']);
+
+        if($order->status!=$statusId)
+        {
+            $order->status=$statusId;
+            $isSaved = $order->save();
+        }
+
+        if($isSaved) 
+        {
+            if(empty($title)) 
+            {
+                $user = Auth::user();
+                $title = 'Пользователь <a href="'.route('user.page', [$user->nickname]).'" target="_blank" title="'.implode(' ', [$user->surname, $user->name, $user->patronymic]).'">'.$user->nickname.'</a> изменил статус заказа: ';
+            }
+            
+            OrderComment::create([
+                'order_id' => $order->id,
+                'auto' => true,
+                'title' => $title.'['.$old.'] -> ['.$new->value.']',
+                'comment' => $comment
+            ]);
+        }
+        else $return=['result'=>false, 'message'=>'Не удалось сменить статус заказа'];
+
+        return $return;
+    }
+
+    public function orderEditPosition(Order $order, OrderEditPositionRequest $request)
+    {
+        $validated = $request->validated();
+        
+        $find = array_find_key($order->body, function($arr) use ($validated){
+            return $arr['offer']==$validated['offer_id'];
+        });
+
+        $body = $order->body;
+
+        if (count($body)<2 && $validated['quantity']<1) throw ValidationException::withMessages([
+            'quantity' => ["Нельзя удалить единственную позицию заказа"],
+        ]);
+
+        if($find!==null) 
+        {
+            if($validated['quantity']>0) 
+            {
+                $offer = Offer::whereId($validated['offer_id'])->whereProductId($validated['product_id'])->with('stocks')->firstOrFail();
+                $sum = $offer->stocks->pluck('quantity')->sum();
+
+                if ($sum<$validated['quantity']) throw ValidationException::withMessages([
+                    'quantity' => ["Количество позиций на складах ($sum) меньше указанного."],
+                ]);
+                
+                $body[$find]['quantity']=(int)$validated['quantity'];
+                $body[$find]['total']=$body[$find]['quantity']*$body[$find]['price'];
+            }
+            else unset($body[$find]);
+
+            $order->body = $body;
+            $order->amount = array_sum(array_column($order->body, 'total'));
+            
+            $order->save();
+        }
     }
 }

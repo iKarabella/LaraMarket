@@ -46,4 +46,9 @@ class Order extends Model
     {
         return $this->hasMany(StockReserve::class, 'order_id', 'id');
     }
+    
+    public function comments()
+    {
+      return $this->hasMany(OrderComment::class, 'order_id', 'id')->orderBy('id');
+    }
 }

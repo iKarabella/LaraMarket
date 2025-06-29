@@ -12,7 +12,7 @@ trait MarketControllerTrait
         ],
         [
             'name'=>'Заказы',
-            'link'=>'admin.catalog.manage',
+            'link'=>'admin.orders.manage',
             'key'=>'orders'
         ],
         [
