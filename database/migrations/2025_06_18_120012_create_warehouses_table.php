@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('address');
             $table->string('description')->nullable();
+            $table->boolean('self_pickup')->default(false);
             $table->timestamps();
         });
     }

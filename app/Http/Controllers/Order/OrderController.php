@@ -8,6 +8,7 @@ use App\Http\Requests\Catalog\StoreOrderRequest;
 use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
+use App\Services\Shipping\ShippingService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,8 +17,18 @@ class OrderController extends Controller
 {
     public function create(CreateOrderRequest $request, OrderService $service):Response
     {
+        $shippings = array_map(function($arr){
+            return [
+                'name'=>$arr['name'],
+                'title'=>$arr['title'],
+                'key'=>$arr['key'],
+                'required_fields'=>$arr['service']::required_fields(),
+            ];
+        }, ShippingService::getPublicServices());
+
         return Inertia::render('Order/OrderCreate', [
             'order'  => $service->makeOrder($request),
+            'shippings' => array_values($shippings)
         ]);
     }
 

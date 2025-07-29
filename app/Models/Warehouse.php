@@ -13,5 +13,6 @@ class Warehouse extends Model
         'address', //адрес
         'caschier', //кассовая система
         'description', //описание
+        'self_pickup', //возможность самовывоза
     ];
 }

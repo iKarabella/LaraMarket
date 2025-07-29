@@ -6,14 +6,25 @@ import TextInput from '@/Components/UI/TextInput.vue';
 import FullLayout from '@/Layouts/FullLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 import {PhoneFormat} from '@/Mixins/PhoneFormat.js';
-import { computed, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { usercart } from '@/Mixins/UserCart.js';
 
 const props = defineProps({
     order:{type:Object},
+    shippings:{type:Array, default:[]},
     order_uuid:{type:String, default:null},
     remove_from_cart:{type:Array, default:[]}
+});
+
+const selectedShipping = ref({
+    name: null,
+    title: null,
+    key: null,
+    required_fields:{
+        customer:{},
+        delivery:{}
+    }
 });
 
 watch(props, async () => {
@@ -27,22 +38,11 @@ watch(props, async () => {
 });
 
 const orderForm = useForm({
-    delivery:{
-        region:props.order.delivery.region??'',
-        city:props.order.delivery.city??'',
-        street:props.order.delivery.street??'',
-        house:props.order.delivery.house??'',
-        apartment:props.order.delivery.apartment??'',
-        comment:props.order.delivery.comment??'',
-    },
-    customer:{
-        name:props.order.customer.name??'',
-        patronymic:props.order.customer.patronymic??'',
-        surname:props.order.customer.surname??'',
-        phone:PhoneFormat(props.order.customer.phone)??'',
-    },
-    comment:props.order.comment??'',
-    code:props.order.code??''
+    delivery:{},
+    customer:{},
+    comment:'',
+    code:'',
+    selected_shipping:null,
 });
 
 const order_total_sum = computed(()=>{
@@ -57,24 +57,46 @@ const positions_count_string = computed(()=>{
     else return props.order.positions.length+' товар';
 });
 
-const checkFields = computed(()=>{
-    return (
-        orderForm.customer.name.length < 2 ||
-        orderForm.customer.surname.length < 2 ||
-        orderForm.customer.phone.length < 10 ||
-        orderForm.delivery.city.length < 2 ||
-        orderForm.delivery.street.length < 2 ||
-        orderForm.delivery.house.length < 2
-    );
+const checkFields = computed(() => {
+    if (!selectedShipping.value.key || !selectedShipping.value.required_fields.delivery || !selectedShipping.value.required_fields.delivery) return true;
+
+    for (var key in selectedShipping.value.required_fields.delivery) {
+        if (selectedShipping.value.required_fields.delivery[key].required && !orderForm.delivery[key]) return true;
+    }
+    for (var key in selectedShipping.value.required_fields.customer) {
+        if (selectedShipping.value.required_fields.customer[key].required && !orderForm.customer[key]) return true;
+    }
+    return false;
 });
 
 const createOrder = ()=>{
     if (checkFields.value) return false;
     orderForm.post(route('order.store'), {
         preserveScroll:true,
-        onError:(e)=>router.get(route('user.cart'))
+        onSuccess:(e)=>console.log(e), 
+        onError:(e)=>console.log(e)
     });
 };
+
+const selectDeliveryType = (key)=>{
+    let find = props.shippings.find(arr=>arr.key==key);
+    if (!find) return false;
+
+    selectedShipping.value = find;
+    orderForm.reset();
+    orderForm.selected_shipping=find.key;
+    
+    if(find.required_fields){
+        if (find.required_fields.delivery) for (var key in find.required_fields.delivery) orderForm.delivery[key]=find.required_fields.delivery[key].default;
+        if (find.required_fields.customer) for (var key in find.required_fields.customer) orderForm.customer[key]=find.required_fields.customer[key].default;
+    }
+};
+
+onMounted(() => {
+    if(orderForm.selected_shipping===null && props.shippings.length>0){
+        selectDeliveryType(props.shippings[0].key);
+    }
+});
 </script>
 <template>
     <Head title="Создание заказа" />
@@ -85,6 +107,64 @@ const createOrder = ()=>{
                 <div class="md:flex md:min-w-[80rem] mx-auto w-fit" v-if="order">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-2 md:w-9/12 md:mr-2">
                         <div class="p-2 border border-gray-200 rounded-md relative mb-2">
+                            <div class="flex">
+                                <div v-for="(shipping, index) in shippings" :key="index" @click="selectDeliveryType(shipping.key)">
+                                    {{ shipping.name }}
+                                </div>
+                            </div>
+                            <InputError class="ml-2" :message="orderForm.errors.selected_shipping" />
+                        </div>
+                        <div class="p-2 border border-gray-200 rounded-md relative mb-2">
+                            <span class="px-2 absolute -top-2 left-4 rounded bg-white text-sm text-gray-500 font-semibold italic">{{selectedShipping.name}}</span>
+                            <div class="md:grid md:grid-cols-2 md:gap-2">
+                                <div v-for="(field,key) in selectedShipping.required_fields.delivery" :key="key">
+                                    <div v-if="field.type=='enum'">
+                                        <span>{{ field.label }}</span>
+                                        <div v-for="(fval, fkey) in field.values">
+                                            <label>
+                                                <input type="radio" :name="'delivery.'+key" :value="fkey" v-model="orderForm.delivery[key]"/>
+                                                {{ fval.title }}
+                                                {{ fval.description }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div v-if="field.type=='string'">
+                                        <InputLabel :for="'delivery.'+key" :value="field.label" />
+                                        <TextInput
+                                            type="text"
+                                            class="w-full"
+                                            :id="'delivery.'+key"
+                                            :name="'delivery.'+key"
+                                            v-model="orderForm.delivery[key]"
+                                            autocomplete="off"
+                                        />
+                                        <InputError class="ml-2" :message="orderForm.errors[`delivery.${key}`]" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-2 border border-gray-200 rounded-md relative mb-2">
+                            <span class="px-2 absolute -top-2 left-4 rounded bg-white text-sm text-gray-500 font-semibold italic">Получатель:</span>
+                            <div class="md:grid md:grid-cols-2 md:gap-2">
+                                <div v-for="(field,key) in selectedShipping.required_fields.customer" :key="key">
+                                    <div v-if="field.type=='string'">
+                                        <InputLabel :for="'customer.'+key" :value="field.label" />
+                                        <TextInput
+                                            type="text"
+                                            class="w-full"
+                                            :id="'customer.'+key"
+                                            :name="'customer.'+key"
+                                            v-model="orderForm.customer[key]"
+                                            autocomplete="off"
+                                        />
+                                        <InputError class="ml-2" :message="orderForm.errors[`customer.${key}`]" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--div class="p-2 border border-gray-200 rounded-md relative mb-2">
                             <span class="px-2 absolute -top-2 left-4 rounded bg-white text-sm text-gray-500 font-semibold italic">Адрес для доставки:</span>
                             <div class="md:grid md:grid-cols-2 md:gap-2">
                                 <div class="mt-4">
@@ -165,8 +245,8 @@ const createOrder = ()=>{
                                     <InputError class="ml-2" :message="orderForm.errors['delivery.apartment']" />
                                 </div>
                             </div>                            
-                        </div>
-                        <div class="p-2 border border-gray-200 relative rounded-md">
+                        </div-->
+                        <!--div class="p-2 border border-gray-200 relative rounded-md">
                             <span class="px-2 absolute -top-2 left-4 rounded bg-white text-sm text-gray-500 font-semibold italic">Получатель:</span>
                             <div class="md:grid md:grid-cols-2 md:gap-2">
                                 <div class="mt-4">
@@ -230,7 +310,7 @@ const createOrder = ()=>{
                                     <InputError class="ml-2" :message="orderForm.errors['customer.patronymic']" />
                                 </div>
                             </div>
-                        </div>
+                        </div-->
                     </div>
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg md:w-3/12 h-fit">
                         <div class="text-center m-4">

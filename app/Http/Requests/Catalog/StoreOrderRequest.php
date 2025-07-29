@@ -3,11 +3,15 @@
 namespace App\Http\Requests\Catalog;
 
 use App\Models\Offer;
+use App\Services\Shipping\ShippingService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class StoreOrderRequest extends FormRequest
 {
+    private $additionalRules = [];
+
     /**
      * Подготовка к проверке данных
      * состав и сумму заказа берем сохраненную из сессии,
@@ -18,10 +22,21 @@ class StoreOrderRequest extends FormRequest
         $saved_data = $this->session()->get('user.order_create', false);
         $errors=[];
         $total=0;
-
+        
         if (!$saved_data) $errors[]=['order'=>['Нет данных о заказе']];
         else 
         {    
+            if ($this->selected_shipping) 
+            {
+                $shipping = ShippingService::get($this->selected_shipping);
+                
+                if ($shipping) foreach($shipping['service']::required_fields() as $key=>$block){
+                    foreach($block as $kField=>$field){
+                        if (isset($field['rules']) && !empty($field['rules'])) $this->additionalRules["{$key}.{$kField}"]=$field['rules'];
+                    }
+                }
+            }
+
             $offers = Offer::whereIn('id', array_column($saved_data['positions'], 'offer'))->whereVisibility(true)->with(['product', 'media'])->get();
     
             foreach ($saved_data['positions'] as $key=>$pos) 
@@ -54,7 +69,7 @@ class StoreOrderRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'user_id' => 'numeric|nullable',
             'total_sum'=>'integer|required',
             'positions'=>'array|nullable|min:1',
@@ -66,21 +81,25 @@ class StoreOrderRequest extends FormRequest
             'positions.*.measure'=>'string|nullable',
             'positions.*.price'=>'integer|nullable',
             'positions.*.total'=>'integer|nullable',
-            'customer'=>'array|required',
-            'customer.name'=>'string|min:2|max:25',
-            'customer.patronymic'=>'nullable|string|max:25',
-            'customer.surname'=>'required|string|min:2|max:25',
-            'customer.phone'=>'required|string',
-            'delivery'=>'array|required',
-            'delivery.region'=>'nullable|string|min:2|max:35',
-            'delivery.city'=>'required|string|min:2|max:35',
-            'delivery.street'=>'required|string|min:2|max:35',
-            'delivery.house'=>'required|string|min:2|max:35',
-            'delivery.apartment'=>'nullable|string|min:2|max:35',
-            'delivery.comment'=>'nullable|string|max:256',
             'code'=>'nullable|string|max:35',
-            'comment'=>'nullable|string|max:256'
+            'comment'=>'nullable|string|max:256',
+            'selected_shipping'=>[Rule::in(ShippingService::keys())],
         ];
+
+        // 'customer'=>'array|required',
+        // 'customer.name'=>'string|min:2|max:25',
+        // 'customer.patronymic'=>'nullable|string|max:25',
+        // 'customer.surname'=>'required|string|min:2|max:25',
+        // 'customer.phone'=>'required|string',
+        // 'delivery'=>'array|required',
+        // 'delivery.region'=>'nullable|string|min:2|max:35',
+        // 'delivery.city'=>'required|string|min:2|max:35',
+        // 'delivery.street'=>'required|string|min:2|max:35',
+        // 'delivery.house'=>'required|string|min:2|max:35',
+        // 'delivery.apartment'=>'nullable|string|min:2|max:35',
+        // 'delivery.comment'=>'nullable|string|max:256',
+
+        return [...$rules, ...$this->additionalRules];
     }
 
     public function attributes(): array
