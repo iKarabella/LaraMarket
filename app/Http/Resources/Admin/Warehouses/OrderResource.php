@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Admin\Orders;
+namespace App\Http\Resources\Admin\Warehouses;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,17 +22,17 @@ class OrderResource extends JsonResource
             'status'  => $this->status??null,
             'amount' => $this->amount??null,
             'discount' => $this->discount??null,
-            'body' => $this->body??null,
+            'body' => $this->body??[],
             'customer' => $this->customer??[],
             'customer_string' => is_array($this->customer)?implode(' ', $this->delivery):'',
             'delivery' => $this->delivery??[],
             'delivery_string' => is_array($this->delivery)?implode(' ', $this->delivery):'',
-            'warehouse_id' => $this->warehouse_id??null,
             'status_info' => $this->status_info?[
                 'id' => $this->status_info->id,
                 'value' => $this->status_info->value,
                 'description' => $this->status_info->descr,
             ]:null,
+            'reserved_products' => $this->reserved_products->values(),
             'comments' => $this->comments?OrderCommentResource::collection($this->comments)->resolve():[],
             'created_at' => new Carbon($this->created_at??null)->format('d.m.Y H:i:s'),
             'updated_at' => new Carbon($this->updated_at??null)->format('d.m.Y H:i:s'),

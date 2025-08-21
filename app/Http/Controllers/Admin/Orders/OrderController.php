@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Orders;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Orders\OrderEditPositionRequest;
+use App\Http\Requests\Admin\Orders\OrderSatWhRequest;
 use App\Http\Requests\Admin\Orders\OrdersListRequest;
 use App\Http\Requests\Admin\Orders\OrderStoreCommentRequest;
 use App\Http\Resources\Admin\Orders\OrderResource;
@@ -27,9 +28,7 @@ class OrderController extends Controller
 
     public function edit(Request $request, string $uuid)
     {
-        $order = Order::whereUuid($uuid)->with(['status_info', 'comments'])->firstOrFail();
-        $whs = Warehouse::all(['id', 'title', 'code', 'address', 'phone']);
-        $order->body = WarehouseService::writeOffCreate($order, $whs);
+        $order = Order::whereUuid($uuid)->with(['status_info', 'comments', 'reserved_products'])->firstOrFail();
         return Inertia::render('Admin/Orders/Order', [
             'navigation'=>$this->getNavigation('orders'),
             'order'=>OrderResource::make($order)->resolve(),
@@ -40,6 +39,11 @@ class OrderController extends Controller
     public function addComment(OrderStoreCommentRequest $request)
     {
         OrderComment::create($request->validated());
+    }
+
+    public function setWarehouse(OrderSatWhRequest $request, string $uuid)
+    {
+        Order::whereId($request->order_id)->update(['warehouse_id'=>$request->warehouse_id]);
     }
     
     public function editPosition(OrderEditPositionRequest $request, string $uuid, OrderService $service)
@@ -54,8 +58,6 @@ class OrderController extends Controller
         $validated = $request->validated();
 
         $orders = Order::with(['status_info']);
-
-        $request->session()->forget('manage.orders.filters');
 
         $filters = $request->session()->get('manage.orders.filters', [
             'statuses' => EntityValue::whereEntity(2)->get()->map(function($arr){return ['status'=>$arr->id, 'name'=>$arr->value, 'on'=>true];}),

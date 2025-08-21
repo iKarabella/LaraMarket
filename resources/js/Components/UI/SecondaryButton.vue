@@ -16,10 +16,6 @@
             type:Boolean,
             default:false
         },
-        inactive:{        //TODO свойстово при отображении разбора. т.е. при воспроизведении разбора 
-            type:Boolean, //кнопки должны выделятся по сценарию, но быть недоступными для пользователя!
-            default:false
-        },
         ifSelected:{
             type:String,
             default:' bg-blue-800 text-white border-gray-300 dark:border-gray-500 hover:bg-blue-700 dark:hover:bg-gray-700 '

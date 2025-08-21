@@ -16,6 +16,7 @@ class Order extends Model
         'body',     //состав заказа
         'customer', //получатель
         'delivery', //доставка
+        'warehouse_id', //склад списания
     ];
 
     protected $casts = [
@@ -45,6 +46,11 @@ class Order extends Model
     public function stock_reserve()
     {
         return $this->hasMany(StockReserve::class, 'order_id', 'id');
+    }
+
+    public function reserved_products()
+    {
+      return $this->hasMany(ReservedProduct::class, 'order_id', 'id');
     }
     
     public function comments()

@@ -189,4 +189,15 @@ class OrderService
             $order->save();
         }
     }
+
+    public static function checkCompleted(Order|int $order)
+    {
+        if (is_int($order)) $order = Order::whereId($order)->with(['reserved_products'])->firstOrFail();
+        
+        return !array_any($order->body, function ($position) use ($order) {
+            return $order->reserved_products->search(function($rp) use ($position){
+                return $rp->product_id == $position['position'] && $rp->offer_id==$position['offer'];
+            })===false;
+        });
+    }
 }

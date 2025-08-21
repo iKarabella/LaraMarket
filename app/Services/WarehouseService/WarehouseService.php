@@ -38,113 +38,113 @@ class WarehouseService
      * @param Collection $warehouses список складов, для расчета списания
      * @return array $body обновленный список товаров в заказе, с указанием списания со складов
      */
-    public static function writeOffCreate(Order $order, Collection $warehouses)
-    {
-        $balance = []; //баланс на складах
-        $writeOffList=[]; //список на списание
-        $body = $order->body; //состав заказ
+    // public static function writeOffCreate(Order $order, Collection $warehouses)
+    // {
+    //     $balance = []; //баланс на складах
+    //     $writeOffList=[]; //список на списание
+    //     $body = $order->body; //состав заказ
 
-        $offers = Offer::whereIn('id', array_column($body, 'offer'))->with('stocks')->get();
+    //     $offers = Offer::whereIn('id', array_column($body, 'offer'))->with('stocks')->get();
 
-        if($order->reserved && $order->reserved->count()) 
-        {
-            foreach($body as &$position) //TODO
-            {
-                $inReserved = $order->reserved->filter(function($arr) use ($position){
-                    return $arr->offer_id==$position['offer'];
-                });
+    //     if($order->reserved_products && $order->reserved_products->count()) 
+    //     {
+    //         foreach($body as &$position)
+    //         {
+    //             $inReserved = $order->reserved_products->filter(function($arr) use ($position){
+    //                 return $arr->offer_id==$position['offer'];
+    //             });
 
-                $map = function($arr) use ($warehouses){
-                    $wh = $warehouses->first(function($w) use ($arr) {return $w->id==$arr->warehouse_id;});
-                    return [
-                        'id' => $arr->warehouse_id,
-                        'code' => $wh->code??null,
-                        'title' => $wh->title??null,
-                        'address' => $wh->address??null,
-                        'quantity' => $arr->quantity
-                    ];
-                };
+    //             $map = function($arr) use ($warehouses){
+    //                 $wh = $warehouses->first(function($w) use ($arr) {return $w->id==$arr->warehouse_id;});
+    //                 return [
+    //                     'id' => $arr->warehouse_id,
+    //                     'code' => $wh->code??null,
+    //                     'title' => $wh->title??null,
+    //                     'address' => $wh->address??null,
+    //                     'quantity' => $arr->quantity
+    //                 ];
+    //             };
                 
-                $position['writeOffWh'] = $inReserved->map($map)->values()->toArray();
-                $position['stocks'] = $offers->first(function($o) use ($position){return $o->id==$position['offer'];})->stocks;
-            }
-        }
-        else 
-        {
-            foreach($offers->pluck('stocks') as $block){
-                foreach($block as $stock){
-                    $balance[$stock->warehouse_id]['whid'] = $stock->warehouse_id;
-                    $balance[$stock->warehouse_id]['items'][]=[
-                        'warehouse_id'=>$stock->warehouse_id,
-                        'offer_id'=>$stock->offer_id,
-                        'quantity'=>$stock->quantity
-                    ];
-                }
-            }
+    //             $position['writeOffWh'] = $inReserved->map($map)->values()->toArray();
+    //             $position['stocks'] = $offers->first(function($o) use ($position){return $o->id==$position['offer'];})->stocks;
+    //         }
+    //     }
+    //     else 
+    //     {
+    //         foreach($offers->pluck('stocks') as $block){
+    //             foreach($block as $stock){
+    //                 $balance[$stock->warehouse_id]['whid'] = $stock->warehouse_id;
+    //                 $balance[$stock->warehouse_id]['items'][]=[
+    //                     'warehouse_id'=>$stock->warehouse_id,
+    //                     'offer_id'=>$stock->offer_id,
+    //                     'quantity'=>$stock->quantity
+    //                 ];
+    //             }
+    //         }
     
-            foreach ($body as $position) 
-            {
-                $writeOffList[$position['offer']]=[
-                    'offer_id'=>$position['offer'],
-                    'writeoff'=>0, 
-                    'total'=>$position['quantity']
-                ];
-            }
+    //         foreach ($body as $position) 
+    //         {
+    //             $writeOffList[$position['offer']]=[
+    //                 'offer_id'=>$position['offer'],
+    //                 'writeoff'=>0, 
+    //                 'total'=>$position['quantity']
+    //             ];
+    //         }
 
-            usort($balance, function($a, $b){ return count($b['items'])-count($a['items']);});
+    //         usort($balance, function($a, $b){ return count($b['items'])-count($a['items']);});
 
-            foreach($balance as $stock)
-            {
-                if (!count($stock['items'])) continue;
+    //         foreach($balance as $stock)
+    //         {
+    //             if (!count($stock['items'])) continue;
 
-                foreach($stock['items'] as $i)
-                {
-                    $position = array_find_key($body, function($arr) use ($i) {
-                        return $arr['offer'] == $i['offer_id'];
-                    });
+    //             foreach($stock['items'] as $i)
+    //             {
+    //                 $position = array_find_key($body, function($arr) use ($i) {
+    //                     return $arr['offer'] == $i['offer_id'];
+    //                 });
 
-                    if($position!==null)
-                    {
-                        $whTick = $warehouses->first(function($wh) use ($stock){return $wh->id==$stock['whid'];});
+    //                 if($position!==null)
+    //                 {
+    //                     $whTick = $warehouses->first(function($wh) use ($stock){return $wh->id==$stock['whid'];});
 
-                        $toWriteOff = $body[$position]['quantity']-$writeOffList[$body[$position]['offer']]['writeoff'];
+    //                     $toWriteOff = $body[$position]['quantity']-$writeOffList[$body[$position]['offer']]['writeoff'];
 
-                        if ($i['quantity']<$toWriteOff) $whq = $i['quantity'];
-                        else $whq = $toWriteOff;
+    //                     if ($i['quantity']<$toWriteOff) $whq = $i['quantity'];
+    //                     else $whq = $toWriteOff;
 
-                        $writeOffList[$body[$position]['offer']]['writeoff']+=$whq;
+    //                     $writeOffList[$body[$position]['offer']]['writeoff']+=$whq;
 
-                        if($whq>0)
-                        {
-                            $body[$position]['writeOffWh'][] = 
-                            [
-                                'id' => $i['warehouse_id'], 
-                                'code' => $whTick->code,
-                                'title' => $whTick->title,
-                                'address' => $whTick->address,
-                                'quantity' => $whq,
-                            ];
-                        }
+    //                     if($whq>0)
+    //                     {
+    //                         $body[$position]['writeOffWh'][] = 
+    //                         [
+    //                             'id' => $i['warehouse_id'], 
+    //                             'code' => $whTick->code,
+    //                             'title' => $whTick->title,
+    //                             'address' => $whTick->address,
+    //                             'quantity' => $whq,
+    //                         ];
+    //                     }
     
-                        $body[$position]['stocks'] = $offers->first(function($o) use ($body, $position){return $o->id==$body[$position]['offer'];})->stocks;
-                    }
-                }
+    //                     $body[$position]['stocks'] = $offers->first(function($o) use ($body, $position){return $o->id==$body[$position]['offer'];})->stocks;
+    //                 }
+    //             }
                 
-                $balance = array_map(
-                    function($arr) use ($writeOffList) 
-                    {
-                        $arr['items'] = array_filter($arr['items'], function($a) use ($writeOffList){
-                            return $writeOffList[$a['offer_id']]['writeoff']<$writeOffList[$a['offer_id']]['total'];
-                        });
-                        return $arr;
-                    }, 
-                    $balance
-                );
-            }
-        }
+    //             $balance = array_map(
+    //                 function($arr) use ($writeOffList) 
+    //                 {
+    //                     $arr['items'] = array_filter($arr['items'], function($a) use ($writeOffList){
+    //                         return $writeOffList[$a['offer_id']]['writeoff']<$writeOffList[$a['offer_id']]['total'];
+    //                     });
+    //                     return $arr;
+    //                 }, 
+    //                 $balance
+    //             );
+    //         }
+    //     }
 
-        return $body;
-    }
+    //     return $body;
+    // }
 
     /**
      * Резервирование товаров

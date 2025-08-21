@@ -25,6 +25,9 @@ const relocation = (destignation)=>{
     else if(destignation=='editWh' && selectedWh!=null) {
         router.get(route('admin.warehouses.edit', [selectedWhInfo.value.code]));
     }
+    else if(destignation=='orders' && selectedWh!=null) {
+        router.get(route('admin.warehouses.orders', [selectedWhInfo.value.code]));
+    }
 };
 
 watch(selectedWh, async (newVal) => {
@@ -49,7 +52,7 @@ watch(selectedWh, async (newVal) => {
                         <SecondaryButton :disabled="selectedWh==null" :selected="currentBlock=='stockIn'" class="mr-2">
                             Наличие
                         </SecondaryButton>
-                        <SecondaryButton :disabled="selectedWh==null" :selected="currentBlock=='orders'">
+                        <SecondaryButton @click="relocation('orders')" :disabled="selectedWh==null" :selected="currentBlock=='orders'">
                             Заказы
                         </SecondaryButton>
                     </div>

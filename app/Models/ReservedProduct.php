@@ -7,12 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ReservedProduct extends Model
 {
     protected $fillable = [
-        'name', //title product, title offer string
+        'product_title', //title product, title offer string
         'order_id', //ID заказа, для которого резервированы товары from orders
         'product_id', //ID товара from products
         'offer_id', //ID ТП from product_offers
         'warehouse_id', //ID from warehouses
-        'shipping_id', //ID доставки, если резерв формируется от ее возврата
         'quantity', //количество в резерве
     ];
     

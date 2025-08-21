@@ -24,6 +24,7 @@ const showEditPositionForm = ref(null);
 const showCancelForm = ref(null);
 const writeOffResult = ref(null);
 const orderBody = ref(props.order.body);
+const orderWh = ref(props.order.warehouse_id);
 
 const cancelForm = useForm({
     order_id: props.order.id,
@@ -48,16 +49,12 @@ const canCancel = computed(()=>{
     return [5,6,9,10].includes(props.order.status);
 });
 
-const totalAmount = computed(()=>{
-    return (props.order.amount/100).toFixed(2);
+const canWriteOffForm = computed(()=>{
+    return orderWh.value>0 && [5,6,7].includes(props.order.status);
 });
 
-const writeOffStocks = computed(()=>{
-    if(!writeOffEdit.value.stocks) return [];
-    return writeOffEdit.value.stocks.filter(arr=>writeOffEdit.value.writeOffWh.findIndex(a=>a.id==arr.warehouse_id)<0).map(arr=>{
-        arr.warehouse = props.warehouses.find(w=>w.id==arr.warehouse_id);
-        return arr;
-    });
+const totalAmount = computed(()=>{
+    return (props.order.amount/100).toFixed(2);
 });
 
 const closeModal = ()=>{
@@ -122,69 +119,28 @@ const orderToAssembly = ()=>{
     });
 };
 
-const writeOffForm = (index=null)=>{
-    console.log('writeOffForm', index);
-    if (props.order.status==11 || index===null) return false;
+const setWh = (whID)=>{
+    orderWh.value = whID;
+};
 
-    writeOffEdit.value = JSON.parse(JSON.stringify(orderBody.value[index]));
+const writeOffForm = ()=>{
+    if (props.order.status==11) return false;
+
     showWriteOffEditForm.value=true;
 
     writeOffResult.value=null;
 };
 const storeWriteOff = ()=>{
-    if(props.order.status!=5 && props.order.status!=7) return false;
+    if(!canWriteOffForm.value) return false;
     
-    let ret = checkWriteOff();
-    if(ret===true){
-        let find = orderBody.value.find(f=>f.offer_id==writeOffEdit.value.offer_id);
-        if(find){
-            find.writeOffWh=writeOffEdit.value.writeOffWh.map(arr=>{
-            arr.quantity = parseInt(arr.quantity);
-            return arr;
-        }).filter(a=>{return a.quantity>0;});
-            showWriteOffEditForm.value=false;
-            writeOffEdit.value={};
-        }
-    }
-    else {
-        writeOffResult.value=ret;
-        setTimeout(() => writeOffResult.value=null, 7000);
-    }
-};
-const checkWriteOff = ()=>{
-    let count = 0, ret = true;
-    writeOffEdit.value.writeOffWh.forEach(wo=>{
-        let find = writeOffEdit.value.stocks.find(wh=>wh.warehouse_id==wo.id);
-        let quantity = 0;
-        if (find)
-            {
-                quantity = parseInt(wo.quantity);
-            
-                if (quantity>find.quantity) ret='Превышено наличие на складе.';
-
-                count+=quantity;
-            }
-            else ret=`Склад (${wo.id}) не найден`;
+    useForm({
+        order_id:props.order.id,
+        warehouse_id:orderWh.value
+    }).post(route('admin.order.setWarehouse', [props.order.uuid]), {
+        preserveScroll: true,
+        onSuccess: () => showWriteOffEditForm.value=false,
+        onError: (e) => console.log(e)
     });
-
-    if(count!=writeOffEdit.value.quantity) ret=`Количество в списании (${count}) не соответствует заказу. (${writeOffEdit.value.quantity})`;
-
-    return ret;
-};
-const addWhToWriteOff = (whId)=>{
-    let find = writeOffEdit.value.stocks.find(arr=>arr.warehouse_id==whId);
-    
-    if(find){
-        writeOffEdit.value.writeOffWh.push({
-            id:whId,
-            code:find.warehouse.code,
-            title:find.warehouse.title,
-            address: find.warehouse.address,
-            quantity:0
-        });
-    }
-                
-    showWriteOffStocksList.value=false;
 };
 </script>
 
@@ -198,7 +154,10 @@ const addWhToWriteOff = (whId)=>{
                     <div>{{ order.customer.surname }} {{ order.customer.name }} {{ order.customer.patronymic }}</div>
                     <div>Телефон: {{ order.customer.phone }}</div>
                 </div>
-                <div class="rounded-md border border-gray-100 bg-gray-100">
+                <div class="rounded-md border border-gray-100 bg-gray-100" v-if="order.delivery.warehouse">
+                    <div>Самовывоз: {{ order.delivery.warehouse }}</div>
+                </div>
+                <div class="rounded-md border border-gray-100 bg-gray-100" v-else>
                     <div>Доставка:</div>
                     <div>Регион: {{ order.delivery.region }}</div>
                     <div>Город:{{ order.delivery.city }}</div>
@@ -212,18 +171,26 @@ const addWhToWriteOff = (whId)=>{
                         <OrderStatus :status="order.status_info"/>
                     </div>
                     <div class="text-center items-center">
-                        <div class="font-semibold italic text-gray-700 text-xs">
-                            <div class="my-1">Установить в статус в</div>
-                            <div class="grid grid-cols-1 mb-2 w-fit mx-auto gap-1 justify-items-center">
-                                <PrimaryButton v-show="order.status==5" class="w-full" @click="waitingPayment()">Ожидание оплаты</PrimaryButton>
-                                <PrimaryButton v-show="[5,7].includes(order.status)" class="w-full" @click="orderToAssembly()">В сборке</PrimaryButton>
+                        <div>
+                            <div v-if="order.status==5 && order.warehouse_id!=null" class="font-semibold italic text-gray-700 text-xs">
+                                <div class="my-1">Установить в статус в</div>
+                                <div class="grid grid-cols-1 mb-2 w-fit mx-auto gap-1 justify-items-center">
+                                    <PrimaryButton v-show="order.status==5" class="w-full" @click="waitingPayment()">Ожидание оплаты</PrimaryButton>
+                                    <PrimaryButton v-show="[5,7].includes(order.status)" class="w-full" @click="orderToAssembly()">В сборке</PrimaryButton>
+                                </div>
+                                <InputError :message="setStatusForm.errors.order_id" class="mt-2" />
                             </div>
-                            <InputError :message="setStatusForm.errors.order_id" class="mt-2" />
+                            <div v-else class="font-semibold italic text-gray-700 text-xs">
+                                <div class="my-1">Действия</div>
+                                <div class="grid grid-cols-1 mb-2 w-fit mx-auto gap-1 justify-items-center">
+                                    <PrimaryButton v-show="order.status==5" class="w-full" @click="writeOffForm()">Выбрать склад</PrimaryButton>
+                                </div>
+                            </div>
+                            <div v-show="canCancel" class="text-xs font-semibold italic text-gray-700 mx-4 border-t-[1px] border-gray-400 pt-1">
+                                или
+                            </div>
+                            <DangerButton v-show="canCancel" @click="showCancelForm=true" class="my-2">Отменить заказ</DangerButton>
                         </div>
-                        <div v-show="canCancel" class="text-xs font-semibold italic text-gray-700 mx-4 border-t-[1px] border-gray-400 pt-1">
-                            или
-                        </div>
-                        <DangerButton v-show="canCancel" @click="showCancelForm=true" class="my-2">Отменить заказ</DangerButton>
                     </div>
                 </div>
             </div>
@@ -244,14 +211,6 @@ const addWhToWriteOff = (whId)=>{
                         </div>
                         <div>{{ (position.total/100).toFixed(2) }} ₽</div>
                         <div class="px-2 md:col-span-2 relative flex whitespace-nowrap justify-end">
-                            <SecondaryButton title="Склады для списания" 
-                                             class="w-full mr-2 text-left" 
-                                             v-if="order.status!=12"
-                                            @click="writeOffForm(index)"
-                            >
-                                <i class="ri-list-check-3"></i>
-                                <span v-if="position.writeOffWh.length>0"> {{ position.writeOffWh[0].code }} {{ position.writeOffWh.length>1?`(+${position.writeOffWh.length-1})`:'' }}</span>
-                            </SecondaryButton>
                             <SecondaryButton :disabled="order.status!=5" @click="editPosition(index)"><i class="ri-edit-2-line"></i></SecondaryButton>
                         </div>
                     </div>
@@ -278,51 +237,18 @@ const addWhToWriteOff = (whId)=>{
                 <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                     Списание со склада
                 </h2>
-                
-                <div class="mt-2">{{ writeOffEdit.name }}</div>
-
-                <div v-for="wh in writeOffEdit.writeOffWh" class="md:grid md:grid-cols-3 md:gap-2 mt-2 hover:bg-gray-100">
-                    <div class="md:col-span-2">
-                        <div><b>[{{ wh.code}}] </b> {{ wh.title }} (в наличии: {{ writeOffEdit.stocks.find(a=>a.warehouse_id==wh.id).quantity }})</div>
-                        <div>{{ wh.address }}</div>
-                    </div>
-                    <div>
-                        <TextInput
-                            :id="`writeoff_quantity_wh_${wh.id}`"
-                            v-model="wh.quantity"
-                            type="number"
-                            :max="writeOffEdit.stocks.find(a=>a.warehouse_id==wh.id).quantity"
-                            min="0"
-                            :disabled="order.status!=5 && order.status!=7"
-                            class="mt-1 block w-3/4"
-                            placeholder="Количество"
-                        />
+                <div class="mt-2">
+                    <div v-for="(wh, index) in warehouses" v-key="index" class="flex w-full justify-beetween mt-2">
+                        <div class="w-full">{{ wh.title }} ({{ wh.address }})</div>
+                        <div>
+                            <PrimaryButton @click="setWh(wh.id)" :disabled="wh.id==orderWh">{{wh.id==orderWh?'Выбран':'Выбрать'}}</PrimaryButton>
+                        </div>
                     </div>
                 </div>
 
-                <div class="font-semibold italic text-red-700">{{ writeOffResult }}</div>
-
-                <div class="flex w-full justify-between mt-2">
-                    <SecondaryButton @click="showWriteOffStocksList=true" :disabled="writeOffStocks.length<1 || (order.status!=5 && order.status!=7)">
-                        <i class="ri-folder-add-line"></i> 
-                        Добавить склад
-                    </SecondaryButton>
-                    <div>
-                        <SecondaryButton @click="showWriteOffEditForm=false" class="mr-2">Закрыть</SecondaryButton>
-                        <PrimaryButton @click="storeWriteOff()" :disabled="order.status!=5 && order.status!=7">Сохранить</PrimaryButton>
-                    </div>
-                </div>
-
-                <div v-show="showWriteOffStocksList==true">
-                    <div v-for="stock in writeOffStocks" class="md:grid md:grid-cols-3 md:gap-2 mt-2">
-                        <div class="md:col-span-2">
-                            <div><b>[{{ stock.warehouse.code}}] </b> {{ stock.warehouse.title }}. В наличии: {{ stock.quantity }}</div>
-                            <div>{{ stock.warehouse.address }}</div>
-                        </div>
-                        <div class="text-right">
-                            <SecondaryButton @click="addWhToWriteOff(stock.warehouse_id)">Добавить</SecondaryButton>
-                        </div>
-                    </div>
+                <div class="flex w-full justify-end mt-2">
+                    <SecondaryButton @click="showWriteOffEditForm=false" class="mr-2">Закрыть</SecondaryButton>
+                    <PrimaryButton @click="storeWriteOff()" :disabled="!canWriteOffForm">Сохранить</PrimaryButton>
                 </div>
             </div>
         </Modal>

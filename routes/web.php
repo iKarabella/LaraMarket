@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\Orders\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\RolesAndPermissions\RolesAndPermissionsController;
 use App\Http\Controllers\Admin\UsersManage\UsersManageController;
 use App\Http\Controllers\Admin\Warehouses\WarehouseController;
+use App\Http\Controllers\Admin\Warehouses\WarehouseOrdersController;
 use App\Http\Controllers\Catalog\CatalogController;
 use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Catalog\ProductController;
@@ -58,6 +59,7 @@ Route::middleware('permission:orders_manage')->group(function () {
     Route::post('admin/order/{uuid}/editPosition', [AdminOrderController::class, 'editPosition'])->name('admin.order.editPosition');
     Route::get('admin/order/{uuid}', [AdminOrderController::class, 'edit'])->name('admin.order.manage');
     Route::post('admin/order/{uuid}/add_сomment', [AdminOrderController::class, 'addComment'])->name('admin.order.addComment');
+    Route::post('admin/order/{uuid}/set_warehouse', [AdminOrderController::class, 'setWarehouse'])->name('admin.order.setWarehouse');
 });
 
 Route::middleware('permission:catalog_manage')->group(function () {
@@ -85,8 +87,15 @@ Route::middleware('permission:warehouses_manage')->group(function () {
     Route::get('admin/warehouse/new', [WarehouseController::class, 'edit'])->name('admin.warehouses.new');
     Route::put('admin/warehouse/storeReceipt', [WarehouseController::class, 'storeReceipt'])->name('admin.warehouse.storeReceipt');
     Route::get('admin/warehouses/{code?}', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
-    Route::get('admin/warehouses/{code?}/edit', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');
+    Route::get('admin/warehouses/{code}/edit', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');
     Route::get('admin/warehouses/{code}/receipt', [WarehouseController::class, 'receipt'])->name('admin.warehouses.receipt');
+    Route::get('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage'])->name('admin.warehouses.orders');
+    Route::post('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage']);
+    Route::get('admin/warehouses/{code}/orders/{uuid}', [WarehouseOrdersController::class, 'order'])->name('admin.warehouses.order');
+    Route::post('admin/warehouses/{code}/orders/{uuid}/markWh', [WarehouseOrdersController::class, 'markWh'])->name('admin.warehouses.order.markWh');
+    Route::post('admin/warehouses/{code}/orders/{uuid}/readyForPickup', [WarehouseOrdersController::class, 'readyForPickup'])->name('admin.warehouses.order.readyForPickup');
+    Route::post('admin/warehouses/{code}/orders/{uuid}/sent', [WarehouseOrdersController::class, 'orderSent'])->name('admin.warehouses.order.sent');
+    Route::post('admin/warehouses/{code}/orders/{uuid}/issued', [WarehouseOrdersController::class, 'orderIssued'])->name('admin.warehouses.order.issued');
 });
 
 require __DIR__.'/auth.php';

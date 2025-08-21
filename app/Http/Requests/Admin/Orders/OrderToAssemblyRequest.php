@@ -26,9 +26,6 @@ class OrderToAssemblyRequest extends FormRequest
             'toAssembly.*.offer'=>'numeric|required|exists:offers,id',
             'toAssembly.*.position'=>'numeric|required|exists:products,id',
             'toAssembly.*.quantity'=>'numeric|required|min:1',
-            'toAssembly.*.writeOffWh'=>'array|required|min:1',
-            'toAssembly.*.writeOffWh.*.id'=>'numeric|required|exists:warehouses',
-            'toAssembly.*.writeOffWh.*.quantity'=>'numeric|required|min:1'
         ];
     }
 

@@ -38,6 +38,8 @@ class DatabaseSeeder extends Seeder
                 ['id'=>10, 'entity' => $entity->id, 'value' => 'Готов к выдаче', 'description'=>'Готов к выдаче', 'available'=>true],
                 ['id'=>11, 'entity' => $entity->id, 'value' => 'Отменен', 'description'=>'Отменен', 'available'=>true],
                 ['id'=>12, 'entity' => $entity->id, 'value' => 'Получен', 'description'=>'Получен', 'available'=>true],
+                ['id'=>13, 'entity' => $entity->id, 'value' => 'Отправлен частично', 'description'=>'Отправлен частично', 'available'=>true],
+                ['id'=>14, 'entity' => $entity->id, 'value' => 'Готов к отправке', 'description'=>'Готов к отправке', 'available'=>true],
             ]);
         }
     }
