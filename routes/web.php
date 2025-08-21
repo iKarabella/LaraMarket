@@ -89,6 +89,7 @@ Route::middleware('permission:warehouses_manage')->group(function () {
     Route::get('admin/warehouses/{code?}', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
     Route::get('admin/warehouses/{code}/edit', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');
     Route::get('admin/warehouses/{code}/receipt', [WarehouseController::class, 'receipt'])->name('admin.warehouses.receipt');
+    Route::get('admin/warehouses/{code}/receipt/new', [WarehouseController::class, 'newReceipt'])->name('admin.warehouses.newreceipt');
     Route::get('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage'])->name('admin.warehouses.orders');
     Route::post('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage']);
     Route::get('admin/warehouses/{code}/orders/{uuid}', [WarehouseOrdersController::class, 'order'])->name('admin.warehouses.order');

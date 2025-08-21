@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\SearchProductRequest;
 use App\Http\Requests\Admin\Warehouses\StoreWarehouseReceiptRequest;
 use App\Http\Requests\Admin\Warehouses\StoreWarehouseRequest;
 use App\Http\Resources\Admin\Catalog\ProductOfferResource;
+use App\Http\Resources\Admin\Warehouses\WarehouseActResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseResource;
 use App\Models\Offer;
 use App\Models\StockBalance;
@@ -58,15 +59,29 @@ class WarehouseController extends Controller
         return Redirect::route('admin.warehouses.manage');
     }
 
-    public function receipt(Request $request, string $code):Response
+    public function newReceipt(Request $request, string $code):Response
     {
         $warehouse = Warehouse::whereCode($code)->firstOrFail();
         $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
 
-        return Inertia::render('Admin/Warehouses/Receipt', [
+        return Inertia::render('Admin/Warehouses/NewReceipt', [
             'navigation'=>$this->getNavigation('warehouses'),
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null)
+        ]);
+    }
+
+    public function receipt(Request $request, string $code):Response
+    {
+        $warehouse = Warehouse::whereCode($code)->firstOrFail();
+        $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
+        $acts = WarehouseAct::whereWarehouseId($warehouse->id)->whereType('receipt')->with('user')->orderByDesc('created_at');
+
+        return Inertia::render('Admin/Warehouses/Receipt', [
+            'navigation'=>$this->getNavigation('warehouses'),
+            'warehouses'=>Warehouse::all(),
+            'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
+            'acts'=>WarehouseActResource::collection($acts->paginate(30))
         ]);
     }
 
