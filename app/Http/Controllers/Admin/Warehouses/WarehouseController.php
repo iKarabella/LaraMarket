@@ -15,6 +15,7 @@ use App\Models\Offer;
 use App\Models\StockBalance;
 use App\Models\Warehouse;
 use App\Models\WarehouseAct;
+use App\Services\WarehouseService\WarehouseService;
 use App\Traits\MarketControllerTrait;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -96,45 +97,15 @@ class WarehouseController extends Controller
         $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
         $perPage = 50;
 
-        $offers = DB::table('offers')
-                     ->leftJoin('products', 'products.id', '=', 'offers.product_id')
-                     ->leftJoin('entity_values', 'entity_values.id', '=', 'products.measure')
-                     ->leftJoin('stock_reserves', 'stock_reserves.offer_id', '=', 'offers.id')
-                     ->leftJoin('stock_balances', function($join) use ($warehouse){
-                        $join->on('stock_balances.offer_id', '=', 'offers.id')->where('stock_balances.warehouse_id', '=', $warehouse->id);
-                     })
-                     ->select([
-                        'products.title as product_title', 
-                        'products.id as product_id', 
-                        'offers.id as offer_id', 
-                        'offers.title as offer_title',
-                        'offers.art', 
-                        'offers.baseprice',
-                        'offers.price',
-                        'offers.coeff',
-                        'offers.visibility',
-                        'stock_balances.quantity as stock_in',
-                        'stock_reserves.quantity as stock_reserved',
-                        'entity_values.value as measure_val'
-                     ]);
-
-        if($request->search){
-            $offers->where(function($query) use ($request){
-                $query->whereLike('offers.title', '%'.$request->search.'%')
-                      ->orWhereLike('products.title', '%'.$request->search.'%')
-                      ->orWhereLike('offers.art', '%'.$request->search.'%');
-            });
-        }
+        $offers = WarehouseService::getStockInList($warehouse->id, $request->search);
 
         if ($offers->count()/$perPage < $request->page) $request->merge(['page' => 1]);
-
-        $stocks = $offers->paginate($perPage);
 
         return Inertia::render('Admin/Warehouses/StockIn', [
             'navigation'=>$this->getNavigation('warehouses'),
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
-            'stocks'=>WarehouseStocksInResource::collection($stocks),
+            'stocks'=>WarehouseStocksInResource::collection($offers->paginate($perPage)),
             'filters'=>[
                 'search'=>$request->search,
                 'page'=>$request->page
@@ -167,24 +138,6 @@ class WarehouseController extends Controller
 
     public function storeReceipt(StoreWarehouseReceiptRequest $request)
     {
-        DB::transaction(function() use ($request) {
-            
-            foreach ($request->items as $item) 
-            {
-                StockBalance::updateOrCreate(
-                    [
-                        'warehouse_id'=>$request->warehouse, 
-                        'offer_id'=>$item['offer_id']
-                    ], 
-                    [
-                        'quantity'=>DB::raw('quantity + '.$item['quantity'])
-                    ]
-                );
-
-                Offer::whereId($item['offer_id'])->update(['baseprice'=>floatval($item['price'])]);
-            }
-
-            WarehouseAct::create(['user_id'=>$request->user()->id, 'warehouse_id'=>$request->warehouse, 'type'=>'receipt', 'act'=>$request->items]);
-        });
+        WarehouseService::storeReceipt($request);
     }
 }

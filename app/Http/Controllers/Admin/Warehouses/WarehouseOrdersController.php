@@ -20,6 +20,7 @@ use App\Models\StockReserve;
 use App\Models\Warehouse;
 use App\Models\WarehouseAct;
 use App\Services\OrderService;
+use App\Services\WarehouseService\WarehouseService;
 use App\Traits\MarketControllerTrait;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -109,24 +110,7 @@ class WarehouseOrdersController extends Controller
 
     public function markWh(OrderMarkWhRequest $request, string $code, string $uuid)
     {
-        $validated = $request->validated();
-
-        if(ReservedProduct::whereOfferId($validated['offer_id'])->whereOrderId($validated['order_id'])->whereProductId($validated['product_id'])->exists()) throw ValidationException::withMessages([
-            'product_title' => ["Такое списание уже было произведено"],
-        ]);
-
-        DB::transaction(function() use ($validated) {            
-            ReservedProduct::create([
-                'product_title'=>$validated['product_title'],
-                'order_id'=>$validated['order_id'],
-                'product_id'=>$validated['product_id'],
-                'offer_id'=>$validated['offer_id'],
-                'warehouse_id'=>$validated['warehouse_id'],
-                'quantity'=>$validated['quantity']
-            ]);
-            StockReserve::whereOrderId($validated['order_id'])->whereOfferId($validated['offer_id'])->delete();
-            StockBalance::whereWarehouseId($validated['warehouse_id'])->whereOfferId($validated['offer_id'])->decrement('quantity', $validated['quantity']);
-        });
+        WarehouseService::writeOff($request->validated());
     }
 
     public function readyForPickup(Request $request)
