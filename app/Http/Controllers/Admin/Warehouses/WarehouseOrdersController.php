@@ -16,6 +16,7 @@ use App\Models\Offer;
 use App\Models\Order;
 use App\Models\ReservedProduct;
 use App\Models\StockBalance;
+use App\Models\StockReserve;
 use App\Models\Warehouse;
 use App\Models\WarehouseAct;
 use App\Services\OrderService;
@@ -114,19 +115,18 @@ class WarehouseOrdersController extends Controller
             'product_title' => ["Такое списание уже было произведено"],
         ]);
 
-        $create = ReservedProduct::create([
-            'product_title'=>$validated['product_title'],
-            'order_id'=>$validated['order_id'],
-            'product_id'=>$validated['product_id'],
-            'offer_id'=>$validated['offer_id'],
-            'warehouse_id'=>$validated['warehouse_id'],
-            'quantity'=>$validated['quantity']
-        ]);
-
-        if($create)
-        {
-            //TODO при создании списания списать эту позицию из stock_reserves и stock_balances
-        }
+        DB::transaction(function() use ($validated) {            
+            ReservedProduct::create([
+                'product_title'=>$validated['product_title'],
+                'order_id'=>$validated['order_id'],
+                'product_id'=>$validated['product_id'],
+                'offer_id'=>$validated['offer_id'],
+                'warehouse_id'=>$validated['warehouse_id'],
+                'quantity'=>$validated['quantity']
+            ]);
+            StockReserve::whereOrderId($validated['order_id'])->whereOfferId($validated['offer_id'])->delete();
+            StockBalance::whereWarehouseId($validated['warehouse_id'])->whereOfferId($validated['offer_id'])->decrement('quantity', $validated['quantity']);
+        });
     }
 
     public function readyForPickup(Request $request)
