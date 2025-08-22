@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Товары на балансе
+ */
 class StockBalance extends Model
 {
     protected $fillable = [

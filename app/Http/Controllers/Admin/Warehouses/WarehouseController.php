@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin\Warehouses;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SearchProductRequest;
+use App\Http\Requests\Admin\Warehouses\StockInListRequest;
 use App\Http\Requests\Admin\Warehouses\StoreWarehouseReceiptRequest;
 use App\Http\Requests\Admin\Warehouses\StoreWarehouseRequest;
 use App\Http\Resources\Admin\Catalog\ProductOfferResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseActResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseResource;
+use App\Http\Resources\Admin\Warehouses\WarehouseStocksInResource;
 use App\Models\Offer;
 use App\Models\StockBalance;
 use App\Models\Warehouse;
@@ -48,7 +50,11 @@ class WarehouseController extends Controller
         return Inertia::render('Admin/Warehouses/EditWarehouse', [
             'navigation'=>$this->getNavigation('warehouses'),
             'warehouse' => WarehouseResource::make($warehouse)->resolve(),
-            'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null)
+            'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
+            'filters'=>[
+                'search'=>$request->search,
+                'page'=>$request->page
+            ]
         ]);
     }
 
@@ -82,6 +88,56 @@ class WarehouseController extends Controller
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
             'acts'=>WarehouseActResource::collection($acts->paginate(30))
+        ]);
+    }
+
+    public function stockIn(StockInListRequest $request, string $code):Response
+    {
+        $warehouse = Warehouse::whereCode($code)->firstOrFail();
+        $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
+        $perPage = 50;
+
+        $offers = DB::table('offers')
+                     ->leftJoin('products', 'products.id', '=', 'offers.product_id')
+                     ->leftJoin('entity_values', 'entity_values.id', '=', 'products.measure')
+                     ->leftJoin('stock_reserves', 'stock_reserves.offer_id', '=', 'offers.id')
+                     ->leftJoin('stock_balances', function($join) use ($warehouse){
+                        $join->on('stock_balances.offer_id', '=', 'offers.id')->where('stock_balances.warehouse_id', '=', $warehouse->id);
+                     })
+                     ->select([
+                        'products.title as product_title', 
+                        'products.id as product_id', 
+                        'offers.id as offer_id', 
+                        'offers.title as offer_title',
+                        'offers.art', 
+                        'offers.baseprice',
+                        'offers.price',
+                        'offers.coeff',
+                        'offers.visibility',
+                        'stock_balances.quantity as stock_in',
+                        'stock_reserves.quantity as stock_reserved',
+                        'entity_values.value as measure_val'
+                     ]);
+        
+        if($request->search){
+            $offers->where(function($query) use ($request){
+                $query->whereLike('offers.title', '%'.$request->search.'%')
+                      ->orWhereLike('products.title', '%'.$request->search.'%')
+                      ->orWhereLike('offers.art', '%'.$request->search.'%');
+            });
+        }
+
+        if ($offers->count()/$perPage < $request->page) $request->merge(['page' => 1]);
+
+        return Inertia::render('Admin/Warehouses/StockIn', [
+            'navigation'=>$this->getNavigation('warehouses'),
+            'warehouses'=>Warehouse::all(),
+            'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
+            'stocks'=>WarehouseStocksInResource::collection($offers->paginate($perPage)),
+            'filters'=>[
+                'search'=>$request->search,
+                'page'=>$request->page
+            ]
         ]);
     }
 

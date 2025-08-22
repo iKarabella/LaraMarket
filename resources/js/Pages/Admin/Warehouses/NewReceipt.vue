@@ -96,7 +96,8 @@ const removeItem = (index=null)=>{
 
 const searchItem = ()=>{
     if (searchItemStr.value.length < 1) return false;
-        axios.post(route('admin.warehouses.searchProduct'), {
+    
+    axios.post(route('admin.warehouses.searchProduct'), {
         search: searchItemStr.value,
     }).then(res=>{
         if (res.data) {

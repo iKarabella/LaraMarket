@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Товары на балансе, зарезирвированные в заказах, но не списанные со склада.
+ */
 class StockReserve extends Model
 {
     protected $fillable = [

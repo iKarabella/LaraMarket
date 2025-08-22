@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Товары зарезервированные в заказах, списанные из stock_balance.
+ */
 class ReservedProduct extends Model
 {
     protected $fillable = [
