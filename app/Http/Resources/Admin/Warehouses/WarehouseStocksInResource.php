@@ -25,7 +25,6 @@ class WarehouseStocksInResource extends JsonResource
             'visibility'=>$this->visibility??null,
             'stock_in'=>$this->stock_in??0,
             'stock_reserved'=>$this->stock_reserved??0,
-            'in_orders'=>$this->in_orders??0,
             'measure_val'=>$this->measure_val??null,
         ];
     }

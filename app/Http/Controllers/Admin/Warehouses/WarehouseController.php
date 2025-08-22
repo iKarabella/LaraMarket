@@ -18,7 +18,6 @@ use App\Models\WarehouseAct;
 use App\Traits\MarketControllerTrait;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -118,7 +117,7 @@ class WarehouseController extends Controller
                         'stock_reserves.quantity as stock_reserved',
                         'entity_values.value as measure_val'
                      ]);
-        
+
         if($request->search){
             $offers->where(function($query) use ($request){
                 $query->whereLike('offers.title', '%'.$request->search.'%')
@@ -129,11 +128,13 @@ class WarehouseController extends Controller
 
         if ($offers->count()/$perPage < $request->page) $request->merge(['page' => 1]);
 
+        $stocks = $offers->paginate($perPage);
+
         return Inertia::render('Admin/Warehouses/StockIn', [
             'navigation'=>$this->getNavigation('warehouses'),
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
-            'stocks'=>WarehouseStocksInResource::collection($offers->paginate($perPage)),
+            'stocks'=>WarehouseStocksInResource::collection($stocks),
             'filters'=>[
                 'search'=>$request->search,
                 'page'=>$request->page
