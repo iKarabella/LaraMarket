@@ -86,12 +86,15 @@ Route::middleware('permission:warehouses_manage')->group(function () {
     Route::post('admin/warehouse/search_product', [WarehouseController::class, 'searchProduct'])->name('admin.warehouses.searchProduct');
     Route::get('admin/warehouse/new', [WarehouseController::class, 'edit'])->name('admin.warehouses.new');
     Route::put('admin/warehouse/storeReceipt', [WarehouseController::class, 'storeReceipt'])->name('admin.warehouse.storeReceipt');
+    Route::put('admin/warehouse/storeWriteOff', [WarehouseController::class, 'storeWriteOff'])->name('admin.warehouse.storeWriteOff');
     Route::get('admin/warehouses/{code?}', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
     Route::get('admin/warehouses/{code}/stock_in', [WarehouseController::class, 'stockIn'])->name('admin.warehouses.stock_in');
     Route::post('admin/warehouses/{code}/stock_in', [WarehouseController::class, 'stockIn']);
     Route::get('admin/warehouses/{code}/edit', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');
     Route::get('admin/warehouses/{code}/receipt', [WarehouseController::class, 'receipt'])->name('admin.warehouses.receipt');
     Route::get('admin/warehouses/{code}/receipt/new', [WarehouseController::class, 'newReceipt'])->name('admin.warehouses.newreceipt');
+    Route::get('admin/warehouses/{code}/write_off', [WarehouseController::class, 'writeOff'])->name('admin.warehouses.write_off');
+    Route::get('admin/warehouses/{code}/write_off/new', [WarehouseController::class, 'newWriteOff'])->name('admin.warehouses.newwriteoff');
     Route::get('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage'])->name('admin.warehouses.orders');
     Route::post('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage']);
     Route::get('admin/warehouses/{code}/orders/{uuid}', [WarehouseOrdersController::class, 'order'])->name('admin.warehouses.order');

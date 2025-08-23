@@ -21,6 +21,7 @@ class WarehouseActResource extends JsonResource
             'warehouse_id' => $this->warehouse_id??null,
             'type' => $this->type??null,
             'act' => $this->act??null,
+            'comment' => $this->comment??null,
             'user' => $this->user ? [
                 'id'=>$this->user->id,
                 'nickname'=>$this->user->nickname,

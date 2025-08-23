@@ -15,6 +15,7 @@ class SearchProductRequest extends FormRequest
     {
         return [
             'search'=>'string|required|min:1',
+            'warehouse'=>'numeric|nullable|exists:warehouses,id'
         ];
     }
 
@@ -22,6 +23,7 @@ class SearchProductRequest extends FormRequest
     {
         return [
             'search' => 'Поисковый запрос',
+            'warehouse'=>'ID склада'
         ];
     }
 }

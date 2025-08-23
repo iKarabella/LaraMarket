@@ -91,6 +91,32 @@ class WarehouseController extends Controller
         ]);
     }
 
+    public function writeOff(Request $request, string $code):Response
+    {
+        $warehouse = Warehouse::whereCode($code)->firstOrFail();
+        $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
+        $acts = WarehouseAct::whereWarehouseId($warehouse->id)->whereType('write-off')->with('user')->orderByDesc('created_at');
+
+        return Inertia::render('Admin/Warehouses/WriteOff', [
+            'navigation'=>$this->getNavigation('warehouses'),
+            'warehouses'=>Warehouse::all(),
+            'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
+            'acts'=>WarehouseActResource::collection($acts->paginate(30))
+        ]);
+    }
+
+    public function newWriteOff(Request $request, string $code):Response
+    {
+        $warehouse = Warehouse::whereCode($code)->firstOrFail();
+        $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
+
+        return Inertia::render('Admin/Warehouses/NewWriteOff', [
+            'navigation'=>$this->getNavigation('warehouses'),
+            'warehouses'=>Warehouse::all(),
+            'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null)
+        ]);
+    }
+
     public function stockIn(StockInListRequest $request, string $code):Response
     {
         $warehouse = Warehouse::whereCode($code)->firstOrFail();
@@ -115,29 +141,46 @@ class WarehouseController extends Controller
 
     public function searchProduct(SearchProductRequest $request):array
     {
+        $select = [
+            'products.title as product_title', 
+            'products.id as product_id', 
+            'offers.id', 
+            'offers.art', 
+            'offers.title',
+            'offers.baseprice',
+            'offers.price',
+            'offers.coeff',
+            'entity_values.value as measure_val'
+        ];
+
         $search = DB::table('offers')
-                    ->select([
-                        'products.title as product_title', 
-                        'products.id as product_id', 
-                        'offers.id', 
-                        'offers.art', 
-                        'offers.title',
-                        'offers.baseprice',
-                        'offers.price',
-                        'offers.coeff',
-                        'entity_values.value as measure_val'
-                    ])
                     ->leftJoin('products', 'products.id', '=', 'offers.product_id')
                     ->leftJoin('entity_values', 'entity_values.id', '=', 'products.measure')
-                    ->whereLike('offers.art', '%'.$request->search.'%')
-                    ->orWhereLike('offers.barcode', '%'.$request->search.'%')
-                    ->orWhereIn('offers.product_id', DB::table('products')->select('id')->whereLike('title', '%'.$request->search.'%'))
-                    ->limit(15)->get();
-        return ProductOfferResource::collection($search)->resolve();
+                    ->where(function($query) use ($request){
+                        $query->whereLike('offers.art', '%'.$request->search.'%')
+                              ->orWhereLike('offers.barcode', '%'.$request->search.'%')
+                              ->orWhereIn('offers.product_id', DB::table('products')->select('id')->whereLike('title', '%'.$request->search.'%'));
+                    });
+
+        if($request->warehouse) {
+            $search->leftJoin('stock_balances', function($join) use ($request){
+                $join->on('stock_balances.offer_id', '=', 'offers.id')->where('stock_balances.warehouse_id', '=', $request->warehouse);
+            });
+            $select[]='stock_balances.quantity as quantity';
+        }
+
+        $search->select($select)->limit(15);
+
+        return ProductOfferResource::collection($search->get())->resolve();
     }
 
     public function storeReceipt(StoreWarehouseReceiptRequest $request)
     {
         WarehouseService::storeReceipt($request);
+    }
+
+    public function storeWriteOff(StoreWarehouseReceiptRequest $request)
+    {
+        WarehouseService::storeWriteOff($request);
     }
 }

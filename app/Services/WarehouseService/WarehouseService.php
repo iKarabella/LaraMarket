@@ -74,6 +74,23 @@ class WarehouseService
         });
     }
 
+    public static function storeWriteOff(StoreWarehouseReceiptRequest $request):void
+    {
+        DB::transaction(function() use ($request) 
+        { 
+            foreach ($request->items as $item) StockBalance::whereWarehouseId($request->warehouse)
+                                                           ->whereOfferId($item['offer_id'])
+                                                           ->decrement('quantity', $item['quantity']);                                                           
+            WarehouseAct::create([
+                'user_id'=>$request->user()->id, 
+                'warehouse_id'=>$request->warehouse, 
+                'type'=>'write-off', 
+                'act'=>$request->items, 
+                'comment'=>$request->reason
+            ]);
+        });
+    }
+
     /**
      * Резервирование товаров
      * 

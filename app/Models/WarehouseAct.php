@@ -11,6 +11,7 @@ class WarehouseAct extends Model
         'warehouse_id', //id склада
         'type', //type enum 'write-off'-списание|'receipt'-поступление
         'act', //список товаров
+        'comment', // комментарий к акту
     ];
 
     protected $casts = [

@@ -15,10 +15,11 @@ class StoreWarehouseReceiptRequest extends FormRequest
     {
         return [
             'warehouse'=>'numeric|required|exists:warehouses,id',
+            'reason'=>'string|required_with:write_off',
             'items'=>'array|required|min:1',
             'items.*'=>'array|required',
             'items.*.offer_id'=>'numeric|required|exists:offers,id',
-            'items.*.price'=>'numeric|required',
+            'items.*.price'=>'numeric|required_without:write_off',
             'items.*.quantity'=>'integer|required|min:1'
         ];
     }
@@ -26,7 +27,7 @@ class StoreWarehouseReceiptRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'id' => 'Категория',
+            'reason' => 'Причина списания',
         ];
     }
 }
