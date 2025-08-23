@@ -15,7 +15,8 @@ const props = defineProps({
     filters: {type:Object, default:{
         search:null,
         page:0
-    }}
+    }},
+    brief_summary: {type:Object, default:{}}
 });
 
 const currentWhInfo = computed(()=>{
@@ -59,6 +60,10 @@ const getPage = (page)=>{
                     placeholder="название/id/артикул/штрихкод"
                     v-on:keyup="searchItem"
                 />
+            </div>
+            <div>
+                Всего товаров: {{ brief_summary.total_quantity }}, 
+                на сумму {{ parseFloat(brief_summary.total_amount).toFixed(2) }} ₽ ({{ parseFloat(brief_summary.total_baseprice).toFixed(2) }} ₽)
             </div>
         </div>
         <div class="mt-2">

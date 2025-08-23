@@ -12,6 +12,7 @@ use App\Models\WarehouseAct;
 use Exception;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -78,6 +79,32 @@ class WarehouseService
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    /**
+     * Краткая сводка по наличию товаров на складе
+     * @param ?int $whId склад
+     * @return array     total_quantity - количество позиций, 
+     *                    total_baseprice - общая закупочная стоимость, 
+     *                    total_amount - общая розничная стоимость
+     */
+    public static function briefSummary(?int $whId=null):array
+    {
+        $query = DB::table('stock_balances')->leftJoin('offers', 'offers.id', '=', 'stock_balances.offer_id')->where('stock_balances.quantity', '>', 0)->select([
+            DB::raw('COUNT(stock_balances.offer_id) as total_quantity'),
+            DB::raw('SUM(stock_balances.quantity*offers.baseprice) as total_baseprice'),
+            DB::raw('SUM(stock_balances.quantity*offers.price) as total_amount'),
+        ]);
+
+        if($whId) $query->whereWarehouseId($whId);
+
+        $result = $query->first();
+
+        return [
+            'total_quantity' => $result->total_quantity,
+            'total_baseprice' =>$result->total_baseprice/100,
+            'total_amount' => $result->total_amount/100
+        ];
     }
 
     /**

@@ -91,7 +91,8 @@ class OrderService
                     'amount'    => (int) $validated['total_sum'],
                     'body'      => $validated['positions'],
                     'customer'  => $validated['customer'],
-                    'delivery'  => $validated['delivery']
+                    'delivery'  => $validated['delivery'],
+                    'shipping_code' => $validated['selected_shipping']
                 ]);
                 
                 foreach ($validated['positions'] as $pos) StockReserve::create([

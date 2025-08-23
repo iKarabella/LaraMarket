@@ -51,14 +51,14 @@ class OwnService implements ShippingInterface
         $auth = Auth::user();
         return [
             'delivery' => [
-                'city' => [
-                    'type'=>'string',
-                    'required'=>true,
-                    'label'=>'Город',
-                    'rules'=>'string',
-                    'title'=>'Город',
-                    'default'=>null,
-                ],
+                // 'city' => [
+                //     'type'=>'string',
+                //     'required'=>true,
+                //     'label'=>'Город',
+                //     'rules'=>'string',
+                //     'title'=>'Город',
+                //     'default'=>null,
+                // ],
                 'street' => [
                     'type'=>'string',
                     'required'=>true,

@@ -135,7 +135,8 @@ class WarehouseController extends Controller
             'filters'=>[
                 'search'=>$request->search,
                 'page'=>$request->page
-            ]
+            ],
+            'brief_summary'=>WarehouseService::briefSummary($warehouse->id),
         ]);
     }
 

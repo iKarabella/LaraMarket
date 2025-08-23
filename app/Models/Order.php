@@ -16,6 +16,7 @@ class Order extends Model
         'body',     //состав заказа
         'customer', //получатель
         'delivery', //доставка
+        'shipping_code', //код сервиса доставки
         'warehouse_id', //склад списания
     ];
 
