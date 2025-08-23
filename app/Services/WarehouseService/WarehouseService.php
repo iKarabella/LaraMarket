@@ -12,6 +12,7 @@ use App\Models\WarehouseAct;
 use Exception;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class WarehouseService
@@ -50,45 +51,120 @@ class WarehouseService
      * 
      * @param StoreWarehouseReceiptRequest $request массив позиций для сохранения
      * @return void
+     * @throws \Exception
      */
     public static function storeReceipt(StoreWarehouseReceiptRequest $request):void
     {
-        DB::transaction(function() use ($request) {
+        try {
+            DB::transaction(function() use ($request) {
             
-            foreach ($request->items as $item) 
-            {
-                StockBalance::updateOrCreate(
-                    [
-                        'warehouse_id'=>$request->warehouse, 
-                        'offer_id'=>$item['offer_id']
-                    ], 
-                    [
-                        'quantity'=>DB::raw('quantity + '.$item['quantity'])
-                    ]
-                );
-
-                Offer::whereId($item['offer_id'])->update(['baseprice'=>floatval($item['price'])]);
-            }
-
-            WarehouseAct::create(['user_id'=>$request->user()->id, 'warehouse_id'=>$request->warehouse, 'type'=>'receipt', 'act'=>$request->items]);
-        });
+                foreach ($request->items as $item) 
+                {
+                    StockBalance::updateOrCreate(
+                        [
+                            'warehouse_id'=>$request->warehouse, 
+                            'offer_id'=>$item['offer_id']
+                        ], 
+                        [
+                            'quantity'=>DB::raw('quantity + '.$item['quantity'])
+                        ]
+                    );
+    
+                    Offer::whereId($item['offer_id'])->update(['baseprice'=>floatval($item['price'])]);
+                }
+    
+                WarehouseAct::create(['user_id'=>$request->user()->id, 'warehouse_id'=>$request->warehouse, 'type'=>'receipt', 'act'=>$request->items]);
+            });
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
+    /**
+     * Возврат товаров из заказа на склад
+     * 
+     * @param Collection $products коллекция из заказа с ReservedProduct элементами
+     * @param int orderId ID заказа
+     * @param array $orderBody массив позиций заказа
+     * @param int $warehouse ID склада
+     * @return bool true если товары возвращены на склад
+     * @throws \Exception
+     */
+    public static function cancelOrderReservation(Collection $products, int $orderId, array $orderBody, int $warehouse):bool
+    {
+        $items = array_map(function($arr){
+            return [
+                "coeff"=> 0,
+                "price"=> $arr['price']/100,
+                "title"=> "{$arr['product_title']}, {$arr['offer_title']}",
+                "offer_id"=> $arr['offer'],
+                "oldPrice"=> 0,
+                "newPrice"=> 0,
+                "quantity"=> $arr['quantity'],
+                "measure_val"=> $arr['measure']
+            ];
+        }, $orderBody);
+
+        $userId = Auth::check() ? Auth::user()->id : null;
+
+        try {
+            DB::transaction(function() use ($products, $orderId, $items, $userId, $warehouse) 
+            { 
+                foreach ($products as $position) 
+                {
+                    StockBalance::updateOrCreate(
+                        [
+                            'warehouse_id'=>$position->warehouse_id, 
+                            'offer_id'=>$position->offer_id
+                        ], 
+                        [
+                            'quantity'=>DB::raw('quantity + '.$position->quantity)
+                        ]
+                    );
+                    $position->delete();
+                }
+
+                WarehouseAct::create([
+                    'user_id'=>$userId, 
+                    'warehouse_id'=>$warehouse, 
+                    'type'=>'receipt', 
+                    'act'=>$items, 
+                    'comment'=>'Возврат товаров при отмене заказа #'.$orderId
+                ]);
+            });
+        } catch (Exception $e) {
+            throw $e;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Списание со склада
+     * 
+     * @param StoreWarehouseReceiptRequest $request запрос на списание
+     * @return void
+     * @throws \Exception
+     */
     public static function storeWriteOff(StoreWarehouseReceiptRequest $request):void
     {
-        DB::transaction(function() use ($request) 
-        { 
-            foreach ($request->items as $item) StockBalance::whereWarehouseId($request->warehouse)
-                                                           ->whereOfferId($item['offer_id'])
-                                                           ->decrement('quantity', $item['quantity']);                                                           
-            WarehouseAct::create([
-                'user_id'=>$request->user()->id, 
-                'warehouse_id'=>$request->warehouse, 
-                'type'=>'write-off', 
-                'act'=>$request->items, 
-                'comment'=>$request->reason
-            ]);
-        });
+        try {
+            DB::transaction(function() use ($request) 
+            { 
+                foreach ($request->items as $item) StockBalance::whereWarehouseId($request->warehouse)
+                                                            ->whereOfferId($item['offer_id'])
+                                                            ->decrement('quantity', $item['quantity']);                                                           
+                WarehouseAct::create([
+                    'user_id'=>$request->user()->id, 
+                    'warehouse_id'=>$request->warehouse, 
+                    'type'=>'write-off', 
+                    'act'=>$request->items, 
+                    'comment'=>$request->reason
+                ]);
+            });
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     /**

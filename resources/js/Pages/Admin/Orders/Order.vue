@@ -10,6 +10,7 @@ import TextInput from '@/Components/UI/TextInput.vue';
 import InputError from '@/Components/UI/InputError.vue';
 import OrderStatus from './Partials/OrderStatus.vue';
 import Comments from './Partials/Comments.vue';
+import Checkbox from '@/Components/UI/Checkbox.vue';
 
 const props = defineProps({
     order: {type:Object, default:{}},
@@ -28,6 +29,7 @@ const orderWh = ref(props.order.warehouse_id);
 
 const cancelForm = useForm({
     order_id: props.order.id,
+    goods_returned:false,
     password:'',
     comment:''
 });
@@ -274,6 +276,13 @@ const storeWriteOff = ()=>{
                     </textarea>
 
                     <InputError :message="cancelForm.errors.comment" class="mt-2" />
+                </div>
+
+                <div class='mt-6'>
+                    <label class="mx-2 text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300">
+                        <Checkbox v-model="cancelForm.goods_returned" :checked="cancelForm.goods_returned"/> - товары из заказа возвращены на склад
+                    </label>
+                    <InputError :message="cancelForm.errors.goods_returned" class="mt-2" />
                 </div>
 
                 <div class="mt-6">

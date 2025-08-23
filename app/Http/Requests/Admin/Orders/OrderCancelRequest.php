@@ -18,8 +18,9 @@ class OrderCancelRequest extends FormRequest
     {
         return [
             'order_id'=>['numeric', 'required', Rule::exists('orders', 'id')->where(function (Builder $query) {
-                $query->whereIn('status', [5,6,8,10]);
+                $query->whereIn('status', [5,6,8,9,10]);
             })],
+            'goods_returned'=>'boolean|required',
             'password'=>'required|current_password',
             'comment'=>'string|required|min:5'
         ];
@@ -29,6 +30,7 @@ class OrderCancelRequest extends FormRequest
     {
         return [
             'order_id' => 'Заказ',
+            'goods_returned' => 'Товары возвращены на склад',
             'comment' => 'Комментарий',
             'password' => 'Пароль'
         ];
