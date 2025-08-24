@@ -2,7 +2,7 @@
 import { useForm } from '@inertiajs/vue3';
 import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import WarehouseLayout from './Partials/WarehouseLayout.vue';
-import { computed, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import DangerButton from '@/Components/UI/DangerButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -19,18 +19,27 @@ const props = defineProps({
     selectedWh: {type:Number, default:null},
     navigation:{type:Array, default:[]},
     order: {type:Object, default:[]},
+    shippingFields:{type:Object, default:{}}
 });
-
-const closeModal = ()=>{
-    showSentForm.value = false;
-    sentForm.reset();
-};
-
-const showSentForm = ref(null);
 
 const setStatusForm = useForm({
     order_id:props.order.id,
     status:null,
+});
+
+let shippingForm = {};
+const requiredShippingForm = ref(false);
+const sendToShippingModal = ref(null);
+
+onBeforeMount(() => {
+    let form = {
+        orderId: props.order.id,
+    };
+    for (var key in props.shippingFields) {
+        form[key]=props.shippingFields[key].default;
+        requiredShippingForm.value = true;
+    }
+    shippingForm = useForm(form);
 });
 
 const currentWhInfo = computed(()=>{
@@ -51,25 +60,6 @@ const writeOffCompleted = computed(()=>{
     })
 });
 
-const openSentForm = ()=>{
-    if (!canSent.value) return false;
-    showSentForm.value=true;
-};
-
-const sentForm = useForm({
-    order_id: props.order.id,
-    statis_id: 9,
-});
-
-const orderSent = ()=>{
-    if (!canSent.value) return false;
-    sentForm.post(route('admin.warehouses.order.sent', [currentWhInfo.value.code, props.order.uuid]), {
-        preserveScroll: true,
-        onSuccess: (e)=>console.log(e),
-        onError: (e)=>console.log(e)
-    });
-};
-
 const readyForPickup = ()=>{
     setStatusForm.status = 10;
     setStatusForm.post(route('admin.warehouses.order.readyForPickup', [currentWhInfo.value.code, props.order.uuid]), {
@@ -86,6 +76,23 @@ const orderIssued = ()=>{
         onSuccess: (e)=>console.log(e),
         onError: (e)=>console.log(e)
     });
+};
+
+const sendToShipping = ()=>{
+    if (!canSent.value) return;
+
+    if (requiredShippingForm.value && !sendToShippingModal.value) sendToShippingModal.value=true;
+    else 
+    {
+        shippingForm.post(route('admin.warehouses.order.sentToShipping', [currentWhInfo.value.code, props.order.uuid]), {
+            preserveScroll: true,
+            onSuccess: () => {
+                if (sendToShippingModal.value) sendToShippingModal.value=false;
+                shippingForm.reset();
+            },
+            onError: (e) => console.log(e)
+        });
+    }
 };
 
 </script>
@@ -105,8 +112,8 @@ const orderIssued = ()=>{
                 </div>
                 <div class="rounded-md border border-gray-100 bg-gray-100" v-else>
                     <div>Доставка:</div>
-                    <div>Регион: {{ order.delivery.region }}</div>
-                    <div>Город:{{ order.delivery.city }}</div>
+                    <div v-show="order.delivery.region">Регион: {{ order.delivery.region }}</div>
+                    <div v-show="order.delivery.city">Город:{{ order.delivery.city }}</div>
                     <div>Улица:{{ order.delivery.street }}</div>
                     <div>Дом:{{ order.delivery.house }}</div>
                     <div>Квартира:{{ order.delivery.apartment }}</div>
@@ -120,11 +127,16 @@ const orderIssued = ()=>{
                         <div class="font-semibold italic text-gray-700 text-xs">
                             <div class="my-1">Установить в статус в</div>
                             <div class="grid grid-cols-1 mb-2 w-fit mx-auto gap-1 justify-items-center">
-                                <PrimaryButton v-show="canSent" class="w-full" @click="openSentForm()">Отправлен</PrimaryButton>
                                 <PrimaryButton v-show="canPickup" class="w-full" @click="readyForPickup()">Готов к выдаче</PrimaryButton>
                                 <PrimaryButton v-show="order.status==10" @click="orderIssued()" class="w-full">Выдан</PrimaryButton>
                             </div>
                             <InputError :message="setStatusForm.errors.order_id" class="mt-2" />
+                        </div>
+                        <div class="font-semibold italic text-gray-700 text-xs">
+                            <div class="my-1">Действия</div>
+                            <div class="grid grid-cols-1 mb-2 w-fit mx-auto gap-1 justify-items-center">
+                                <PrimaryButton v-show="canSent" class="w-full" @click="sendToShipping()">Передать в доставку</PrimaryButton>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -158,27 +170,33 @@ const orderIssued = ()=>{
                      :active="![11,12].includes(order.status)"
             />
         </div>
-        <Modal :show="showSentForm">
+        <Modal :show="sendToShippingModal">
             <div class="p-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Отправка заказа
+                    Передать заказ в доставку
                 </h2>
-                <div class="mt-2">
-                    <InputLabel for="tracknumber">Укажите трекномер отправления.</InputLabel>
-                    <TextInput
-                        id="tracknumber"
-                        v-model="sentForm.tracknumber"
-                        type="text"
-                        class="mt-1 block w-3/4"
-                    />
-
-                    <InputError :message="sentForm.errors.tracknumber" class="mt-2" />
+                
+                <div v-for="(field, key) in shippingFields" v-key="key" class="mt-2">
+                    <template v-if="field.type=='string'">
+                        <InputLabel :for="key" :required="field.required">{{ field.label }}</InputLabel>
+                        <TextInput
+                            :id="key"
+                            :ref="key"
+                            :required="field.required"
+                            v-model="shippingForm[key]"
+                            type="text"
+                            class="mt-1 block w-3/4"
+                        />
+                    </template>
+                    <InputError :message="shippingForm.errors[key]" class="mt-2" />
                 </div>
 
                 <div class="flex w-full justify-end mt-2">
-                    <SecondaryButton @click="closeModal()" class="mr-2">Закрыть</SecondaryButton>
-                    <PrimaryButton @click="orderSent()">Сохранить</PrimaryButton>
+                    <SecondaryButton @click="sendToShippingModal=false" class="mr-2">Закрыть</SecondaryButton>
+                    <PrimaryButton @click="sendToShipping()">Отправить</PrimaryButton>
                 </div>
+                
+                <InputError :message="shippingForm.errors.orderId" class="mt-2" />
             </div>
         </Modal>
     </WarehouseLayout>

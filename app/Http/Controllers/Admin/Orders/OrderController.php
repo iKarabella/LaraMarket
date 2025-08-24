@@ -28,7 +28,8 @@ class OrderController extends Controller
 
     public function edit(Request $request, string $uuid)
     {
-        $order = Order::whereUuid($uuid)->with(['status_info', 'comments', 'reserved_products'])->firstOrFail();
+        $order = Order::whereUuid($uuid)->with(['status_info', 'comments', 'reserved_products', 'shippings'])->firstOrFail();
+
         return Inertia::render('Admin/Orders/Order', [
             'navigation'=>$this->getNavigation('orders'),
             'order'=>OrderResource::make($order)->resolve(),

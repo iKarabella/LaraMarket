@@ -35,6 +35,11 @@ class Shipping extends Model
         return $this->hasOne(EntityValue::class, 'id', 'status');
     }
 
+    public function courier_info()
+    {
+        return $this->hasOne(User::class, 'id', 'courier');
+    }
+
     public function warehouse_info()
     {
         return $this->hasOne(Warehouse::class, 'id', 'warehouse_id');

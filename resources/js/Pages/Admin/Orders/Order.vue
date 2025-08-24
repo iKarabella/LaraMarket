@@ -161,8 +161,8 @@ const storeWriteOff = ()=>{
                 </div>
                 <div class="rounded-md border border-gray-100 bg-gray-100" v-else>
                     <div>Доставка:</div>
-                    <div>Регион: {{ order.delivery.region }}</div>
-                    <div>Город:{{ order.delivery.city }}</div>
+                    <div v-show="order.delivery.region">Регион: {{ order.delivery.region }}</div>
+                    <div v-show="order.delivery.city">Город:{{ order.delivery.city }}</div>
                     <div>Улица:{{ order.delivery.street }}</div>
                     <div>Дом:{{ order.delivery.house }}</div>
                     <div>Квартира:{{ order.delivery.apartment }}</div>

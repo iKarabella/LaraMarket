@@ -98,6 +98,7 @@ Route::middleware('permission:warehouses_manage')->group(function () {
     Route::get('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage'])->name('admin.warehouses.orders');
     Route::post('admin/warehouses/{code}/orders', [WarehouseOrdersController::class, 'manage']);
     Route::get('admin/warehouses/{code}/orders/{uuid}', [WarehouseOrdersController::class, 'order'])->name('admin.warehouses.order');
+    Route::post('admin/warehouses/{code}/orders/{uuid}/send_to_shipping', [WarehouseOrdersController::class, 'sentToShipping'])->name('admin.warehouses.order.sentToShipping');
     Route::post('admin/warehouses/{code}/orders/{uuid}/markWh', [WarehouseOrdersController::class, 'markWh'])->name('admin.warehouses.order.markWh');
     Route::post('admin/warehouses/{code}/orders/{uuid}/readyForPickup', [WarehouseOrdersController::class, 'readyForPickup'])->name('admin.warehouses.order.readyForPickup');
     Route::post('admin/warehouses/{code}/orders/{uuid}/sent', [WarehouseOrdersController::class, 'orderSent'])->name('admin.warehouses.order.sent');

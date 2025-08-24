@@ -2,6 +2,7 @@
 
 namespace App\Services\Shipping\Carriers\SelfPickup;
 
+use App\Services\Shipping\Contract\SendToShippingRequest;
 use App\Models\Shipping;
 use App\Models\Warehouse;
 use App\Services\Shipping\Contract\ShippingInterface;
@@ -10,23 +11,14 @@ use Illuminate\Support\Facades\Auth;
 
 class SelfPickupService implements ShippingInterface
 {
-    public function takeToDelivery(Shipping &$shipping):string
-    {
-        return false;
-    }
-
-    public function delivered(Shipping &$shipping):bool
-    {
-        return false;
-    }
-
-    public function returned(Shipping &$shipping):void
+    public function create(SendToShippingRequest $request):void
     {
         //
     }
 
-    public function failed(){
-        //
+    public function wh_required_fields():array
+    {
+        return [];
     }
 
     public static function required_fields():array

@@ -20,6 +20,8 @@ use App\Models\StockReserve;
 use App\Models\Warehouse;
 use App\Models\WarehouseAct;
 use App\Services\OrderService;
+use App\Services\Shipping\Contract\SendToShippingRequest;
+use App\Services\Shipping\ShippingService;
 use App\Services\WarehouseService\WarehouseService;
 use App\Traits\MarketControllerTrait;
 use Carbon\Carbon;
@@ -92,6 +94,12 @@ class WarehouseOrdersController extends Controller
         ]);
     }
 
+    public function sentToShipping(SendToShippingRequest $request, string $code, string $uuid)
+    {
+        ShippingService::client($request->preparing_fields['shipping_code'])->create($request);
+        OrderService::setStatus($request->orderId, 9);
+    }
+
     public function order(Request $request, string $code, string $uuid)
     {
         $order = Order::whereUuid($uuid)->with(['status_info', 'comments', 'reserved_products'])->firstOrFail();
@@ -105,6 +113,7 @@ class WarehouseOrdersController extends Controller
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
             'order'=>OrderResource::make($order)->resolve(),
+            'shippingFields'=>$order->shipping_code ? ShippingService::client($order->shipping_code)->wh_required_fields() : []
         ]);
     }
 

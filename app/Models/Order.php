@@ -34,6 +34,11 @@ class Order extends Model
         });
     }
 
+    public function shippings()
+    {
+      return $this->hasMany(Shipping::class, 'order_id', 'id')->with('status_info');
+    }
+
     public function status_info()
     {
       return $this->hasOne(EntityValue::class, 'id', 'status');
