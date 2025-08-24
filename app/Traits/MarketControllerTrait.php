@@ -22,7 +22,7 @@ trait MarketControllerTrait
         ],
         [
             'name'=>'Доставка',
-            'link'=>'admin.catalog.manage',
+            'link'=>'admin.delivery.manage',
             'key'=>'delivery'
         ]
     ];

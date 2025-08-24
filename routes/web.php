@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Catalog\CatalogController as AdminCatalogController;
 use App\Http\Controllers\Admin\Catalog\ProductMediaController as AdminProductMediaController;
+use App\Http\Controllers\Admin\Delivery\DeliveryController;
 use App\Http\Controllers\Admin\Orders\OrderStatusController;
 use App\Http\Controllers\Admin\Orders\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\RolesAndPermissions\RolesAndPermissionsController;
@@ -79,6 +80,10 @@ Route::middleware('permission:catalog_manage')->group(function () {
     Route::post('admin/catalog/media/store', [AdminProductMediaController::class, 'storeProductMedia'])->name('admin.products.media');
     Route::post('admin/catalog/media/sort', [AdminProductMediaController::class, 'storeProductMediaSorting'])->name('admin.products.media.sorting');
     Route::post('admin/catalog/media/remove', [AdminProductMediaController::class, 'removeProductMedia'])->name('admin.products.media.remove');
+});
+
+Route::middleware('permission:delivery_manage')->group(function(){
+    Route::get('admin/delivery/manage', [DeliveryController::class, 'manage'])->name('admin.delivery.manage');
 });
 
 Route::middleware('permission:warehouses_manage')->group(function () {

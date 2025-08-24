@@ -18,7 +18,8 @@ class Shipping extends Model
         'carrier_key',  // Key компании доставки (null при своей доставке)
         'carrier',      // Название компании доставки (null при своей доставке)
         'courier',      // ID users курьера
-        'status',       // ID статус из site_entities_values, entity:15
+        'delivered',    // отметка о доставке
+        'cancelled',    // отметка об отмене
         'weight',       // масса груза, г
         'width',        // ширина груза, мм
         'height',       // высота груза, мм
@@ -27,7 +28,9 @@ class Shipping extends Model
     
     protected $casts = [
         'positions' => 'array',
-        'customer' => 'array'
+        'customer' => 'array',
+        'delivered' => 'array',
+        'cancelled' => 'array'
     ];
 
     public function status_info()
