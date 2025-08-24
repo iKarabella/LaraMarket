@@ -18,8 +18,6 @@ const props = defineProps({
     navigation:{type:Array, default:[]},
 });
 
-const writeOffEdit = ref({});
-const showWriteOffStocksList = ref(false);
 const showWriteOffEditForm = ref(null);
 const showEditPositionForm = ref(null);
 const showCancelForm = ref(null);

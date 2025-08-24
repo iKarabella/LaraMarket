@@ -38,6 +38,11 @@ class OwnService implements ShippingInterface
 
     }
 
+    public function canCreateShipping():bool
+    {
+        return true;
+    }
+    
     public function wh_required_fields():array
     {
         return [

@@ -16,6 +16,11 @@ class SelfPickupService implements ShippingInterface
         //
     }
 
+    public function canCreateShipping():bool
+    {
+        return false;
+    }
+
     public function wh_required_fields():array
     {
         return [];

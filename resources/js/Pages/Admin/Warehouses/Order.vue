@@ -19,7 +19,8 @@ const props = defineProps({
     selectedWh: {type:Number, default:null},
     navigation:{type:Array, default:[]},
     order: {type:Object, default:[]},
-    shippingFields:{type:Object, default:{}}
+    shippingFields:{type:Object, default:{}},
+    canCreateShipping:{type:Boolean, default:false}
 });
 
 const setStatusForm = useForm({
@@ -51,7 +52,7 @@ const canPickup = computed(()=>{ //статус "готов к выдаче", п
 });
 
 const canSent = computed(()=>{ //при передаче заказа в транспортную компанию или курьеру
-    return [8,10].includes(props.order.status) && writeOffCompleted.value;
+    return [8,10].includes(props.order.status) && writeOffCompleted.value && props.canCreateShipping;
 });
 
 const writeOffCompleted = computed(()=>{

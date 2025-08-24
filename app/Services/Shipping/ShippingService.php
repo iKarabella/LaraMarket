@@ -12,7 +12,6 @@ class ShippingService
             'name'=>'Доставка',
             'title'=>'Собственная служба доставки',
             'key'=>'own',
-            'trackNumberField'=>false,
             'site_available'=>true,
             'service'=>'App\Services\Shipping\Carriers\Own\OwnService'
         ],
@@ -20,7 +19,6 @@ class ShippingService
             'name'=>'Самовывоз',
             'title'=>'Самовывоз из магазина',
             'key'=>'self_pickup',
-            'trackNumberField'=>false,
             'site_available'=>true,
             'service'=>'App\Services\Shipping\Carriers\SelfPickup\SelfPickupService'
         ],
@@ -29,7 +27,6 @@ class ShippingService
         //     'title'=>'Служба доставки "СДЭК"',
         //     'key'=>'sdek',
         //     'site_available'=>true,
-        //     'trackNumberField'=>true,
         //     'service'=>null
         // ],
     ];

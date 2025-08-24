@@ -20,4 +20,9 @@ interface ShippingInterface
      * Создание доставки
      */
     public function create(SendToShippingRequest $request):void;
+
+    /**
+     * Может ли сервис создавать доставку
+     */
+    public function canCreateShipping():bool;
 }

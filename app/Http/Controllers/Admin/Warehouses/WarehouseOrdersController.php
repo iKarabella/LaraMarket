@@ -107,13 +107,15 @@ class WarehouseOrdersController extends Controller
         $warehouses = Warehouse::all();
         $warehouse = $warehouses->firstOrFail(function($arr) use ($code){return $arr->code==$code;});
         $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
+        $shipping = $order->shipping_code ? ShippingService::client($order->shipping_code) : null;
 
         return Inertia::render('Admin/Warehouses/Order', [
             'navigation'=>$this->getNavigation('warehouses'),
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
             'order'=>OrderResource::make($order)->resolve(),
-            'shippingFields'=>$order->shipping_code ? ShippingService::client($order->shipping_code)->wh_required_fields() : []
+            'shippingFields' => $shipping ? $shipping->wh_required_fields() : [],
+            'canCreateShipping' => $shipping ? $shipping->canCreateShipping() : false
         ]);
     }
 
