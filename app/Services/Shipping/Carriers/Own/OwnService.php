@@ -5,6 +5,7 @@ namespace App\Services\Shipping\Carriers\Own;
 use App\Services\Shipping\Contract\SendToShippingRequest;
 use App\Models\Shipping;
 use App\Services\Shipping\Contract\ShippingInterface;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,28 +58,21 @@ class OwnService implements ShippingInterface
         ];
     }
 
-    // public function takeToDelivery(Shipping &$shipping):string
-    // {
-    //     if (Auth::check()) new Exception('Не удалось сохранить изменение статуса доставки');
+    public function takeToDelivery(Shipping &$shipping, ?int $courier=null):void
+    {
+        if (!$courier) throw new Exception('Не указан курьер');
 
-    //     $user = Auth::user();
-    //     $shipping->courier = $user->id;
-    //     $shipping->status  = 91;
+        $shipping->courier = $courier;
 
-    //     $res = $shipping->save();
+        if (!$shipping->save()) throw new Exception('Не удалось сохранить изменение статуса доставки');
+    }
 
-    //     if ($res) return 'Принят в доставку со склада <b>"'.$shipping->warehouse_info->code.'</b>". Курьер: <a href="'.route('user.page', [$user->login]).'" target="_blank">'.$user->name.' '.$user->surname.'</a>';
-    //     else throw new Exception('Не удалось сохранить изменение статуса доставки');
-    // }
+    public function delivered(Shipping &$shipping):void
+    {
+        $shipping->delivered = new Carbon();
 
-    // public function delivered(Shipping &$shipping):bool
-    // {
-    //     $shipping->status = 92;
-    //     $res = $shipping->save();
-
-    //     if($res) return true;
-    //     else throw new Exception('Не удалось сохранить изменение статуса доставки');
-    // }
+        if (!$shipping->save()) throw new Exception('Не удалось сохранить изменение статуса доставки');
+    }
 
     // public function returned(Shipping &$shipping):void
     // {

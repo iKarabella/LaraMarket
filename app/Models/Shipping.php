@@ -33,9 +33,9 @@ class Shipping extends Model
         'cancelled' => 'array'
     ];
 
-    public function status_info()
+    public function order_info()
     {
-        return $this->hasOne(EntityValue::class, 'id', 'status');
+        return $this->hasOne(Order::class, 'id', 'order_id');
     }
 
     public function courier_info()

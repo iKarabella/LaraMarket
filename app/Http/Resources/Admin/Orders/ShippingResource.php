@@ -24,8 +24,9 @@ class ShippingResource extends JsonResource
             'address'=>$this->address,
             'carrier_key'=>$this->carrier_key,  // Key компании доставки (null при своей доставке)
             'carrier'=>$this->carrier,      // Название компании доставки (null при своей доставке),
-            'courier'=>$this->courier ? ['id'=>$this->courier->id, 'name'=>$this->courier->name, 'nickname'=>$this->courier->nickname] : null,
+            'courier'=>$this->courier,
             'track'=>$this->track??null,
+            //'courier_info'=>$this->courier_info ? ['id'=>$this->courier_info->id, 'name'=>$this->courier_info->name, 'nickname'=>$this->courier_info->nickname] : null,
             'shipping'=>[
                 'name'=>$shipping['name']??'',
                 'title'=>$shipping['title']??'',

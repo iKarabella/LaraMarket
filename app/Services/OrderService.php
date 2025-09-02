@@ -115,13 +115,11 @@ class OrderService
      * @param $order Order|int Модель или ID заказа 
      * @param $statusId integer ID entity_value Entyty 2
      */
-    public static function setStatus(Order|int $order, int $statusId, $title=null, $comment=null):array
+    public static function setStatus(Order|int $order, int $statusId, $title=null, $comment=null)
     {
         if (is_int($order)) $order = Order::whereId($order)->with(['status_info'])->firstOrFail();
 
-        $return = ['result'=>true, 'message'=>''];
         $isSaved=false;
-        $title='';
         
         if ($order->status_info) $old = $order->status_info->value;
         else $old = '';
@@ -141,17 +139,9 @@ class OrderService
                 $user = Auth::user();
                 $title = 'Пользователь <a href="'.route('user.page', [$user->nickname]).'" target="_blank" title="'.implode(' ', [$user->surname, $user->name, $user->patronymic]).'">'.$user->nickname.'</a> изменил статус заказа: ';
             }
-            
-            OrderComment::create([
-                'order_id' => $order->id,
-                'auto' => true,
-                'title' => $title.'['.$old.'] -> ['.$new->value.']',
-                'comment' => $comment
-            ]);
+            self::addComment($order->id, $title.'['.$old.'] -> ['.$new->value.']', $comment);
         }
-        else $return=['result'=>false, 'message'=>'Не удалось сменить статус заказа'];
-
-        return $return;
+        else throw new Exception('Не удалось сменить статус заказа');
     }
 
     public function orderEditPosition(Order $order, OrderEditPositionRequest $request)
@@ -200,5 +190,32 @@ class OrderService
                 return $rp->product_id == $position['position'] && $rp->offer_id==$position['offer'];
             })===false;
         });
+    }
+
+    /**
+     * Заказ получен клиентом
+     */
+    public static function orderDelivered(Order|int $order, ?string $comment = null)
+    {
+        self::setStatus($order, 12, $comment);
+    }
+    /**
+     * Заказ получен клиентом
+     */
+    public static function orderSent(Order|int $order, ?string $comment = null)
+    {
+        self::setStatus($order, 9, $comment);
+    }
+
+    public static function addComment(Order|int $order, ?string $title = null, ?string $comment = null, bool $auto=true):void
+    {
+        if (is_int($order)) $order = Order::whereId($order)->with(['status_info'])->firstOrFail();
+
+        OrderComment::create([
+            'order_id' => $order->id,
+            'auto' => $auto,
+            'title' => $title,
+            'comment' => $comment
+        ]);
     }
 }

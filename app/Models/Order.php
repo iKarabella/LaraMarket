@@ -36,7 +36,7 @@ class Order extends Model
 
     public function shippings()
     {
-      return $this->hasMany(Shipping::class, 'order_id', 'id')->with('status_info');
+      return $this->hasMany(Shipping::class, 'order_id', 'id');
     }
 
     public function status_info()

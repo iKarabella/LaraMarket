@@ -58,6 +58,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
         
+        access_rights(refresh:true);
+        
         return redirect()->route('home'); //return redirect()->route('verification.phone');
     }
 }

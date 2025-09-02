@@ -2,6 +2,7 @@
 
 namespace App\Services\Shipping\Contract;
 
+use App\Models\Shipping;
 use App\Services\Shipping\Contract\SendToShippingRequest;
 
 interface ShippingInterface
@@ -25,4 +26,14 @@ interface ShippingInterface
      * Может ли сервис создавать доставку
      */
     public function canCreateShipping():bool;
+
+    /**
+     * Метод, вызываемый при приеме сервисом заказа на доставку.
+     */
+    public function takeToDelivery(Shipping &$shipping):void;
+
+    /**
+     * Метод, вызываемый при успешном завершении доставки.
+     */
+    public function delivered(Shipping &$shipping):void;
 }
