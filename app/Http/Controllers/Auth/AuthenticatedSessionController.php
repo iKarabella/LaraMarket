@@ -48,6 +48,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        access_rights(refresh:true);
+
         if($backto) return Redirect::to($backto);
         else return redirect()->route('home');
     }

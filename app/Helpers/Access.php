@@ -17,11 +17,11 @@ if (! function_exists('access_rights')) {
      * @param string|null $code код конкретного разрешения
      * @return bool|array ['permission code','permission code']
      */
-    function access_rights(?string $code=null):bool|array
+    function access_rights(?string $code=null, bool $refresh = false):bool|array
     {
         $cache = session()->get('access_rights', false);
 
-        if(!$cache || $cache['time']+60<time()){
+        if($refresh || !$cache || $cache['time']+60<time()){
             $cache = [
                 'rights'=>[],
                 'time'=>time()
