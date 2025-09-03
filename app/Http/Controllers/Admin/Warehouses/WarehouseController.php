@@ -65,12 +65,12 @@ class WarehouseController extends Controller
         CashRegister::whereWarehouseId($request->warehouse_id)->whereCrId($request->guid)->delete();
     }
 
-    public function getCashRegisters(string $code)
+    public function getCashRegisters()
     {
-        $warehouse = Warehouse::whereCode($code)->with('cash_registers')->firstOrFail();
+        $usedCashRegisters = CashRegister::whereNotNull('warehouse_id')->get(['cr_id']);
 
-        return (new ModulKassa())->getRetailPoints()->filter(function($point) use ($warehouse){
-            return $warehouse->cash_registers->doesntContain(function($a) use ($point){return $a->cr_id==$point['id'];});
+        return (new ModulKassa())->getRetailPoints()->filter(function($point) use ($usedCashRegisters){
+            return $usedCashRegisters->doesntContain(function($a) use ($point){return $a->cr_id==$point['id'];});
         });
     }
 
