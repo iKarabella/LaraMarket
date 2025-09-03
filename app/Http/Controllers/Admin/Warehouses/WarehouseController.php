@@ -11,10 +11,11 @@ use App\Http\Resources\Admin\Catalog\ProductOfferResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseActResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseStocksInResource;
-use App\Models\Offer;
-use App\Models\StockBalance;
+use App\Models\CashRegister;
 use App\Models\Warehouse;
 use App\Models\WarehouseAct;
+use App\Services\ModulKassa\ModulKassa;
+use App\Services\WarehouseService\Requests\SetCashRegistersRequest;
 use App\Services\WarehouseService\WarehouseService;
 use App\Traits\MarketControllerTrait;
 use Illuminate\Http\RedirectResponse;
@@ -45,8 +46,9 @@ class WarehouseController extends Controller
 
     public function edit(Request $request, ?string $code=null)
     {
-        if ($code) $warehouse = Warehouse::whereCode($code)->firstOrFail();
+        if ($code) $warehouse = Warehouse::whereCode($code)->with('cash_registers')->firstOrFail();
         else $warehouse = (object)[];
+        
         return Inertia::render('Admin/Warehouses/EditWarehouse', [
             'navigation'=>$this->getNavigation('warehouses'),
             'warehouse' => WarehouseResource::make($warehouse)->resolve(),
@@ -54,8 +56,27 @@ class WarehouseController extends Controller
             'filters'=>[
                 'search'=>$request->search,
                 'page'=>$request->page
-            ]
+            ],
         ]);
+    }
+
+    public function deleteCashRegister(Request $request, string $code)
+    {
+        CashRegister::whereWarehouseId($request->warehouse_id)->whereCrId($request->guid)->delete();
+    }
+
+    public function getCashRegisters(string $code)
+    {
+        $warehouse = Warehouse::whereCode($code)->with('cash_registers')->firstOrFail();
+
+        return (new ModulKassa())->getRetailPoints()->filter(function($point) use ($warehouse){
+            return $warehouse->cash_registers->doesntContain(function($a) use ($point){return $a->cr_id==$point['id'];});
+        });
+    }
+
+    public function storeCashRegisters(SetCashRegistersRequest $request, string $code)
+    {        
+        WarehouseService::setCashRegisters($request);
     }
 
     public function store(StoreWarehouseRequest $request):RedirectResponse

@@ -97,6 +97,11 @@ Route::middleware('permission:warehouses_manage')->group(function () {
     Route::put('admin/warehouse/storeReceipt', [WarehouseController::class, 'storeReceipt'])->name('admin.warehouse.storeReceipt');
     Route::put('admin/warehouse/storeWriteOff', [WarehouseController::class, 'storeWriteOff'])->name('admin.warehouse.storeWriteOff');
     Route::get('admin/warehouses/{code?}', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
+    
+    Route::get('admin/warehouses/{code?}/cashRegisters', [WarehouseController::class, 'getCashRegisters'])->name('admin.warehouse.cashRegisters');
+    Route::put('admin/warehouses/{code?}/cashRegisters', [WarehouseController::class, 'storeCashRegisters']);
+    Route::delete('admin/warehouses/{code?}/cashRegisters', [WarehouseController::class, 'deleteCashRegister']);
+
     Route::get('admin/warehouses/{code}/stock_in', [WarehouseController::class, 'stockIn'])->name('admin.warehouses.stock_in');
     Route::post('admin/warehouses/{code}/stock_in', [WarehouseController::class, 'stockIn']);
     Route::get('admin/warehouses/{code}/edit', [WarehouseController::class, 'edit'])->name('admin.warehouses.edit');

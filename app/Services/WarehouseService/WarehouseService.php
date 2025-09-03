@@ -3,16 +3,17 @@
 namespace App\Services\WarehouseService;
 
 use App\Http\Requests\Admin\Warehouses\StoreWarehouseReceiptRequest;
+use App\Models\CashRegister;
 use App\Models\Offer;
-use App\Models\Order;
 use App\Models\ReservedProduct;
 use App\Models\StockBalance;
 use App\Models\StockReserve;
+use App\Models\Warehouse;
 use App\Models\WarehouseAct;
+use App\Services\WarehouseService\Requests\SetCashRegistersRequest;
 use Exception;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -219,6 +220,42 @@ class WarehouseService
         }
 
         return true;
+    }
+
+    /**
+     * Резервирование товаров
+     * 
+     * @param array $toReserve массив позиций для резервирования
+     * @return bool true при успешном резервировании
+     * @throws \Exception
+     */
+    public static function setCashRegisters(SetCashRegistersRequest $request):void
+    {
+        $validated = $request->validated();
+
+        try {
+            DB::transaction(function() use ($validated)
+            {
+                foreach (array_filter($validated['cash_registers'], function($arr) { return $arr['addForWarehouse']===true; }) as $item) 
+                {
+                    CashRegister::updateOrCreate([
+                        'cr_id'=>$item['id'],
+                        'system'=>'modulkassa',
+                        'warehouse_id'=>$validated['warehouse_id'],
+                        'user_id'=>null
+                    ], [
+                        'details'=>[
+                            'name'=>$item['name'],
+                            'address'=>$item['address'],
+                            'phone'=>$item['phone']
+                        ]
+                    ]);
+                }
+            });
+        } 
+        catch (Exception $e) {
+            throw $e;
+        }
     }
 
     /**

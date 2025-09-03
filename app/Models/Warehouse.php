@@ -15,4 +15,9 @@ class Warehouse extends Model
         'description', //описание
         'self_pickup', //возможность самовывоза
     ];
+
+    public function cash_registers()
+    {
+        return $this->hasMany(CashRegister::class, 'warehouse_id', 'id');
+    }
 }

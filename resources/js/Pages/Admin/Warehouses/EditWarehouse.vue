@@ -7,6 +7,7 @@ import InputError from '@/Components/UI/InputError.vue';
 import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import Tiptap from '@/Components/Tiptap/Tiptap.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
+import Modal from '@/Components/Modals/MainModal.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
 import { ref } from 'vue';
 
@@ -36,6 +37,53 @@ const storeWarehouse = ()=>{
 const updateContent = (content) => {
     warehouseForm.description=content;
 };
+
+const addCashRegisterForm = useForm({
+    cash_registers:[],
+    warehouse_id: props.warehouse.id
+});
+const cashRegistersModal = ref(false);
+const addCashRegister = () => {
+    axios.get(route('admin.warehouse.cashRegisters', [props.warehouse.code])).then(res=>{
+        if (res.data) {
+            addCashRegisterForm.cash_registers = res.data.map(arr=>{
+                return {
+                    id:arr.id,
+                    name:arr.name,
+                    address:arr.address,
+                    phone:arr.phone,
+                    addForWarehouse:false
+                }
+            });
+            cashRegistersModal.value = true;
+        }
+    });
+}
+const storeCashRegisters = () => {
+    addCashRegisterForm.put(route('admin.warehouse.cashRegisters', props.warehouse.code), {
+        preserveScroll:true,
+        onSuccess:()=>modalClose(), 
+        onError:(e)=>console.log(e)
+    });
+};
+const modalClose = ()=>{
+    cashRegistersModal.value=false;
+    addCashRegisterForm.reset();
+}
+
+const cashRegisterRemoveForm = useForm({
+    warehouse_id:props.warehouse.id,
+    guid: null,
+});
+
+const removeCashRegister = (guid)=>{
+    cashRegisterRemoveForm.guid = guid;
+    cashRegisterRemoveForm.delete(route('admin.warehouse.cashRegisters', props.warehouse.code), {
+        preserveScroll:true,
+        onSuccess:() => cashRegisterRemoveForm.reset(), 
+        onError:(e) => console.log(e)
+    });
+}
 </script>
 
 <template>
@@ -110,6 +158,39 @@ const updateContent = (content) => {
                 </Link>
                 <PrimaryButton @click="storeWarehouse">Сохранить</PrimaryButton>
             </div>
+
+            <div class="mt-2">
+                <h2>МодульКасса</h2>
+                <div>
+                    <div v-for="(kassa, index) in warehouse.cash_registers">
+                        {{ kassa.details.name }}
+                        <span title="Отвязать кассу" class="text-red-500 pl-2 cursor-pointer" @click="removeCashRegister(kassa.cr_id)"><i class="ri-close-circle-line"></i></span>
+                    </div>
+                    <SecondaryButton @click="addCashRegister">+ Добавить</SecondaryButton>
+                </div>
+            </div>
+            <Modal :show="cashRegistersModal" @close="closeModal()">
+                <div class="p-6">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        Выберите кассу
+                    </h2>
+
+                    <div class="mt-6 md:grid md:grid-cols-3 md:gap-2">
+                        <label v-for="(point, index) in addCashRegisterForm.cash_registers" :key="index">
+                            <div>
+                                <Checkbox @change="addCashRegisterForm.cash_registers[index].addForWarehouse=!addCashRegisterForm.cash_registers[index].addForWarehouse"/>
+                                {{ point.name }}
+                            </div>
+                            <div>{{ point.address }}</div>
+                        </label>
+                    </div>
+                    
+                    <div class="mt-2 md:flex gap-2 justify-end">
+                        <SecondaryButton @click="modalClose">Закрыть</SecondaryButton>
+                        <PrimaryButton @click="storeCashRegisters">Сохранить</PrimaryButton>
+                    </div>
+                </div>
+            </Modal>
         </div>
     </MarketLayout>
 </template>

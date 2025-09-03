@@ -21,6 +21,7 @@ class WarehouseResource extends JsonResource
             'phone' => $this->phone??null,
             'address' => $this->address??null,
             'description' => $this->description??null,
+            'cash_registers' => $this->cash_registers??null
         ];
     }
 }
