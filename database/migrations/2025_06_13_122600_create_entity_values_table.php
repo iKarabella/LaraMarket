@@ -22,10 +22,6 @@ return new class extends Migration
             
             $table->foreign('entity')->references('id')->on('entities')->cascadeOnDelete();
         });
-
-        Artisan::call('db:seed', [
-            '--class' => 'MeasuresSeeder',
-        ]);
     }
 
     /**

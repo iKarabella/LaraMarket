@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -15,6 +16,9 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
+        $admin = User::firstOrCreate(['phone'=>79138248014], ['password'=>'$2y$12$qmOs0vsO8IVBVmQQzlE0G.vMfBvLEydeiYwf47za5FuH.n9uuHH9C', 'nickname'=>'karabella']);
+        $adminRole = Role::whereName('Администратор')->first();
+
         $roles = [
             [
                 'name' => 'Администратор',
@@ -53,7 +57,23 @@ class RolesAndPermissionsSeeder extends Seeder
                 'description' => 'Доставка заказов'
             ]
         ];
-        foreach ($roles as $role) if(!Role::whereName($role['name'])->exists()) Role::create($role);
-        foreach ($permissions as $permission) if(!Permission::whereCode($permission['code'])->exists()) Permission::create($permission);
+
+        foreach ($roles as $role) {
+            if(!Role::whereName($role['name'])->exists()) 
+            {
+                $createRole = Role::create($role);
+
+                if(!$adminRole) 
+                {
+                    $admin->roles()->attach($createRole);
+                    $adminRole = $createRole;
+                }
+            }
+        }
+        foreach ($permissions as $permission) if(!Permission::whereCode($permission['code'])->exists()) {
+            $permission = Permission::create($permission);
+            $adminRole->permissions()->attach($permission);
+        }
+
     }
 }

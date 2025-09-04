@@ -24,7 +24,6 @@ const tradeOfferForm = useForm({
     barcode:props.offer.barcode??'',
     art:props.offer.art??'',
     visibility:props.offer.visibility??true,
-    to_caschier:props.offer.to_caschier??false,
     coeff:props.offer.coeff??0,
     weight:props.offer.weight??null,
     length:props.offer.length??null,
@@ -101,11 +100,6 @@ const saveOffer = () => {
                         <Checkbox name="visibility" id="visibility" v-model="tradeOfferForm.visibility" :checked="tradeOfferForm.visibility" title="Будет доступен в каталоге"/>
                         <InputLabel class="ml-2" for="visibility" value=" - Доступен в каталоге"/>
                         <InputError class="ml-2" :message="tradeOfferForm.errors.visibility" />
-                    </div>
-                    <div class="flex whitespace-nowrap mt-2 pt-6 md:ml-2">
-                        <Checkbox name="sendToCaschier" id="sendToCaschier" v-model="tradeOfferForm.to_caschier" :checked="tradeOfferForm.to_caschier" title="Передавать информацию о позиции в кассовую систему"/>
-                        <InputLabel class="ml-2" for="sendToCaschier" value=" - Передавать в кассу"/>
-                        <InputError class="ml-2" :message="tradeOfferForm.errors.sendToCaschier" />
                     </div>
                     <div class="mt-2 pt-6 md:ml-2 flex whitespace-nowrap" title="Коэффициент отпускной цены">
                         <InputLabel for="coeff" value="Коэф.%"/>
