@@ -58,9 +58,50 @@ class ModulKassa
         });
     }
 
+    public function catalogChanges(Collection $get, Collection $guids)
+    {
+        $offers = $get->map(function ($offer) {
+                            switch($offer->product_measure){
+                                case 2: $measure = 'kg'; break;
+                                case 3: $measure = 'pcs'; break;
+                                default: $measure = 'other';
+                            };
+
+                            return json_encode([
+                                'command'=>'add',
+                                'entity'=>[
+                                    'catalogType' => 'INVENTORY',
+                                    'inventCode' => str_pad($offer->offer_id, 3, '0', STR_PAD_LEFT),
+                                    'name' => "{$offer->product_title}, {$offer->offer_title}",
+                                    'barcode' => $offer->barcode??null,
+                                    'barcodes'=>[],
+                                    'price'=>$offer->price/100,
+                                    'measure' => $measure,
+                                    'alcoholType' => 'NO_ALCOHOL',
+                                    'itemType' => 'INVENTORY',
+                                    'separateModifiers' => true
+                                ]
+                            ], JSON_UNESCAPED_UNICODE);
+                        })
+                      ->implode("\n---\n");
+
+        $data = "### data begin ###\n{\"command\":\"clear\",\"catalogs\":[\"INVENTORY\"]}".$offers.="\n### data end ###";
+
+        foreach ($guids as $guid) if ($guid) $this->post('/v1/retail-point/'.$guid.'/catalog-changes', $data);
+    }
+
     private function get(string $method):Collection
     {
         $result = $this->client->get($this->host.$method);
+        if ($result->successful()) return $result->collect();
+        else throw new Exception('Не удалось получить ответ.');
+    }
+
+    private function post(string $method, string|array $data)
+    {
+        if (is_array($data)) $result = $this->client->post($this->host.$method, $data);
+        else $result = $this->client->withBody($data, 'text/plain')->post($this->host.$method);
+        
         if ($result->successful()) return $result->collect();
         else throw new Exception('Не удалось получить ответ.');
     }
