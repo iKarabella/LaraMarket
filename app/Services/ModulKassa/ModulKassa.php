@@ -27,7 +27,12 @@ class ModulKassa
 
     }
 
-    public function getRetailPoints()
+    /**
+     * Запрос списка торговых точек модулькассы
+     * 
+     * @return Collection список торговых точек
+     */
+    public function getRetailPoints():Collection
     {
         return $this->get('/v1/retail-points')->map(function($point){
             return [
@@ -58,7 +63,14 @@ class ModulKassa
         });
     }
 
-    public function catalogChanges(Collection $get, Collection $guids)
+    /**
+     * Отправить список товаров в систему модулькассы
+     * 
+     * @param Collection $get список товаров из бд.
+     * @param Collection $guids список идентификаторов торговых точек модулькассы, в которые нужно загрузить товары.
+     * @return void
+     */
+    public function catalogChanges(Collection $get, Collection $guids):void
     {
         $offers = $get->map(function ($offer) {
                             switch($offer->product_measure){
@@ -90,6 +102,12 @@ class ModulKassa
         foreach ($guids as $guid) if ($guid) $this->post('/v1/retail-point/'.$guid.'/catalog-changes', $data);
     }
 
+    /** 
+     * GET запрос к API модулькассы
+     * @param string $method метод в URL
+     * @return Collection
+     * @throws Exception
+     */
     private function get(string $method):Collection
     {
         $result = $this->client->get($this->host.$method);
@@ -97,6 +115,13 @@ class ModulKassa
         else throw new Exception('Не удалось получить ответ.');
     }
 
+    /** 
+     * POST запрос к API модулькассы
+     * @param string $method метод в URL
+     * @param string|array $data тело запроса
+     * @return Collection
+     * @throws Exception
+     */
     private function post(string $method, string|array $data)
     {
         if (is_array($data)) $result = $this->client->post($this->host.$method, $data);
