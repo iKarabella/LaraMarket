@@ -20,13 +20,18 @@ class WarehouseActResource extends JsonResource
             'user_id' => $this->user_id??null,
             'warehouse_id' => $this->warehouse_id??null,
             'type' => $this->type??null,
-            'act' => $this->act??null,
+            'act' => $this->act??[],
+            'doc_id'=>$this->doc_id??[],
             'comment' => $this->comment??null,
             'user' => $this->user ? [
                 'id'=>$this->user->id,
                 'nickname'=>$this->user->nickname,
                 'name'=>implode(' ', array_filter([$this->user->name, $this->user->surname]))
-            ] : null,
+            ] : [
+                'id'=>'',
+                'nickname'=>'',
+                'name'=>'server'
+            ],
             'created' => (new Carbon($this->created_at))->format('d.m.Y H:i:s'),
         ];
     }

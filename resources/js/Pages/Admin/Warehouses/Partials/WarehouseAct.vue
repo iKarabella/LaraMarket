@@ -1,9 +1,4 @@
 <script setup>
-import InputError from '@/Components/UI/InputError.vue';
-import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
-import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
-import Tiptap from '@/Components/Tiptap/Tiptap.vue';
-import { useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -17,6 +12,7 @@ const computedAct = computed(()=>{
         return pos;
     });
 });
+
 const actAmount = computed(()=>{
     if(props.act.type=='write-off') return null;
     let amount = 0;
@@ -33,20 +29,22 @@ const showAct = ref(false);
         <div class="md:grid md:grid-cols-4 md:gap-2 cursor-pointer" @click="showAct=!showAct">
             <div>{{ act.created }}</div>
             <div>{{ act.user.name }}</div>
-            <div v-if="props.act.type!='write-off'">{{ actAmount }}</div>
-            <div></div>
+            <div v-if="act.type!='write-off'">{{ actAmount }}</div>
+            <div>
+                <span v-if="act.doc_id">{{ act.doc_id.type }}</span>
+            </div>
         </div>
         <Transition>
             <div v-show="showAct">
                 <div v-for="(position, index) in computedAct" class="md:grid md:grid-cols-10 md:gap-2">
                     <div>{{ index+1 }}</div>
                     <div class="col-span-5">{{ position.title }}</div>
-                    <div class="text-right" v-if="props.act.type!='write-off'">{{ position.price }} ₽</div>
+                    <div class="text-right" v-if="act.type!='write-off'">{{ position.price }} ₽</div>
                     <div class="text-right">{{ position.quantity }}</div>
                     <div>{{ position.measure_val }}</div>
-                    <div class="text-right" v-if="props.act.type!='write-off'">{{ position.amount.toFixed(2) }} ₽</div>
+                    <div class="text-right" v-if="act.type!='write-off'">{{ position.amount.toFixed(2) }} ₽</div>
                 </div>
-                <div v-if="props.act.comment" v-html="props.act.comment"></div>
+                <div v-if="act.comment" v-html="act.comment"></div>
             </div>
         </Transition>
     </div>

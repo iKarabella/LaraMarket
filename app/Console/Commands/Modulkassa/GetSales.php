@@ -72,16 +72,25 @@ class GetSales extends Command
 
                         return [
                             'offer_id'=>$offer->id,
+                            'title'=>"{$offer->product->title}, {$offer->title}",
+                            'measure_val'=>$offer->product->measure_value->value,
                             'quantity'=>(int) $quantity,
                             'price'=>$arr['price'],
+                            'amount'=>$arr['quantity']*$arr['price']
                          ];
                     }, $doc['inventPositions']);
 
+                    $reason = [
+                        'system'=>'modulkassa', 
+                        'id'=>$doc['id'],
+                        'type'=>($doc['docType']=='SALE' ? 'Продажа' : (($doc['docType']=='RETURN_BY_SALE' || $doc['docType'] == 'RETURN_BY_SALE') ? 'Возврат' : 'Неопределен'))
+                    ];
+
                     switch($doc['docType'])
                     {
-                        case 'SALE': WarehouseService::otherWriteOff($positions, 1, ['system'=>'modulkassa', 'id'=>$doc['id']]); break;
-                        //case 'RETURN': WarehouseService::returnPositions($positions, 1, ['system'=>'modulkassa', 'id'=>$doc['id']]); break;
-                        case 'RETURN_BY_SALE': WarehouseService::otherWriteOff($positions, 1, ['system'=>'modulkassa', 'id'=>$doc['id']], true); break;
+                        case 'SALE': WarehouseService::otherWriteOff($positions, 1, $reason); break;
+                        //case 'RETURN': WarehouseService::returnPositions($positions, 1, $reason); break;
+                        case 'RETURN_BY_SALE': WarehouseService::otherWriteOff($positions, 1, $reason, true); break;
                         // case 'ORDER': break; //TODO работа с заказами
                     }
                 }

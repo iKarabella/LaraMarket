@@ -66,6 +66,7 @@ class WarehouseService
                     'doc_id'=>[
                         'system'=>$docInfo['system']??null,
                         'id'=>$docInfo['id']??null,
+                        'type'=>$docInfo['type']??null
                     ]
                 ]);
                 foreach ($positions as $position) {
