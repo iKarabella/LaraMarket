@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 class WarehouseService
 {
     /**
-     * Списание товаров со склада
+     * Списание со склада товаров из заказа
      */
     public static function writeOff(array $validated):bool
     {
@@ -46,6 +46,37 @@ class WarehouseService
         }
 
         return true;
+    }
+
+    /**
+     * Списание со склада по запросу
+     * @param array $positions список позиций к списанию
+     * @param int $warehouse_id ID склада
+     * @param array $docInfo запрос списания ['system'=>string, 'id'=>string]
+     * @param bool $return возврат позиций на склад
+     */
+    public static function otherWriteOff(array $positions, int $warehouse_id, array $docInfo, $return=false):void
+    {
+        try {    
+            DB::transaction(function() use ($positions, $warehouse_id, $docInfo, $return) {
+                WarehouseAct::create([
+                    'warehouse_id'=>$warehouse_id,
+                    'type'=>$return?'receipt':'write-off',
+                    'act'=>$positions,
+                    'doc_id'=>[
+                        'system'=>$docInfo['system']??null,
+                        'id'=>$docInfo['id']??null,
+                    ]
+                ]);
+                foreach ($positions as $position) {
+                    StockBalance::whereWarehouseId($warehouse_id)
+                                ->whereOfferId($position['offer_id'])
+                                ->{$return?'decrement':'increment'}('quantity', $position['quantity']);
+                }
+            });
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     /**

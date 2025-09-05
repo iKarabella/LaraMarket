@@ -19,6 +19,7 @@ class Offer extends Model
         'length',
         'width',
         'height',
+        'temp_field' //технический временный параметр
     ];
 
     protected $casts = [

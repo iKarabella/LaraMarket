@@ -102,6 +102,22 @@ class ModulKassa
         foreach ($guids as $guid) if ($guid) $this->post('/v1/retail-point/'.$guid.'/catalog-changes', $data);
     }
 
+    /**
+     * Запрос списка смен торговой точки
+     * 
+     * @param int $days количество дней
+     * @return Collection список смен
+     */
+    public function getShifts(string $guid, int $days=1):Collection
+    {
+        return $this->get('/v1/retail-point/'.$guid.'/get-recent-shifts?days='.$days);
+    }
+
+    public function getCashDocs(string $pointId, string $shiftDocId):Collection
+    {
+        return $this->get("/v1/retail-point/{$pointId}/shift/{$shiftDocId}/cashdoc");
+    }
+
     /** 
      * GET запрос к API модулькассы
      * @param string $method метод в URL
