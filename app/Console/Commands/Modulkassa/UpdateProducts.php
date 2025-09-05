@@ -56,7 +56,7 @@ class UpdateProducts extends Command
             
             if ($offers->count()) {
                 $guids = $cashRegisters->filter(function($arr)use($wh){return $arr->warehouse_id==$wh;})->pluck('cr_id');
-                $modulKassa->catalogChanges($offers, $guids);
+               // $modulKassa->catalogChanges($offers, $guids);
             }
         }
     }
