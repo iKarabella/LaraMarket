@@ -19,13 +19,13 @@ class StoreCatRequest extends FormRequest
      */
     public function rules(): array
     {
-        if ($this->id) $rule = ['string','required', 'min:3', 'max:25', Rule::unique(Category::class)->ignore($this->id)];
-        else $rule = 'string|required|min:3|max:25|unique:categories,code';
+        if ($this->id) $codeRules = ['string','required', 'min:3', 'max:25', Rule::unique(Category::class)->ignore($this->id)];
+        else $codeRules = 'string|required|min:3|max:25|unique:categories,code';
 
         return [
             'id'=>'numeric|nullable|exists:categories',
-            'title'=>'string|min:3',
-            'code'=>['string','required', 'min:3', 'max:25', $rule],
+            'title'=>'string|required|min:3',
+            'code'=>$codeRules,
             'description'=>'string|nullable',
             'visibility'=>'boolean',
             'parent'=>'numeric|nullable|exists:categories,id'

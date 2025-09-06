@@ -16,9 +16,12 @@ class ProductController extends Controller
 
     public function index(Request $request, string $code): Response
     {
-        $product = Product::whereCode($code)
-                          ->with(['categories', 'media', 'publicOffersWithRel', 'measure_value'])
-                          ->firstOrFail();
+        $product = Product::whereCode($code);
+
+        if (!access_rights('catalog_manage')) $product->whereVisibility(true);
+
+        $product=$product->with(['categories', 'media', 'publicOffersWithRel', 'measure_value'])->firstOrFail();
+
         return Inertia::render('Catalog/ProductCard', [
             'status' => session('status'),
             'product'   => ProductResource::make($product)->resolve(),

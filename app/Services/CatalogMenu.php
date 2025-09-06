@@ -37,12 +37,12 @@ class CatalogMenu
 
         $this->categories = DB::select(
             "WITH RECURSIVE CatsTree AS (
-                SELECT id, title, code, parent FROM categories $where
+                SELECT id, title, code, parent, visibility FROM categories $where
                 UNION ALL
-                SELECT c.id, c.title, c.code, c.parent FROM categories c
+                SELECT c.id, c.title, c.code, c.parent, c.visibility FROM categories c
                 JOIN CatsTree ON c.id = CatsTree.parent
              )
-             SELECT DISTINCT id, title, code, parent FROM CatsTree"
+             SELECT DISTINCT id, title, code, parent FROM CatsTree" // WHERE visibility = 1
         );
     }
 
