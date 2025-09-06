@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\Orders\OrderToAssemblyRequest;
 use App\Http\Requests\Admin\Orders\OrderWaitingPaymentRequest;
 use App\Models\Order;
 use App\Models\StockReserve;
+use App\Services\ModulKassa\ModulKassa;
 use App\Services\OrderService;
 use App\Services\WarehouseService\DTO\ReservationDTO;
 use App\Services\WarehouseService\WarehouseService;
@@ -24,9 +25,9 @@ class OrderStatusController extends Controller
     {
         $order = Order::whereId($request->order_id)->with(['status_info', 'reserved_products'])->firstOrFail();
 
-        $cancelled = $request->goods_returned ? WarehouseService::cancelOrderReservation($order->reserved_products, $order->id, $order->body, $order->warehouse_id) : true;
-        //TODO если есть в кассах -- удалить из касс
-        //TODO если есть доставка -- отменить доставку
+        $cancelled = ($request->goods_returned && $order->warehouse_id) ? WarehouseService::cancelOrderReservation($order->reserved_products, $order->id, $order->body, $order->warehouse_id) : true;
+
+        (new ModulKassa())->cancelOrder($order->id);
         
         if ($cancelled===true) OrderService::setStatus($order, 11, null, $request->comment);
     }

@@ -154,7 +154,7 @@ class ModulKassa
             'documentNumber'=>"Заказ №{$order->id}",
             'documentType'=>'SALE',
             'documentDateTime'=>(string)$order->created_at->format('c'),
-            'customerContact'=>(string)'+'.$order->customer['phone']??'',
+            //'customerContact'=>(string)'+'.$order->customer['phone']??'', //TODO телефон брать из данных пользователя
             'description'=>$description,
             'retailPointId'=>null,
             'prepaid'=>false,

@@ -7,6 +7,8 @@ import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import DangerButton from '@/Components/UI/DangerButton.vue';
 import InputError from '@/Components/UI/InputError.vue';
+import InputLabel from '@/Components/UI/InputLabel.vue';
+import Checkbox from '@/Components/UI/Checkbox.vue';
 import Modal from '@/Components/Modals/MainModal.vue';
 import { Link } from '@inertiajs/vue3';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -18,7 +20,7 @@ const props = defineProps({
 
 const showOrderBodyId = ref(null);
 const showFinishModal = ref(false);
-const shippingForm = useForm({id:null, comment:null, type:null});
+const shippingForm = useForm({id:null, comment:null, type:null, returned:true});
 const commentArea = ref(null);
 
 const closeModal = ()=>{
@@ -133,6 +135,11 @@ const finiShipping = (id, type) => {
                     <InputError :message="shippingForm.errors.comment" class="mt-2" />
                     <InputError :message="shippingForm.errors.action" class="mt-2" />
                     <InputError :message="shippingForm.errors.id" class="mt-2" />
+                </div>
+
+                <div class="mt-2 flex gap-2" v-show="shippingForm.type=='cancelled'">
+                    <Checkbox name="returned" id="returned" v-model="shippingForm.returned" :checked="shippingForm.returned" title="Заказ возвращен на склад"/>
+                    <InputLabel class="ml-2" for="returned" value=" - возвращен на склад"/>
                 </div>
 
                 <div class="flex w-full justify-end mt-2">

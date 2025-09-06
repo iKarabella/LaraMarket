@@ -25,13 +25,19 @@ class DeliveryActionRequest extends FormRequest
                 Rule::exists('shippings', 'id')->whereNull('courier')->whereNull('delivered')->whereNull('cancelled')
             ];
         }
-        elseif($action=='cancelled' || $action == 'delivered')
+        
+        if($action=='cancelled' || $action == 'delivered')
         {
             $this->additionalRules['id'] = [
                 'numeric', 
                 'required', 
                 Rule::exists('shippings', 'id')->where('courier', $this->user()->id)->whereNull('delivered')->whereNull('cancelled')
             ];
+        }
+
+        if($action=='cancelled')
+        {
+            $this->additionalRules['returned']='boolean|nullable';
         }
     }
 

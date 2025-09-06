@@ -66,7 +66,8 @@ class DeliveryController extends Controller
     public function addComment(DeliveryActionRequest $request)
     {
         $shipping = Shipping::whereId($request->id)->firstOrFail();
-        $title = '<a href="'.route('user.page', [$request->user()->nickname]).'" target="_blank">'.$request->user()->name.' '.$request->user()->surname.'</a> оставил комментарий.';
+        $author = empty($request->user()->name) ? $request->user()->nickname : $request->user()->name.' '.$request->user()->surname;
+        $title = '<a href="'.route('user.page', [$request->user()->nickname]).'" target="_blank">'.$author.'</a> оставил комментарий.';
 
         OrderService::addComment($shipping->order_id, $title, $request->comment, false);
     }
