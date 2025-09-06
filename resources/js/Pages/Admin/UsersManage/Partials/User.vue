@@ -1,6 +1,7 @@
 <script setup>
 import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import TextInput from '@/Components/UI/TextInput.vue';
+import Checkbox from '@/Components/UI/Checkbox.vue';
 import {PhoneFormat} from '@/Mixins/PhoneFormat.js';
 import {TextTranslit} from '@/Mixins/TextFormat.js';
 import { ref } from 'vue';
@@ -17,7 +18,7 @@ const updFilts = () => {emit('updateParams');};
         <td class="py-2">+{{ user.phone }}</td>
         <td>{{ user.name }} {{ user.patronymic }}</td>
         <td>{{ user.surname }}</td>
-        <td>{{ user.login }}</td>
+        <td>{{ user.nickname }}</td>
         <td class="text-right">
             <SecondaryButton @click="userEdit(user.id)">{{user.isAdmin?'Смотреть':'Редактировать'}}</SecondaryButton>
         </td>
@@ -37,26 +38,41 @@ const updFilts = () => {emit('updateParams');};
                 <TextInput v-model="params.phone" 
                     :keyup="params.phone=PhoneFormat(params.phone)"
                     v-on:change="updFilts"
-                    placeholder="Телефона"/>
+                    name="phone"
+                    autocomplete="false"
+                    placeholder="Телефон"/>
             </td>
             <td class="text-center">
                 <TextInput v-model="params.name" 
                     v-on:change="updFilts"
+                    name="name"
+                    autocomplete="false"
                     placeholder="Имя"/>
             </td>
             <td class="text-center">
                 <TextInput v-model="params.surname" 
                     v-on:change="updFilts"
+                    name="surname"
                     placeholder="Фамилия"/>
             </td>
             <td class="text-center">
                 <TextInput v-model="params.nickname" 
                     :keyup="params.nickname=TextTranslit(params.nickname, true)"
                     v-on:change="updFilts"
+                    name="nickname"
                     placeholder="Псевдоним"/>
             </td>
             <td></td>
-            <td class="text-right"></td>
+            <td class="text-right">
+                <label class="flex font-medium text-sm text-gray-700 dark:text-gray-300">
+                    <Checkbox class="mr-4"
+                              name="courier"
+                              v-model="params.couriers"
+                              :checked="params.couriers"
+                              v-on:change="updFilts"/> 
+                    Курьер
+                </label>
+            </td>
         </tr>
     </template>
 </template>

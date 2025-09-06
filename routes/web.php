@@ -43,6 +43,11 @@ Route::middleware('permission:users_manage')->group(function () {
     Route::get('admin/users', [UsersManageController::class, 'index'])->name('admin.users.manage');
     Route::post('admin/users', [UsersManageController::class, 'index']);
     Route::patch('admin/users', [UsersManageController::class, 'store'])->name('admin.users.update');
+    Route::get('admin/user/{userId}/getCurrentCashRegisters', [UsersmanageController::class, 'getCurrentCashRegisters'])->name('admin.user.getCurrentCashRegisters');
+    Route::get('admin/user/{userId}/getAvailableCashRegisters', [UsersmanageController::class, 'getAvailableCashRegisters'])->name('admin.user.getAvailableCashRegisters');
+    Route::get('admin/user/{userId}/getModulkassaUsers/{pointId}', [UsersmanageController::class, 'getModulkassaUsers'])->name('admin.user.getModulkassaUsers');
+    Route::post('admin/user/{userId}/ModulkassaUser', [UsersmanageController::class, 'setModulkassaUser'])->name('admin.user.ModulkassaUser');
+    Route::delete('admin/user/{userId}/ModulkassaUser', [UsersmanageController::class, 'removeModulkassaUser'])->name('admin.user.ModulkassaUser');
 });
 
 Route::middleware('permission:roles_and_permissions')->group(function () {

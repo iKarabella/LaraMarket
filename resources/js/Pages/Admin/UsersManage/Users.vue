@@ -11,14 +11,15 @@ import InputLabel from '@/Components/UI/InputLabel.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
 import TextInput from '@/Components/UI/TextInput.vue';
 import {TextTranslit} from '@/Mixins/TextFormat.js';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import ModulkassaUser from './Partials/ModulkassaUser.vue';
 
 const props = defineProps({
     filter:{type:Object, default:{
         phone: '',
         name: '',
         surname: '',
-        login: '',
+        nickname: '',
         order: '',
         desc: false,
         page: null,
@@ -34,7 +35,8 @@ const params = useForm({
     nickname: props.filter.nickname??'',
     order: props.filter.order??'',
     desc: props.filter.desc??false,
-    page: props.filter.page??null
+    page: props.filter.page??null,
+    couriers: props.filter.couriers??false,
 });
 
 
@@ -67,8 +69,15 @@ const editForm = useForm({
     name: null,
     patronymic: null,
     surname: null,
-    login: null,
+    nickname: null,
     roles: [],
+});
+
+const isCourier = computed(()=>{
+    return editForm.roles.some((role)=>{
+        if(!role || !role.permissions) return false;
+        return -1<role.permissions.findIndex(permission=>permission.code=='delivery_manage');
+    })
 });
 
 const editUserForm = ref(false);
@@ -128,6 +137,7 @@ const setRole = (rid)=>{
                         v-model="editForm.name"
                         type="text"
                         class="mt-1 block w-full"
+                        autocomplete="false"
                     />
 
                     <InputError :message="editForm.errors.name" class="mt-2" />
@@ -140,6 +150,7 @@ const setRole = (rid)=>{
                         v-model="editForm.patronymic"
                         type="text"
                         class="mt-1 block w-full"
+                        autocomplete="false"
                     />
 
                     <InputError :message="editForm.errors.patronymic" class="mt-2" />
@@ -152,23 +163,25 @@ const setRole = (rid)=>{
                         v-model="editForm.surname"
                         type="text"
                         class="mt-1 block w-full"
+                        autocomplete="false"
                     />
 
                     <InputError :message="editForm.errors.surname" class="mt-2" />
                 </div>
 
                 <div>
-                    <InputLabel for="login" value="Псевдоним" />
+                    <InputLabel for="nickname" value="Псевдоним" />
 
                     <TextInput
-                        id="login"
-                        v-model="editForm.login"
-                        :keyup="editForm.login=TextTranslit(editForm.login, true)"
+                        id="nickname"
+                        v-model="editForm.nickname"
+                        :keyup="editForm.nickname=TextTranslit(editForm.nickname, true)"
                         type="text"
                         class="mt-1 block w-full"
+                        autocomplete="false"
                     />
 
-                    <InputError :message="editForm.errors.login" class="mt-2" />
+                    <InputError :message="editForm.errors.nickname" class="mt-2" />
                 </div>
 
                 <div>
@@ -180,12 +193,15 @@ const setRole = (rid)=>{
                             <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">
                                 <Checkbox :checked="editForm.roles.findIndex(f=>f.id == role.id)>=0" 
                                           @change="setRole(role.id)"
+                                          :name="`setRole_${role.id}`"
                                           class="mr-4" /> 
                                 {{ role.name }}
                             </label>
                         </div>
                     </div>
                 </div>
+
+                <ModulkassaUser v-show="isCourier" :user="editForm.id"/>
 
                 <div class="flex justify-end gap-4 mt-2">
                     <InputError :message="editForm.errors.id" class="mt-2" />

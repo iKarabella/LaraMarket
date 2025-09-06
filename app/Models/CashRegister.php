@@ -11,6 +11,7 @@ class CashRegister extends Model
         'cr_id', //ID кассы
         'warehouse_id', //ID склада
         'user_id', //ID пользователя
+        'cashier', //ID пользователя в системе модулькассы
         'details' //описание кассы массив [name=>'', address=>'', phone=>'']
     ];
 

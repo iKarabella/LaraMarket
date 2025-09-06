@@ -22,7 +22,8 @@ class GetListRequest extends FormRequest
             'perPage' => ['integer', 'nullable'],
             'order' => ['string', 'nullable', Rule::in(['phone', 'name', 'surname', 'login'])],
             'desc' => ['boolean', 'nullable'],
-            'page' => ['integer', 'nullable']
+            'page' => ['integer', 'nullable'],
+            'couriers'=>['boolean', 'nullable']
         ];
     }
 
