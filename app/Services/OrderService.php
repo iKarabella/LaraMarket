@@ -131,6 +131,7 @@ class OrderService
             $order->status=$statusId;
             $isSaved = $order->save();
         }
+        else throw new Exception('Заказ уже имеет этот статус');
 
         if($isSaved) 
         {
@@ -200,11 +201,11 @@ class OrderService
         self::setStatus($order, 12, $comment);
     }
     /**
-     * Заказ получен клиентом
+     * Заказ отправлен клиенту
      */
     public static function orderSent(Order|int $order, ?string $comment = null)
     {
-        self::setStatus($order, 9, $comment);
+        self::addComment($order, '', $comment);
     }
 
     public static function addComment(Order|int $order, ?string $title = null, ?string $comment = null, bool $auto=true):void

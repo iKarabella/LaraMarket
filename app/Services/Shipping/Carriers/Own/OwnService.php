@@ -47,14 +47,14 @@ class OwnService implements ShippingInterface
     public function wh_required_fields():array
     {
         return [
-            'trackNumber'=>[
-                'type'=>'string',
-                'required'=>true,
-                'label'=>'Трекномер',
-                'title'=>'Трекномер',
-                'rules'=>'string|required|min:10|max:50',
-                'default'=>null
-            ]
+            // 'trackNumber'=>[
+            //     'type'=>'string',
+            //     'required'=>true,
+            //     'label'=>'Трекномер',
+            //     'title'=>'Трекномер',
+            //     'rules'=>'string|required|min:10|max:50',
+            //     'default'=>null
+            // ]
         ];
     }
 

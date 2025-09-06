@@ -2,6 +2,9 @@
 
 namespace App\Services\ModulKassa;
 
+use App\Models\ModulkassaDocs;
+use App\Models\Order;
+use App\Services\Modulkassa\DTO\OrderDTO;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
@@ -113,9 +116,136 @@ class ModulKassa
         return $this->get('/v1/retail-point/'.$guid.'/get-recent-shifts?days='.$days);
     }
 
+    /**
+     * Запрос документов смены торговой точки
+     * 
+     * @param int $days количество дней
+     * @return Collection список смен
+     */
     public function getCashDocs(string $pointId, string $shiftDocId):Collection
     {
         return $this->get("/v1/retail-point/{$pointId}/shift/{$shiftDocId}/cashdoc");
+    }
+
+    /**
+     * Передать информацию о заказе в кассовую систему
+     * 
+     * @param Collection $points торговые точки, в которые нужно передать заказ
+     * @param Order $order заказ
+     */
+    public function sendOrder(Collection $points, Order $order)
+    {
+        if($order->shipping_code=='self_pickup') {
+            $description='Самовывоз ('.($order->delivery['warehouse']??'').')';
+        }
+        elseif($order->shipping_code=='own') 
+        {
+            $delivery=[
+                'street'=>$order->delivery['street']??'',
+                'house'=>$order->delivery['house']??'',
+                'apartment'=>$order->delivery['apartment']??'',
+            ];
+            $description="ул. {$delivery['street']}, д.{$delivery['house']}, кв.{$delivery['apartment']}";
+        }
+        else $description='';
+
+        $data = [
+            'id' => '',
+			'docNum' => $order->id,
+			'docType' => 'SALE',
+			'status' => 'OPENED',
+			'shift' => ['shiftType' => 'EXTERNAL'],
+			'baseSum' => $order->amount/100,
+			'actualSum' => $order->amount/100,
+			'description' => $description,
+			'beginDateTime' => $order->created_at->format('c'),
+			'inventPositions' => [],
+            'emailOrPhone'=>(string)$order->customer['phone']??''
+        ];
+
+        foreach ($order->body as $key=>$position)
+        {
+            if($position['measure']=='кг.') $measure='kg';
+            else if($position['measure']=='г.') {
+                $measure='kg';
+                $position['quantity']=$position['quantity']/1000;
+                $position['price']=$position['price']*1000;
+            }
+            else $measure = 'pcs';
+
+            $price = floor($position['price']/100);
+            $amount = $price*$position['quantity'];
+            
+            $data['inventPositions'][]=[
+                'id' => '',
+				'inventCode' => $position['offer'],
+				'name' => "{$position['product_title']}, {$position['offer_title']}",
+				'posNum' => $key+1,
+				'quantity' => $position['quantity'],
+				'price' => $price,
+				'minPrice' => 0,
+				'baseSum' => $amount,
+				'posSum' => $amount, 
+				'measure' => $measure,
+				'basePrice' => $price,
+				'type' => 'MAIN',
+				'baseGoodPrice' => $price,
+				'vatTag' => ''
+            ];
+        }
+
+        $points->each(function($point) use ($data)
+        {
+            $result = $this->post("/v1/retail-point/{$point}/shift/:external/cashdoc", $data)->toArray();
+
+            ModulkassaDocs::create([
+                'order_id'=>$data['docNum'],
+                'guid'=>$result['id'],
+                'point'=>$point,
+                'order_info'=>$result,
+            ]);
+        });
+    }
+
+    public function getRetailPointUsers(string $pointId)
+    {
+        $result = $this->get("/v1/retail-point/{$pointId}/catalog/CONTRACTOR")->first();
+        
+        $result = array_filter($result, function($contractor){
+            return $contractor['locked']!==true && in_array('CASHIER', $contractor['roles']);
+        });
+
+        return array_map(function($arr){
+            return [
+                'code'=>$arr['code'],
+                'name'=>$arr['name']
+            ];
+        }, $result);
+    }
+
+    /** 
+     * Удалить заказ из касс
+     * @param int $order_id ID заказа
+     */
+    public function cancelOrder(int $order_id)
+    {
+        $docs = ModulkassaDocs::whereOrderId($order_id)->get();
+
+        $docs->each(function($doc){
+            $res = $this->delete("/v2/retail-point/{$doc->point}/order/$doc->guid");
+            if($res) $doc->delete();
+        });
+    }
+
+    /** 
+     * DELETE запрос к API модулькассы
+     * @param string $method метод в URL
+     * @return bool
+     */
+    private function delete(string $method):bool
+    {
+        $result = $this->client->delete($this->host.$method);
+        return $result->successful();
     }
 
     /** 

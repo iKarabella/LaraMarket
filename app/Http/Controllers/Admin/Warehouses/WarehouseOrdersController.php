@@ -19,6 +19,7 @@ use App\Models\StockBalance;
 use App\Models\StockReserve;
 use App\Models\Warehouse;
 use App\Models\WarehouseAct;
+use App\Services\ModulKassa\ModulKassa;
 use App\Services\OrderService;
 use App\Services\Shipping\Contract\SendToShippingRequest;
 use App\Services\Shipping\ShippingService;
@@ -124,10 +125,16 @@ class WarehouseOrdersController extends Controller
         WarehouseService::writeOff($request->validated());
     }
 
-    public function readyForPickup(Request $request)
+    public function readyForPickup(Request $request, string $uuid)
     {
         $order = Order::whereId($request->order_id)->with(['reserved_products', 'status_info'])->firstOrFail();
-        if (OrderService::checkCompleted($order)) OrderService::setStatus($order, 10);
+        $warehouse = Warehouse::whereCode($uuid)->with('cash_registers')->firstOrFail();
+
+        if (OrderService::checkCompleted($order)) 
+        {
+            if ($order->shipping_code=='self_pickup') (new ModulKassa())->sendOrder($warehouse->cash_registers->pluck('cr_id'), $order);
+            OrderService::setStatus($order, 10);
+        }
     }
 
     public function orderSent(Request $request)

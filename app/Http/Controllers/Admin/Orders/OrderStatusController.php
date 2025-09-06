@@ -25,6 +25,9 @@ class OrderStatusController extends Controller
         $order = Order::whereId($request->order_id)->with(['status_info', 'reserved_products'])->firstOrFail();
 
         $cancelled = $request->goods_returned ? WarehouseService::cancelOrderReservation($order->reserved_products, $order->id, $order->body, $order->warehouse_id) : true;
+        //TODO если есть в кассах -- удалить из касс
+        //TODO если есть доставка -- отменить доставку
+        
         if ($cancelled===true) OrderService::setStatus($order, 11, null, $request->comment);
     }
 
