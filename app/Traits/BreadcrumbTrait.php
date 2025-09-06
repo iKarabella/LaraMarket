@@ -49,7 +49,7 @@ trait BreadcrumbTrait
             $getCats = Category::where(function(Builder $query) use ($catsTree){
                 $query->whereNull('parent');
                 if (count($catsTree)) $query->orWhereIn('parent', array_column($catsTree, 'id'));
-            })->whereVisibility(true)->get();
+            })->get(); //->whereVisibility(true)
 
             $currentCat = $getCats->first(function($f) use ($cat) {return $f->code==$cat;});
 

@@ -21,7 +21,9 @@ class CatalogController extends Controller
 
         if($category) 
         {
-            if (!Category::whereCode($category)->exists()) abort(404);
+            $cat = Category::whereCode($category);
+            if (!access_rights('catalog_manage')) $cat->whereVisibility(true);
+            if (!$cat->exists()) abort(404);
 
             $products->whereRaw("id IN (SELECT product_id FROM product_categories WHERE category_id IN (
                 WITH RECURSIVE CatsTree AS (
