@@ -150,17 +150,17 @@ class ModulKassa
         else $description='';
 
         $data = [
-            'id' => '',
-			'docNum' => $order->id,
-			'docType' => 'SALE',
-			'status' => 'OPENED',
-			'shift' => ['shiftType' => 'EXTERNAL'],
-			'baseSum' => $order->amount/100,
-			'actualSum' => $order->amount/100,
-			'description' => $description,
-			'beginDateTime' => $order->created_at->format('c'),
-			'inventPositions' => [],
-            'emailOrPhone'=>(string)$order->customer['phone']??''
+            'id'=>'',
+            'documentNumber'=>"Заказ №{$order->id}",
+            'documentType'=>'SALE',
+            'documentDateTime'=>(string)$order->created_at->format('c'),
+            'customerContact'=>(string)'+'.$order->customer['phone']??'',
+            'description'=>$description,
+            'retailPointId'=>null,
+            'prepaid'=>false,
+            'inventPositions'=>[],
+            'remoteId'=>$order->id,
+            'responsURL'=>null,
         ];
 
         foreach ($order->body as $key=>$position)
@@ -174,32 +174,26 @@ class ModulKassa
             else $measure = 'pcs';
 
             $price = floor($position['price']/100);
-            $amount = $price*$position['quantity'];
             
             $data['inventPositions'][]=[
-                'id' => '',
-				'inventCode' => $position['offer'],
-				'name' => "{$position['product_title']}, {$position['offer_title']}",
-				'posNum' => $key+1,
-				'quantity' => $position['quantity'],
-				'price' => $price,
-				'minPrice' => 0,
-				'baseSum' => $amount,
-				'posSum' => $amount, 
-				'measure' => $measure,
-				'basePrice' => $price,
-				'type' => 'MAIN',
-				'baseGoodPrice' => $price,
-				'vatTag' => ''
+                'barcode'=>null,
+                'inventCode'=>$position['offer'],
+                'name' => "{$position['product_title']}, {$position['offer_title']}",
+                'description'=>null,
+                'measure' => $measure,
+                'quantity' => $position['quantity'],
+			    'price' => $price,
+			 	'minPrice' => 0,
+                'inventoryType'=>'INVENTORY'
             ];
         }
 
         $points->each(function($point) use ($data)
         {
-            $result = $this->post("/v1/retail-point/{$point}/shift/:external/cashdoc", $data)->toArray();
+            $result = $this->post("/v2/retail-point/{$point}/order", $data);
 
             ModulkassaDocs::create([
-                'order_id'=>$data['docNum'],
+                'order_id'=>$data['remoteId'],
                 'guid'=>$result['id'],
                 'point'=>$point,
                 'order_info'=>$result,
@@ -272,7 +266,7 @@ class ModulKassa
     {
         if (is_array($data)) $result = $this->client->post($this->host.$method, $data);
         else $result = $this->client->withBody($data, 'text/plain')->post($this->host.$method);
-        
+
         if ($result->successful()) return $result->collect();
         else throw new Exception('Не удалось получить ответ.');
     }
