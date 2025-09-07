@@ -45,6 +45,6 @@ class CatalogController extends Controller
 
     public function notifyAboutAdmission(Request $request)
     {
-        //
+        dd($request->toArray());
     }
 }

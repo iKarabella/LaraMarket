@@ -23,4 +23,6 @@ yarn-error.log
 /.vscode
 /.zed
 gitall
-/app/Console/Commands/AddTestProducts.php
+app/Console/Commands/AddTestProducts.php
+database/migrations/2025_09_07_122036_create_logs_table.php
+app/Models/Log.php

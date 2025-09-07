@@ -24,6 +24,7 @@ const props = defineProps({
                     <div v-if="products.data && products.data.length">
                         <Positions :positions="products.data" 
                                    :userCart="userCart"
+                                   :auth="$page.props.auth"
                         />
                         <Pagination lineClass="w-full flex justify-center mb-2 mt-2" 
                                     v-show="products.meta" 

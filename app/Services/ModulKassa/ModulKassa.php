@@ -149,18 +149,21 @@ class ModulKassa
         }
         else $description='';
 
+        $userInfo = $order->user_info;
+        $customerPhone = $userInfo ? "+{$userInfo->phone}" : null;
+
         $data = [
             'id'=>'',
             'documentNumber'=>"Заказ №{$order->id}",
             'documentType'=>'SALE',
             'documentDateTime'=>(string)$order->created_at->format('c'),
-            //'customerContact'=>(string)'+'.$order->customer['phone']??'', //TODO телефон брать из данных пользователя
+            'customerContact'=>$customerPhone,
             'description'=>$description,
             'retailPointId'=>null,
             'prepaid'=>false,
             'inventPositions'=>[],
             'remoteId'=>$order->id,
-            'responsURL'=>null,
+            'responseURL'=>route('modulkassa.responseUrl', $order->uuid),
         ];
 
         foreach ($order->body as $key=>$position)

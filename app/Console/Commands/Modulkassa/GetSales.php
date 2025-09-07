@@ -3,9 +3,11 @@
 namespace App\Console\Commands\Modulkassa;
 
 use App\Models\CashRegister;
+use App\Models\Log;
 use App\Models\Offer;
 use App\Models\WarehouseAct;
 use App\Services\ModulKassa\ModulKassa;
+use App\Services\OrderService;
 use App\Services\WarehouseService\WarehouseService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -88,7 +90,17 @@ class GetSales extends Command
 
                     switch($doc['docType'])
                     {
-                        case 'SALE': WarehouseService::otherWriteOff($positions, 1, $reason); break;
+                        case 'SALE': 
+                            if (empty($doc['remoteId']) && empty($doc['linkedDocId'])) WarehouseService::otherWriteOff($positions, 1, $reason); 
+                            else {
+                                OrderService::orderDelivered((int)(empty($doc['remoteId'])?$doc['linkedDocId']:$doc['remoteId']));
+                                Log::create([
+                                    'author'=>'getSales',
+                                    'message'=>'order?',
+                                    'object'=>$doc
+                                ]);
+                            }
+                            break;
                         //case 'RETURN': WarehouseService::returnPositions($positions, 1, $reason); break;
                         case 'RETURN_BY_SALE': WarehouseService::otherWriteOff($positions, 1, $reason, true); break;
                         // case 'ORDER': break; //TODO работа с заказами

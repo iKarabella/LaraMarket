@@ -14,6 +14,7 @@ use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Catalog\ProductController;
 use App\Http\Controllers\Catalog\UserCartController;
 use App\Http\Controllers\Home\HomeController;
+use App\Http\Controllers\Modulkassa\ModulKassaController;
 use App\Http\Controllers\User\PublicPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +26,9 @@ Route::get('/@{nick}', [PublicPageController::class, 'page'])->name('user.page')
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('modulkassa/{order_code}', [ModulKassaController::class, 'index'])->name('modulkassa.responseUrl');
+Route::post('modulkassa/{order_code}', [ModulKassaController::class, 'index']);
 
 Route::get('catalog/{category?}', [CatalogController::class, 'index'])->name('catalog');
 Route::get('products/{code?}', [ProductController::class, 'index'])->name('catalog.product');

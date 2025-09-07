@@ -10,7 +10,10 @@ import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import { usercart, addToCart, removeFromCart } from '@/Mixins/UserCart.js';
 
-const props = defineProps({positions:{type:Array, default:[]}});
+const props = defineProps({
+    positions:{type:Array, default:[]},
+    auth:{type:Object, default:null}
+});
 
 const showNotifyAboutAdmission = ref(false);
 
@@ -32,7 +35,8 @@ const notifyAboutAdmission = (i) => {
     notifyAboutAdmissionForm.offer_id = i.offer;
     notifyAboutAdmissionForm.product_id = i.position;
 
-    showNotifyAboutAdmission = true; //TODO если пользователь авторизован -- отправлять сразу, без формы
+    if (props.auth && props.auth.user.id) notifyFormSend();
+    else showNotifyAboutAdmission.value = true;
 };
             
 const notifyFormSend = () => {
@@ -40,6 +44,7 @@ const notifyFormSend = () => {
         preserveScroll:true,
         onSuccess:(e)=>{
             notifyAboutAdmissionForm.reset();
+            //TODO показать уведомление, что мы вам сообщим о поступлении
             closeModal();
         }, 
         onError:(e)=>console.log(e)
