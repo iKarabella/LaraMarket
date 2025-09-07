@@ -102,7 +102,7 @@ onMounted(() => {
     <Head title="Создание заказа" />
 
     <FullLayout>
-        <div class="py-12">
+        <div class="py-4">
             <div class="sm:px-6 lg:px-8">
                 <div class="md:flex md:min-w-[80rem] mx-auto w-fit" v-if="order">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-2 md:w-9/12 md:mr-2">

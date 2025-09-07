@@ -69,7 +69,7 @@ const modalClose = ()=>{
     <Head title="Marketzone" />
 
     <FullLayout>
-        <div class="py-12">
+        <div class="py-4">
             <div class="sm:px-6 lg:px-8">
                 <div class="md:flex md:min-w-[80rem] mx-auto w-fit">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-2 mr-2 md:w-9/12">

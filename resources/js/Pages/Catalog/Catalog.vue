@@ -17,7 +17,7 @@ const props = defineProps({
     <Head title="Catalog Manage">
     </Head>
     <FullLayout>
-        <div class="py-12">
+        <div class="py-4">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg mb-2 pb-2">
                     <Breadcrumb :breadcrumb="breadcrumb"/>

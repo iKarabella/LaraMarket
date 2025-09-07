@@ -28,9 +28,9 @@
 
                     <div class="pr-6">
                         <i class="ri-phone-fill"></i>
-                        <Link href="tel:+7 (3333) 54-56-15" class="ml-2 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
+                        <a href="tel:+7 (3333) 54-56-15" class="ml-2 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
                             +7 (3333) 54-56-15
-                        </Link>
+                        </a>
                     </div>
 
                     <!-- Выпадающее меню -->
