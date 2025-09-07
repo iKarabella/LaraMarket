@@ -10,18 +10,33 @@ import InputError from '@/Components/UI/InputError.vue';
 import InputLabel from '@/Components/UI/InputLabel.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
 import Modal from '@/Components/Modals/MainModal.vue';
+import Dropdown from '@/Components/UI/Dropdown.vue';
+import Datepicker from '@vuepic/vue-datepicker';
+import { DatepickerFormat } from '@/Mixins/DatepickerFormat';
 import { Link } from '@inertiajs/vue3';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 const props = defineProps({
     orders: {type:Array, default:[]},
     navigation:{type:Array, default:[]},
+    filters:{type:Object, default:{
+        statuses:[],
+        dateFrom:null,
+        deteUntil:null,
+        sortDesc:null
+    }}
 });
 
 const showOrderBodyId = ref(null);
 const showFinishModal = ref(false);
 const shippingForm = useForm({id:null, comment:null, type:null, returned:true});
 const commentArea = ref(null);
+
+const fChange = () => {
+    useForm({filters:props.filters}).post(route('admin.delivery.manage'), {
+        preserveScroll:true,
+    });
+};
 
 const closeModal = ()=>{
     showFinishModal.value=false;
@@ -69,6 +84,10 @@ const finiShipping = (id, type) => {
         commentArea.value.focus();
     });
 };
+
+const showOrderBody = (order_id) => {
+    showOrderBodyId.value = showOrderBodyId.value==order_id ? null : order_id;
+};
 </script>
 
 <template>
@@ -76,7 +95,62 @@ const finiShipping = (id, type) => {
     </Head>
     <MarketLayout :navigation="navigation">
         <div>
-            <div>
+            <div class="flex items-start w-full">
+                <div class="relative">
+                    <Dropdown align="right" width="48" :closeAfterClick="false">
+                        <template #trigger>
+                            <span class="inline-flex rounded-md">
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150"
+                                >
+                                    Статус заказа
+                                    <svg
+                                        class="ms-2 -me-0.5 h-4 w-4"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
+                            </span>
+                        </template>
+                        <template #content>
+                            <div v-for="status in filters.statuses" :key="status.id" class="ml-2 mt-1 hover:bg-gray-100 rounded-md">
+                                <label>
+                                    <Checkbox v-model="status.on" :checked="status.on" @change="fChange"/> 
+                                    {{status.name}}
+                                </label>
+                            </div>
+                        </template>
+                    </Dropdown>
+                </div>
+                <div>
+                    <label class="mx-2 text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300">
+                        <Checkbox v-model="filters.sortDesc" :checked="filters.sortDesc" @change="fChange"/> - сначала новые
+                    </label>
+                </div>
+                <div>
+                    <Datepicker v-model="filters.dates" range
+                                @update:model-value="fChange"
+                                :show-last-in-range="false"
+                                :format="DatepickerFormat"
+                                locale="ru"
+                                position="left"
+                                auto-position="bottom"
+                                id="date"
+                                placeholder="Период"
+                                cancelText="Отменить"
+                                selectText="Выбрать" 
+                    />
+                </div>
+            </div>
+            <div class="mt-2">
                 <div v-for="order in orders.data" :key="order.id" class="hover:bg-gray-200 rounded-md mb-2">
                     <div class="grid grid-cols-7 gap-2">
                         <div>{{ order.id }}</div>
@@ -86,10 +160,13 @@ const finiShipping = (id, type) => {
                         </div>
                         <div class="col-span-2">{{ order.address }}</div>
                         <div>
-                            <SecondaryButton @click="showOrderBodyId=order.id">Заказ</SecondaryButton>
+                            <SecondaryButton @click="showOrderBody(order.id)">Заказ</SecondaryButton>
                         </div>
-                        <div v-if="!order.delivered && !order.cancelled">
-                            <PrimaryButton v-if="!order.courier" @click="takeShipping(order.id)">Взять в работу</PrimaryButton>
+                        <div>
+                            <PrimaryButton v-if="order.status=='awaiting'" @click="takeShipping(order.id)">Взять в работу</PrimaryButton>
+                            <SecondaryButton v-if="order.status=='processed'" @click="showOrderBody(order.id)">В работе</SecondaryButton>
+                            <SecondaryButton v-if="order.status=='delivered'" :disabled="true">Доставлен</SecondaryButton>
+                            <DangerButton v-if="order.status=='cancelled'" :disabled="true">Отменен</DangerButton>
                         </div>
                     </div>
                     <div v-show="showOrderBodyId==order.id">

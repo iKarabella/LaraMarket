@@ -38,6 +38,7 @@ class ShippingResource extends JsonResource
                 'uuid' => $this->order_info->uuid,
                 'body' => $this->order_info->body
             ] : [],
+            'status'=>$this->status??'',
             //'courier_info'=>$this->courier_info ? ['id'=>$this->courier_info->id, 'name'=>$this->courier_info->name, 'nickname'=>$this->courier_info->nickname] : null,
             'created_at' => (new Carbon($this->created_at))->format('d.m.Y H:i:s'),
             'updated_at' => (new Carbon($this->updated_at))->format('d.m.Y H:i:s'),

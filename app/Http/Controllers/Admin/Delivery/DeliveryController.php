@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Delivery;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Delivery\DeliveryActionRequest;
+use App\Http\Requests\Admin\Delivery\DeliveryListRequest;
 use App\Http\Resources\Admin\Delivery\ShippingResource;
 use App\Models\CashRegister;
 use App\Models\Order;
@@ -13,6 +14,7 @@ use App\Services\ModulKassa\ModulKassa;
 use App\Services\OrderService;
 use App\Services\Shipping\ShippingService;
 use App\Traits\MarketControllerTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,14 +23,77 @@ class DeliveryController extends Controller
 {
     use MarketControllerTrait;
 
-    public function manage(Request $request):Response
+    public function manage(DeliveryListRequest $request):Response
     {
-        $shippings = Shipping::where(function($query)use($request){$query->whereNull('courier')->orWhere('courier', '=', $request->user()->id);})
-                             ->with(['warehouse_info', 'order_info']);
+        $shippings = Shipping::where(function($query)use($request){$query->whereNull('courier')->orWhere('courier', '=', $request->user()->id);});
+
+        $validated = $request->validated();
+        $filters = $request->session()->get('delivery_manage.filters', [
+            'statuses' => [
+                ['status'=>'delivered', 'name'=>'Доставлен', 'on'=>true],
+                ['status'=>'cancelled', 'name'=>'Отменен', 'on'=>true],
+                ['status'=>'processed', 'name'=>'В работе', 'on'=>true],
+                ['status'=>'awaiting', 'name'=>'В ожидании', 'on'=>true],
+            ],
+            'dates' => [new Carbon()->startOfWeek(), new Carbon()->endOfDay()],
+            'sortDesc' => false
+        ]);
+
+        if(isset($validated['filters']['statuses'])) 
+        {
+            if(array_any($validated['filters']['statuses'], function($a){return $a['on']==true;}))
+            {
+                $filters['statuses'] = array_map(function($s) use ($validated){
+                    $s['on'] = array_find($validated['filters']['statuses'], function($f) use ($s){return $f['status']==$s['status'];})['on'];
+                    return $s;
+                }, $filters['statuses']);
+            }
+        }
+        if(isset($validated['filters']['dates'])) $filters['dates'] = $validated['filters']['dates'];
+        if(isset($validated['filters']['sortDesc'])) $filters['sortDesc'] = $validated['filters']['sortDesc'];
+
+        $request->session()->put('delivery_manage.filters', $filters);
+        
+        $checks = array_filter($filters['statuses'], function($arr){return $arr['on'];});
+        if ($checks) $shippings->where(function($query) use($checks) {
+            foreach($checks as $index=>$check) {
+                switch ($check['status']) {
+                    case 'delivered': $query->{$index==0?'where':'orWhere'}('delivered', '!=', null); 
+                        break;
+                    case 'cancelled': $query->{$index==0?'where':'orWhere'}('cancelled', '!=', null); 
+                        break;
+                    case 'processed': $query->{$index==0?'where':'orWhere'}(function($subQuery){
+                                            $subQuery->whereNotNull('courier')
+                                                    ->whereNull('delivered')
+                                                    ->whereNull('cancelled');
+                                      }); 
+                        break;
+                    case 'awaiting': $query->{$index==0?'where':'orWhere'}(function($subQuery){
+                                            $subQuery->whereNull('courier')
+                                                    ->whereNull('delivered')
+                                                    ->whereNull('cancelled');
+                                     });  
+                        break;
+                }
+            }
+        });
+
+        if(isset($filters['dates']) && count($filters['dates'])) 
+        {
+            if ($filters['dates'][0]) $shippings->where('created_at', '>', new Carbon($filters['dates'][0])->startOfDay());
+            if ($filters['dates'][1]) $shippings->where('created_at', '<', new Carbon($filters['dates'][1])->endOfDay());
+        }
+        if(isset($filters['sortDesc'])) 
+        {
+            if($filters['sortDesc']) $shippings->orderByDesc('created_at');
+            else $shippings->orderBy('created_at');
+        }
+        else $shippings->orderBy('created_at');
 
         return Inertia::render('Admin/Delivery/Manage', [
-            'navigation'=>$this->getNavigation('delivery'),
-            'orders' => ShippingResource::collection($shippings->paginate(30))
+            'navigation' => $this->getNavigation('delivery'),
+            'orders' => ShippingResource::collection($shippings->with(['warehouse_info', 'order_info'])->paginate(30)),
+            'filters' => $filters
         ]);
     }
 

@@ -33,6 +33,16 @@ class Shipping extends Model
         'cancelled' => 'array'
     ];
 
+    protected $appends = ['status'];
+
+    public function getStatusAttribute()
+    {
+        if ($this->delivered!=null) return 'delivered';
+        else if ($this->cancelled!=null) return 'cancelled';
+        else if ($this->courier!=null) return 'processed';
+        else return 'awaiting';
+    }
+
     public function order_info()
     {
         return $this->hasOne(Order::class, 'id', 'order_id');

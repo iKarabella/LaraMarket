@@ -55,7 +55,7 @@ class WarehouseOrdersController extends Controller
         $filters = $request->session()->get('whmanage.orders.filters', [
             'statuses' => EntityValue::whereIn('id', [8,10])->get()->map(function($arr){return ['status'=>$arr->id, 'name'=>$arr->value, 'on'=>true];}),
             'dates' => [new Carbon()->startOfWeek(), new Carbon()->endOfDay()],
-            'sortDesc' => false
+            'sortDesc' => true
         ]);
 
         if(isset($validated['filters']['statuses'])) 

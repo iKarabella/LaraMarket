@@ -93,6 +93,7 @@ Route::middleware('permission:catalog_manage')->group(function () {
 
 Route::middleware('permission:delivery_manage')->group(function(){
     Route::get('admin/delivery/manage', [DeliveryController::class, 'manage'])->name('admin.delivery.manage');
+    Route::post('admin/delivery/manage', [DeliveryController::class, 'manage']);
     Route::post('admin/delivery/actions/takeToDelivery', [DeliveryController::class, 'takeToDelivery'])->name('admin.delivery.takeToDelivery');
     Route::post('admin/delivery/actions/delivered', [DeliveryController::class, 'delivered'])->name('admin.delivery.delivered');
     Route::post('admin/delivery/actions/cancelled', [DeliveryController::class, 'cancelled'])->name('admin.delivery.cancelled');
