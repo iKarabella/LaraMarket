@@ -61,10 +61,15 @@
                             </template>
 
                             <template #content>
-                        <DropdownLink :href="route('user.page', [$page.props.auth.user.nickname])"> Профиль </DropdownLink>
-                        <DropdownLink :href="route('logout')" method="post" as="button">
-                            Выход
-                        </DropdownLink>
+                                <template v-if="$page.props.headLinksForUser">
+                                    <DropdownLink v-for="(link,index) in $page.props.headLinksForUser" v-key="index" :href="link.href">
+                                        {{ link.title }}
+                                    </DropdownLink>
+                                </template>
+                                <DropdownLink :href="route('user.page', [$page.props.auth.user.nickname])"> Профиль </DropdownLink>
+                                <DropdownLink :href="route('logout')" method="post" as="button">
+                                    Выход
+                                </DropdownLink>
                             </template>
                         </Dropdown>
                     </div>

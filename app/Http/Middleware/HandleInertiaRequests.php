@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 // use Illuminate\Foundation\Inspiring;
 
 use App\Services\CatalogMenu;
+use App\Services\User\UserService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 // use Tighten\Ziggy\Ziggy;
@@ -51,6 +52,7 @@ class HandleInertiaRequests extends Middleware
             //     'location' => $request->url(),
             // ],
             'catalogMenu' => (new CatalogMenu())->get(),
+            'headLinksForUser' => UserService::getHeadLinks()
 
         ];
     }
