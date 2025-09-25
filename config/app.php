@@ -126,5 +126,7 @@ return [
     'catalog' => [ // настройки каталога
         'show_categories_without_products' => true, //отображать в меню категории без продуктов
     ],
+    
+    'p1sms_key' => env('P1SMS_KEY'),
 
 ];

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Offer extends Model
 {
@@ -28,7 +30,7 @@ class Offer extends Model
         'price'=>'float:2'
     ];
 
-    protected $appends = ['available'];
+    protected $appends = ['available', 'notify'];
 
     public function product()
     {
@@ -49,9 +51,25 @@ class Offer extends Model
         return $this->hasMany(StockReserve::class, 'offer_id', 'id');
     }
 
-    public function getAvailableAttribute()
+    public function getAvailableAttribute():int
     {
         $count = $this->stocks->sum('quantity')-$this->stocks_reserve()->sum('quantity');
         return $count > 0 ? $count : 0;
+    }
+
+    public function getNotifyAttribute():bool
+    {
+        $user = Auth::user();
+
+        if ($user) 
+        {
+            return ExpectedOffer::whereOfferId($this->id)
+                                ->where(function(Builder $query) use ($user){
+                                    $query->whereUserId($user->id);
+                                    if ($user->email && $user->email_verified_at) $query->orWhere('email', '=', $user->email);
+                                })
+                                ->exists();
+        }
+        else return false;
     }
 }

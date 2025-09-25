@@ -8,6 +8,7 @@ import TextInput from '@/Components/UI/TextInput.vue';
 import InputError from '@/Components/UI/InputError.vue';
 import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
+import DangerButton from '@/Components/UI/DangerButton.vue';
 import { usercart, addToCart, removeFromCart } from '@/Mixins/UserCart.js';
 
 const props = defineProps({
@@ -16,17 +17,19 @@ const props = defineProps({
 });
 
 const showNotifyAboutAdmission = ref(false);
+const showNotifyAboutAdmissionResult = ref(false);
 
 const notifyAboutAdmissionForm = useForm({
     product_id:null,
     offer_id:null,
-    name:'',
-    email:'',
+    name:null,
+    email:null,
 });
 
 const closeModal = () => {
     notifyAboutAdmissionForm.reset();
     showNotifyAboutAdmission.value=false;
+    showNotifyAboutAdmissionResult.value=false;
 };
 
 const notifyAboutAdmission = (i) => {
@@ -35,17 +38,15 @@ const notifyAboutAdmission = (i) => {
     notifyAboutAdmissionForm.offer_id = i.offer;
     notifyAboutAdmissionForm.product_id = i.position;
 
-    if (props.auth && props.auth.user.id) notifyFormSend();
-    else showNotifyAboutAdmission.value = true;
+    if ((props.auth==null || !props.auth.user) && (!notifyAboutAdmissionForm.email || !notifyAboutAdmissionForm.name)) showNotifyAboutAdmission.value = true;
+    else notifyFormSend();
 };
             
 const notifyFormSend = () => {
     notifyAboutAdmissionForm.post(route('catalog.notifyAboutAdmission'), {
         preserveScroll:true,
         onSuccess:(e)=>{
-            notifyAboutAdmissionForm.reset();
-            //TODO показать уведомление, что мы вам сообщим о поступлении
-            closeModal();
+            showNotifyAboutAdmissionResult.value=true;
         }, 
         onError:(e)=>console.log(e)
     });
@@ -66,40 +67,49 @@ const notifyFormSend = () => {
     <Modal :show="showNotifyAboutAdmission" @close="closeModal">
         <div class="p-6">
             <div>
-                Notify About Admission
+                Уведомление о наличии
             </div>
-                
-            <div class="mt-2">
-                <InputLabel for="name" value="Имя" />
-                <TextInput
-                    type="text"
-                    id="name"
-                    name="name"
-                    class="w-full mt-1 block"
-                    required
-                    v-model="notifyAboutAdmissionForm.name"
-                    autocomplete="off"
-                />
-                <InputError class="ml-2" :message="notifyAboutAdmissionForm.errors.name" />
-            </div>
-            <div class="mt-2">
-                <InputLabel for="email" value="E-mail" />
-                <TextInput
-                    type="email"
-                    id="email"
-                    name="email"
-                    class="w-full mt-1 block"
-                    required
-                    v-model="notifyAboutAdmissionForm.email"
-                    autocomplete="off"
-                />
-                <InputError class="ml-2" :message="notifyAboutAdmissionForm.errors.email" />
-            </div>
-                
-            <div class="mt-2 text-right">
-                <SecondaryButton class="mr-2" @click="closeModal">Отменить</SecondaryButton>
-                <PrimaryButton class="mr-2" @click="notifyFormSend">Отправить</PrimaryButton>
-            </div>
+            <template v-if="showNotifyAboutAdmissionResult">
+                <div class="mt-2">
+                    Как только этот товар будет в наличии — мы сразу вам сообщим!
+                </div>
+                <div class="mt-2 text-center">
+                    <DangerButton class="mr-2" @click="closeModal">Отлично!</DangerButton>
+                </div>
+            </template>
+            <template v-else>
+                <div class="mt-2">
+                    <InputLabel for="name" value="Имя" />
+                    <TextInput
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="w-full mt-1 block"
+                        required
+                        v-model="notifyAboutAdmissionForm.name"
+                        autocomplete="off"
+                    />
+                    <InputError class="ml-2" :message="notifyAboutAdmissionForm.errors.name" />
+                </div>
+                <div class="mt-2">
+                    <InputLabel for="email" value="E-mail" />
+                    <TextInput
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="w-full mt-1 block"
+                        required
+                        v-model="notifyAboutAdmissionForm.email"
+                        autocomplete="off"
+                    />
+                    <InputError class="ml-2" :message="notifyAboutAdmissionForm.errors.email" />
+                </div>
+                    
+                <div class="mt-2 text-right">
+                    <SecondaryButton class="mr-2" @click="closeModal">Отменить</SecondaryButton>
+                    <PrimaryButton class="mr-2" @click="notifyFormSend">Отправить</PrimaryButton>
+                </div>
+            </template>            
         </div>
     </Modal>
 </template>

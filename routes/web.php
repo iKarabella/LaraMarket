@@ -33,7 +33,7 @@ Route::post('modulkassa/{order_code}', [ModulKassaController::class, 'index']);
 
 Route::get('catalog/{category?}', [CatalogController::class, 'index'])->name('catalog');
 Route::get('products/{code?}', [ProductController::class, 'index'])->name('catalog.product');
-Route::post('catalog/actions/notifyAboutAdmission', [CatalogController::class, 'notifyAboutAdmission'])->name('catalog.notifyAboutAdmission');
+Route::post('catalog/actions/notifyAboutAdmission', [CatalogController::class, 'notifyAboutAdmission'])->middleware('throttle:5,1')->name('catalog.notifyAboutAdmission');
 Route::get('cart', [UserCartController::class, 'index'])->name('user.cart');
 Route::post('cart/get_positions', [UserCartController::class, 'getCartPositions'])->name('catalog.usercart.getPosition');
 Route::post('cart/check', [UserCartController::class, 'check'])->name('catalog.usercart.check');

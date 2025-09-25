@@ -118,7 +118,10 @@ const notifyAboutAdmission = () => {
             </div>
         </div>
         <div v-show="!position.offers[currentOffer].available" class="m-4 bg-white">
-            <PrimaryButton title="Сообщить, как только товар появится в продаже" class="w-full" @click="notifyAboutAdmission">
+            <PrimaryButton v-if="position.offers[currentOffer].notify" title="Сообщим как только товар появится в продаже" class="w-full" :disabled="true">
+                <i class="ri-check-line mr-2"></i> Сообщим
+            </PrimaryButton>
+            <PrimaryButton v-else title="Сообщить, как только товар появится в продаже" class="w-full" @click="notifyAboutAdmission">
                 <i class="ri-notification-2-line mr-2"></i> Сообщить
             </PrimaryButton>
         </div>

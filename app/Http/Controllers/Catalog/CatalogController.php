@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Catalog;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Catalog\NotifyAboutAdmissionRequest;
 use App\Http\Resources\Catalog\ProductResource;
 use App\Models\Category;
+use App\Models\ExpectedOffer;
 use App\Models\Product;
 use App\Traits\BreadcrumbTrait;
 use Illuminate\Http\Request;
@@ -43,8 +45,9 @@ class CatalogController extends Controller
         ]);
     }
 
-    public function notifyAboutAdmission(Request $request)
+    public function notifyAboutAdmission(NotifyAboutAdmissionRequest $request)
     {
-        dd($request->toArray());
+        $validated = $request->validated();
+        ExpectedOffer::updateOrCreate(['offer_id'=>$validated['offer_id'], 'user_id'=>$validated['user_id'], 'email'=>$validated['email']], $validated);
     }
 }
