@@ -24,7 +24,6 @@ class UserService
             case 'warehouses_manage': $links[]=['href'=>route('admin.warehouses.manage'), 'title'=>'Склады']; break;
             case 'catalog_manage': $links[]=['href'=>route('admin.catalog.manage'), 'title'=>'Каталог']; break;
             case 'delivery_manage': $links[]=['href'=>route('admin.delivery.manage'), 'title'=>'Доставка']; break;
-            default: continue;
         }
 
         return $links;
