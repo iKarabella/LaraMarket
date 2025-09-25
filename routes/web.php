@@ -15,6 +15,7 @@ use App\Http\Controllers\Catalog\ProductController;
 use App\Http\Controllers\Catalog\UserCartController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Modulkassa\ModulKassaController;
+use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\PublicPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -42,6 +43,12 @@ Route::post('orders/new', [OrderController::class, 'create']);
 Route::post('orders/store', [OrderController::class, 'store'])->name('order.store');
 Route::get('order/{uuid}', [OrderController::class, 'show'])->name('order.show');
 
+Route::middleware('auth')->group(function(){
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile/password/update', [ProfileController::class, 'passwordUpdate'])->name('profile.password.update');
+});
 
 Route::middleware('permission:users_manage')->group(function () {
     Route::get('admin/users', [UsersManageController::class, 'index'])->name('admin.users.manage');

@@ -61,7 +61,7 @@
                             </template>
 
                             <template #content>
-                        <DropdownLink :href="route('home', userLogin)"> Профиль </DropdownLink>
+                        <DropdownLink :href="route('user.page', [$page.props.auth.user.nickname])"> Профиль </DropdownLink>
                         <DropdownLink :href="route('logout')" method="post" as="button">
                             Выход
                         </DropdownLink>
