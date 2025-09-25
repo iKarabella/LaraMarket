@@ -19,6 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->json('details')->nullable();
             $table->timestamps();
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->nullOnDelete();
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
         });
     }
 

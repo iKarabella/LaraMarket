@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('point'); 
             $table->json('order_info')->nullable();
             $table->timestamps();
+            $table->foreign('order_id')->references('id')->on('orders')->nullOnDelete();
         });
     }
 
