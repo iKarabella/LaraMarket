@@ -15,7 +15,8 @@ const props = defineProps({
     warehouses: {type: Array, defalt:[]},
     navigation:{type:Array, default:[]},
     selectedWh: {type:Number, default:null},
-    acts: {type:Object, default:{}}
+    acts: {type:Object, default:{}},
+    offersEditable:{type:Boolean, default:false}
 });
 
 const currentWhInfo = computed(()=>{
@@ -39,7 +40,7 @@ const currentWhInfo = computed(()=>{
             </div>
             <div class="mt-2">
                 <div>
-                    <WarehouseAct v-for="(act, index) in acts.data" :act="act" v-key="index" class="mt-2"/>
+                    <WarehouseAct v-for="(act, index) in acts.data" :act="act" v-key="index" class="mt-2" :offersEditable="offersEditable"/>
                 </div>
                 <Pagination :paginator="acts.meta"/>
             </div>

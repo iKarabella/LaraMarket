@@ -101,23 +101,38 @@ class CatalogController extends Controller
         return redirect()->route('admin.products.edit', [$product->code]);
     }
 
-    public function offer(Request $request, $code, $offer_id=null):Response
+    public function editOffer(Request $request, int $offer_id):Response
     {
-        $product=Product::whereCode($code)->with(['categories'])->firstOrFail();
+        $offer = Offer::whereId($offer_id)->firstOrFail();
 
-        if ($offer_id) $offer = Offer::whereId($offer_id)->firstOrFail();
-        else $offer= (object) [
-            'id'=>null,
-            'product_id'=>$product->id,
-            'title'=>'',
-            'baseprice'=>'0.00',
-            'price'=>'0.00',
-            'coeff'=>'0',
-            'barcode'=>'',
-            'art'=>'',
-            'media'=>[],
-            'visibility'=>true
-        ];
+        return Inertia::render('Admin/Catalog/EditOffer', [
+            'product'=>ProductResource::make($offer->product)->resolve(),
+            'offer'=>OfferResource::make($offer)->resolve(),
+            'navigation'=>$this->getNavigation('categories'),
+        ]);
+    }
+    
+    public function offer(Request $request, string $code, ?int $offer_id=null):Response
+    {
+        if ($offer_id) {
+            $offer = Offer::whereId($offer_id)->with(['product'])->firstOrFail();
+            $product = $offer->product;
+        }
+        else {
+            $product = Product::whereCode($code)->with(['categories'])->firstOrFail();
+            $offer= (object) [
+                'id'=>null,
+                'product_id'=>$product->id,
+                'title'=>'',
+                'baseprice'=>'0.00',
+                'price'=>'0.00',
+                'coeff'=>'0',
+                'barcode'=>'',
+                'art'=>'',
+                'media'=>[],
+                'visibility'=>true
+            ];
+        }
 
         return Inertia::render('Admin/Catalog/EditOffer', [
             'product'=>ProductResource::make($product)->resolve(),

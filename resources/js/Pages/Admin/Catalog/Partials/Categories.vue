@@ -134,7 +134,7 @@ const openCatDelete = () =>{
 <template>
     <div>
         <div class="w-full flex">
-                <div class="w-4/12 max-h-screen overflow-y-scroll overflow-x-auto py-4">
+                <div class="w-4/12 max-h-[50vh] overflow-y-scroll overflow-x-auto py-4">
                     <Category v-for="(cat, index) in categories.filter(a=>a.parent==null).sort(function(a,b){return a.sort-b.sort;})"
                             :categories="categories" 
                             :cat="cat" v-key="index" 
