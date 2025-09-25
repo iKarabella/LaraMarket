@@ -34,6 +34,9 @@ const relocation = (destignation)=>{
     else if (destignation=='writeOff' && selectedWh!=null){
         router.get(route('admin.warehouses.write_off', [selectedWhInfo.value.code]));
     }
+    else if(destignation=='priceTags' && selectedWh!=null){
+        router.get(route('admin.warehouses.priceTags'), {selectedWh:selectedWhInfo.value.id});
+    }
 };
 
 watch(selectedWh, async (newVal) => {
@@ -58,13 +61,16 @@ watch(selectedWh, async (newVal) => {
                         <SecondaryButton @click="relocation('stockIn')" :disabled="selectedWh==null" :selected="currentBlock=='stockIn'" class="mr-2">
                             Наличие
                         </SecondaryButton>
-                        <SecondaryButton @click="relocation('orders')" :disabled="selectedWh==null" :selected="currentBlock=='orders'">
+                        <SecondaryButton @click="relocation('orders')" :disabled="selectedWh==null" :selected="currentBlock=='orders'" class="mr-2">
                             Заказы
+                        </SecondaryButton>
+                        <SecondaryButton @click="relocation('priceTags')" :disabled="selectedWh==null" :selected="currentBlock=='priceTags'">
+                            Ценники
                         </SecondaryButton>
                     </div>
                 </div>
                 <div class="mt-2 whitespace-nowrap">
-                    <select v-model="selectedWh" class="mr-2 whitespace-nowrap px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150  bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                    <select v-model="selectedWh" name="select_current_wh" class="mr-2 whitespace-nowrap px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150  bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
                         <option v-for="wh in warehouses" :key="wh.id" :value="wh.id">{{wh.title}}</option>
                     </select>
                     <SecondaryButton :disabled="selectedWh==null" @click="relocation('editWh')" class="mr-2"><i class="ri-edit-2-fill"></i></SecondaryButton>

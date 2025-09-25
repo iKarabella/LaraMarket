@@ -83,6 +83,7 @@ Route::middleware('permission:catalog_manage')->group(function () {
     Route::get('admin/catalog/product/edit/{code}', [AdminCatalogController::class, 'products'])->name('admin.products.edit');
     Route::post('admin/catalog/product/store', [AdminCatalogController::class, 'storeProduct'])->name('admin.products.store');
     Route::post('admin/catalog/product/offers/store', [AdminCatalogController::class, 'storeOffer'])->name('admin.products.offers.store');
+    Route::get('admin/catalog/product/offers/edit/{offer_id}', [AdminCatalogController::class, 'editOffer'])->name('admin.catalog.editOffer');
     Route::get('admin/catalog/products/{code}/offers/{offer_id}', [AdminCatalogController::class, 'offer'])->name('admin.products.editOffer');
     Route::get('admin/catalog/products/{code}/offers/', [AdminCatalogController::class, 'offer'])->name('admin.products.newOffer');
 
@@ -106,11 +107,16 @@ Route::middleware('permission:warehouses_manage')->group(function () {
     Route::get('admin/warehouse/new', [WarehouseController::class, 'edit'])->name('admin.warehouses.new');
     Route::put('admin/warehouse/storeReceipt', [WarehouseController::class, 'storeReceipt'])->name('admin.warehouse.storeReceipt');
     Route::put('admin/warehouse/storeWriteOff', [WarehouseController::class, 'storeWriteOff'])->name('admin.warehouse.storeWriteOff');
+
+    Route::get('admin/warehouses/price-tags', [WarehouseController::class, 'priceTags'])->name('admin.warehouses.priceTags');
+    Route::post('admin/warehouses/price-tags', [WarehouseController::class, 'priceTags']);
+    Route::post('admin/warehouses/price-tags/print', [WarehouseController::class, 'printPriceTags'])->name('admin.warehouses.printPriceTags');
+
     Route::get('admin/warehouses/{code?}', [WarehouseController::class, 'manage'])->name('admin.warehouses.manage');
     
-    Route::get('admin/warehouses/{code?}/cashRegisters', [WarehouseController::class, 'getCashRegisters'])->name('admin.warehouse.cashRegisters');
-    Route::put('admin/warehouses/{code?}/cashRegisters', [WarehouseController::class, 'storeCashRegisters']);
-    Route::delete('admin/warehouses/{code?}/cashRegisters', [WarehouseController::class, 'deleteCashRegister']);
+    Route::get('admin/warehouses/{code}/cashRegisters', [WarehouseController::class, 'getCashRegisters'])->name('admin.warehouse.cashRegisters');
+    Route::put('admin/warehouses/{code}/cashRegisters', [WarehouseController::class, 'storeCashRegisters']);
+    Route::delete('admin/warehouses/{code}/cashRegisters', [WarehouseController::class, 'deleteCashRegister']);
 
     Route::get('admin/warehouses/{code}/stock_in', [WarehouseController::class, 'stockIn'])->name('admin.warehouses.stock_in');
     Route::post('admin/warehouses/{code}/stock_in', [WarehouseController::class, 'stockIn']);

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin\Warehouses;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SearchProductRequest;
+use App\Http\Requests\Admin\Warehouses\PriceTagsPrintRequest;
+use App\Http\Requests\Admin\Warehouses\PriceTagsRequest;
 use App\Http\Requests\Admin\Warehouses\StockInListRequest;
 use App\Http\Requests\Admin\Warehouses\StoreWarehouseReceiptRequest;
 use App\Http\Requests\Admin\Warehouses\StoreWarehouseRequest;
@@ -12,6 +14,7 @@ use App\Http\Resources\Admin\Warehouses\WarehouseActResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseResource;
 use App\Http\Resources\Admin\Warehouses\WarehouseStocksInResource;
 use App\Models\CashRegister;
+use App\Models\Offer;
 use App\Models\Warehouse;
 use App\Models\WarehouseAct;
 use App\Services\ModulKassa\ModulKassa;
@@ -42,6 +45,52 @@ class WarehouseController extends Controller
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null)
         ]);
+    }
+
+    public function priceTags(PriceTagsRequest $request)
+    {
+        if($request->createFromReceipt)
+        {
+            $act = WarehouseAct::whereId($request->createFromReceipt)->first();
+            $offers = Offer::whereIn('id', array_column($act->act, 'offer_id'))->with('product')->get();
+            $positions = $offers->map(function($offer){
+                return [
+                    'offer_id'=>$offer->id,
+                    'product_id'=>$offer->product->id,
+                    'price'=>number_format($offer->price/100, 2, '.', ""),
+                    'barcode'=>$offer->barcode,
+                    'title'=>"{$offer->product->title}, {$offer->title}",
+                    'measure'=>$offer->product->measure_value->value,
+                    'quantity'=>1
+                ];
+            });
+        }
+        else $positions = [];
+
+        return Inertia::render('Admin/Warehouses/PriceTags', [
+            'navigation'=>$this->getNavigation('warehouses'),
+            'warehouses'=>Warehouse::all(),
+            'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
+            'positions'=>$positions
+        ]);
+    }
+
+    public function printPriceTags(PriceTagsPrintRequest $request)
+    {
+        $positions = [];
+
+        foreach($request->positions as $item)
+        {
+            $add = [
+                'title'=>$item['title'],
+                'price'=>$item['price'],
+                'offer_id'=>$item['offer_id']
+            ];
+
+            for ($i=0; $i<$item['quantity']; $i++) $positions[]=$add;
+        }
+
+        return view('PrintPriceTipsPages.'.$request->format, ['positions' => $positions, 'companyName'=>env('COMPANY_NAME_SHORT', '')]);
     }
 
     public function edit(Request $request, ?string $code=null)
@@ -108,7 +157,8 @@ class WarehouseController extends Controller
             'navigation'=>$this->getNavigation('warehouses'),
             'warehouses'=>Warehouse::all(),
             'selectedWh'=>$request->session()->get('admin.manage_warehouses.selectedWh', null),
-            'acts'=>WarehouseActResource::collection($acts->paginate(30))
+            'acts'=>WarehouseActResource::collection($acts->paginate(30)),
+            'offersEditable'=>access_rights('catalog_manage')
         ]);
     }
 

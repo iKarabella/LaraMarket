@@ -1,8 +1,12 @@
 <script setup>
+import { router, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
+import { route } from 'ziggy-js';
 
 const props = defineProps({
-    act:{type:Object, default:{}}
+    act:{type:Object, default:{}},
+    offersEditable:{type:Boolean, default:false}
 });
 
 const computedAct = computed(()=>{
@@ -23,6 +27,13 @@ const actAmount = computed(()=>{
 });
 const showAct = ref(false);
 
+const priceTags = () => {
+    router.post(route('admin.warehouses.priceTags'), {
+        createFromReceipt: props.act.id,
+        selectedWh:props.act.warehouse_id
+    });
+};
+
 </script>
 <template>
     <div>
@@ -38,13 +49,21 @@ const showAct = ref(false);
             <div v-show="showAct">
                 <div v-for="(position, index) in computedAct" class="md:grid md:grid-cols-10 md:gap-2">
                     <div>{{ index+1 }}</div>
-                    <div class="col-span-5">{{ position.title }}</div>
+                    <div class="col-span-5">
+                        <Link v-if="offersEditable" :href="route('admin.catalog.editOffer', position.offer_id)">
+                            {{ position.title }}
+                        </Link>
+                        <template v-else>{{ position.title }}</template>
+                    </div>
                     <div class="text-right" v-if="act.type!='write-off'">{{ position.price }} ₽</div>
                     <div class="text-right">{{ position.quantity }}</div>
                     <div>{{ position.measure_val }}</div>
                     <div class="text-right" v-if="act.type!='write-off'">{{ position.amount.toFixed(2) }} ₽</div>
                 </div>
                 <div v-if="act.comment" v-html="act.comment"></div>
+                <div v-if="act.type=='receipt'" class="text-right">
+                    <SecondaryButton @click="priceTags" :disabled="!act.id">Печать ценников</SecondaryButton>
+                </div>
             </div>
         </Transition>
     </div>
