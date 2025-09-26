@@ -38,7 +38,7 @@ const notifyAboutAdmission = (i) => {
     notifyAboutAdmissionForm.offer_id = i.offer;
     notifyAboutAdmissionForm.product_id = i.position;
 
-    if ((props.auth==null || !props.auth.user) && (!notifyAboutAdmissionForm.email || !notifyAboutAdmissionForm.name)) showNotifyAboutAdmission.value = true;
+    if ((props.auth==null || !props.auth.user)) showNotifyAboutAdmission.value = true;
     else notifyFormSend();
 };
             
