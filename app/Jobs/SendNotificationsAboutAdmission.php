@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Mail\NotificationAboutAdmission;
 use App\Models\ExpectedOffer;
 use App\Services\SmsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Mail;
 
 class SendNotificationsAboutAdmission implements ShouldQueue
 {
@@ -25,6 +27,7 @@ class SendNotificationsAboutAdmission implements ShouldQueue
             foreach ($rows as $row) 
             {
                 $email = $phone = $name = null;
+                $offername = "{$row->product->title}, {$row->offer->title}";
 
                 if ($row->user) 
                 {
@@ -38,11 +41,13 @@ class SendNotificationsAboutAdmission implements ShouldQueue
                     $name = $row->name;
                 }
 
-                if ($email) {
-                    //TODO отправляем email
+                if ($email) 
+                {
+                    Mail::to($email)->send(new NotificationAboutAdmission($name, $offername));
                 }
-                else if ($phone) {
-                    $sms = "В магазин ".config('app.name')." поступил товар {$row->product->title}, {$row->offer->title}.";
+                else if ($phone) 
+                {
+                    $sms = "В магазин ".config('app.name')." поступил товар {$offername}.";
                     SmsService::send($phone, $sms);
                 }
 
