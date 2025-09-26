@@ -20,7 +20,7 @@ use App\Http\Controllers\User\PublicPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [CatalogController::class, 'index'])->name('home');
 
 Route::get('/@{nick}', [PublicPageController::class, 'page'])->name('user.page');
 
