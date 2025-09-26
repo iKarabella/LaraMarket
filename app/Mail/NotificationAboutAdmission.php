@@ -25,7 +25,7 @@ class NotificationAboutAdmission extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('no-reply@example.com', 'no-reply'),
+            from: new Address(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME')),
             subject: 'Notification About Admission',
         );
     }
