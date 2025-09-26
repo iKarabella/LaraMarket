@@ -62,7 +62,7 @@ class OrderController extends Controller
 
         $filters = $request->session()->get('manage.orders.filters', [
             'statuses' => EntityValue::whereEntity(2)->get()->map(function($arr){return ['status'=>$arr->id, 'name'=>$arr->value, 'on'=>true];}),
-            'dates' => [new Carbon()->startOfWeek(), new Carbon()->endOfDay()],
+            'dates' => [new Carbon()->subDays(7), new Carbon()->endOfDay()],
             'sortDesc' => true
         ]);
 

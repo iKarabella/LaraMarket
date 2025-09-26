@@ -35,7 +35,7 @@ class DeliveryController extends Controller
                 ['status'=>'processed', 'name'=>'В работе', 'on'=>true],
                 ['status'=>'awaiting', 'name'=>'В ожидании', 'on'=>true],
             ],
-            'dates' => [new Carbon()->startOfWeek(), new Carbon()->endOfDay()],
+            'dates' => [new Carbon()->subDays(7), new Carbon()->endOfDay()],
             'sortDesc' => false
         ]);
 

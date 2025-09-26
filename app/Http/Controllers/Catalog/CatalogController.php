@@ -39,7 +39,7 @@ class CatalogController extends Controller
         }
 
         return Inertia::render('Catalog/Catalog', [
-            'products'=>ProductResource::collection($products->orderBy('id', 'desc')->paginate(50)),
+            'products'=>ProductResource::collection($products->orderBy('id', 'desc')->paginate(30)),
             'breadcrumb'=>$this->getBreadcrumb(cat:$category),
             'filters'=>[]
         ]);
