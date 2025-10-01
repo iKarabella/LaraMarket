@@ -23,6 +23,12 @@ class UserCartController extends Controller
         ]);
     }
 
+    /**
+     * Список товаров в корзине
+     * 
+     * @param App\Http\Requests\Catalog\GetCartPositionsRequest $request
+     * @return JsonResource
+     */
     public function getCartPositions(GetCartPositionsRequest $request): JsonResource
     {
         $offers = Offer::whereIn('id', array_column($request->positions, 'offer'))->with(['product', 'media'])->get();
@@ -30,6 +36,12 @@ class UserCartController extends Controller
         return UserCartResource::collection($offers);
     }
 
+    /**
+     * Список товаров в корзине
+     * 
+     * @param App\Http\Requests\Catalog\GetCartPositionsRequest $request
+     * @return JsonResource
+     */
     public function check(GetCartPositionsRequest $request):JsonResponse
     {
         $offers = Offer::whereIn('id', array_column($request->positions, 'offer'))->get(['id']);

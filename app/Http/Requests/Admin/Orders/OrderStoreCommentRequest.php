@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Admin\Orders;
 
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -20,6 +19,7 @@ class OrderStoreCommentRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        /**@var Request $this */
         $this->merge([
             'user_id'=>$this->user()->id,
             'auto'=>false,
@@ -34,7 +34,7 @@ class OrderStoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id'=>['numeric','required',Rule::exists('orders', 'id')->where(function (Builder $query) {
+            'order_id'=>['numeric','required',Rule::exists('orders', 'id')->where(function ($query) {
                 $query->whereNotIn('status', [11, 12]);
             })],
             'user_id'=>'numeric|required',

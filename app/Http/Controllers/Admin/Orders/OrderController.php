@@ -8,17 +8,14 @@ use App\Http\Requests\Admin\Orders\OrderSatWhRequest;
 use App\Http\Requests\Admin\Orders\OrdersListRequest;
 use App\Http\Requests\Admin\Orders\OrderStoreCommentRequest;
 use App\Http\Resources\Admin\Orders\OrderResource;
-use App\Http\Resources\EntityValueResource;
 use App\Models\EntityValue;
 use App\Models\Order;
 use App\Models\OrderComment;
 use App\Models\Warehouse;
 use App\Services\OrderService;
-use App\Services\WarehouseService\WarehouseService;
 use App\Traits\MarketControllerTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -42,6 +39,12 @@ class OrderController extends Controller
         OrderComment::create($request->validated());
     }
 
+    /**
+     * Выбрать склад
+     * 
+     * @param App\Http\Requests\Admin\Orders\OrderSatWhRequest $request
+     * @return Response
+     */
     public function setWarehouse(OrderSatWhRequest $request, string $uuid)
     {
         Order::whereId($request->order_id)->update(['warehouse_id'=>$request->warehouse_id]);
@@ -54,7 +57,13 @@ class OrderController extends Controller
         $service->orderEditPosition($order, $request);
     }
 
-    public function manage(OrdersListRequest $request)
+    /**
+     * Управление заказами
+     * 
+     * @param App\Http\Requests\Admin\Orders\OrdersListRequest $request
+     * @return Response
+     */
+    public function manage(OrdersListRequest $request):Response
     {
         $validated = $request->validated();
 
@@ -62,7 +71,7 @@ class OrderController extends Controller
 
         $filters = $request->session()->get('manage.orders.filters', [
             'statuses' => EntityValue::whereEntity(2)->get()->map(function($arr){return ['status'=>$arr->id, 'name'=>$arr->value, 'on'=>true];}),
-            'dates' => [new Carbon()->subDays(7), new Carbon()->endOfDay()],
+            'dates' => [(new Carbon())->subDays(7), (new Carbon())->endOfDay()],
             'sortDesc' => true
         ]);
 
@@ -84,8 +93,8 @@ class OrderController extends Controller
         if($filters['statuses']) $orders->whereIn('status', $filters['statuses']->filter(function($f){return $f['on'];})->pluck('status'));
         if(isset($filters['dates']) && count($filters['dates'])) 
         {
-            if ($filters['dates'][0]) $orders->where('created_at', '>', new Carbon($filters['dates'][0])->startOfDay());
-            if ($filters['dates'][1]) $orders->where('created_at', '<', new Carbon($filters['dates'][1])->endOfDay());
+            if ($filters['dates'][0]) $orders->where('created_at', '>', (new Carbon($filters['dates'][0]))->startOfDay());
+            if ($filters['dates'][1]) $orders->where('created_at', '<', (new Carbon($filters['dates'][1]))->endOfDay());
         }
         if(isset($filters['sortDesc'])) 
         {

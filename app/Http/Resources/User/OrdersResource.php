@@ -23,8 +23,8 @@ class OrdersResource extends JsonResource
             'discount'=>$this->discount??'',
             'body'=>$this->body??'',
             'status_info'=>$this->status_info?$this->status_info->value:'',
-            'created_at' => new Carbon($this->created_at??null)->format('d.m.Y H:m:s'),
-            'updated_at' => new Carbon($this->updated_at??null)->format('d.m.Y H:m:s'),
+            'created_at' => (new Carbon($this->created_at??null))->format('d.m.Y H:m:s'),
+            'updated_at' => (new Carbon($this->updated_at??null))->format('d.m.Y H:m:s'),
         ];
     }
 }

@@ -39,6 +39,7 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
+        /**@var Request $this */
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('phone', 'password'), $this->boolean('remember'))) {
@@ -80,6 +81,7 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
+        /**@var Request $this */
         return Str::transliterate(Str::lower($this->string('phone')).'|'.$this->ip());
     }
 }

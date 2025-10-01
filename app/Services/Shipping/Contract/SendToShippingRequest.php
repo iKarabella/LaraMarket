@@ -13,6 +13,7 @@ class SendToShippingRequest extends FormRequest
 
     public function prepareForValidation()
     {
+        /** @var Request $this */
         $order = Order::whereId($this->orderId)->with('reserved_products')->firstOrFail();
 
         if (!$order->shipping_code) throw ValidationException::withMessages(['orderId' => 'В заказе не указан тип доставки']);

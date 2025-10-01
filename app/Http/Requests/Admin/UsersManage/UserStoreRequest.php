@@ -15,6 +15,7 @@ class UserStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**@var Request $this */
         $rules = [
             'id' => 'required|integer|exists:users',
             'roles' => 'array|nullable',

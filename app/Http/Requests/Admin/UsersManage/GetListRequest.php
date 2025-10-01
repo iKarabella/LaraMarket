@@ -29,6 +29,7 @@ class GetListRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        /**@var Request $this */
         $this->merge([
             'phone' => $this->phone?intval($this->phone):null,
             'name' => $this->name?$this->name:'',

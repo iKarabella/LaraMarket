@@ -15,6 +15,7 @@ class ModulkassaUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**@var Request $this */
         $rules = [
             'user_id' => 'required|numeric|exists:users,id',
             'cashierRegister'=>'required|string'

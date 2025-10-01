@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Admin\Orders;
 
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +15,7 @@ class OrderEditPositionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id'=>['numeric', 'required', Rule::exists('orders', 'id')->where(function (Builder $query) {
+            'order_id'=>['numeric', 'required', Rule::exists('orders', 'id')->where(function ($query) {
                 $query->whereStatus(5);
             })],
             'offer_id'=>'numeric|required|exists:offers,id',

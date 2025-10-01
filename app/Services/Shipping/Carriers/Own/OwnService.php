@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Auth;
 
 class OwnService implements ShippingInterface
 {
+    /**
+     * Сохранить заказ
+     * 
+     * @param App\Services\Shipping\Contract\SendToShippingRequest $request
+     * @return string|null
+     */
     public function create(SendToShippingRequest $request):void
     {
         try {

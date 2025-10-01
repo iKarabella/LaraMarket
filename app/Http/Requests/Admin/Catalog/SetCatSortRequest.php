@@ -15,6 +15,7 @@ class SetCatSortRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**@var Request $this */
         if ($this->id) $rule = ['string','required', 'min:3', 'max:25', Rule::unique(Category::class)->ignore($this->id)];
         else $rule = 'string|required|min:3|max:25|unique:categories,code';
 

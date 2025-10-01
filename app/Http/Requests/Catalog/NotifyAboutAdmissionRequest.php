@@ -14,6 +14,7 @@ class NotifyAboutAdmissionRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        /**@var Request $this */
         $this->merge([
             'user_id' => $this->user() ? $this->user()->id : null
         ]);

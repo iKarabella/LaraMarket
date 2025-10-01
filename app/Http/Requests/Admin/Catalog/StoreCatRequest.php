@@ -19,6 +19,7 @@ class StoreCatRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**@var Request $this */
         if ($this->id) $codeRules = ['string','required', 'min:3', 'max:25', Rule::unique(Category::class)->ignore($this->id)];
         else $codeRules = 'string|required|min:3|max:25|unique:categories,code';
 

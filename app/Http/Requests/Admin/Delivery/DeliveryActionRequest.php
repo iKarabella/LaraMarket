@@ -11,6 +11,7 @@ class DeliveryActionRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        /**@var Request $this */
         $action = explode('@', $this->route()->getActionName())[1];
 
         $this->merge([

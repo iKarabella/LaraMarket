@@ -22,8 +22,8 @@ class OrderCommentResource extends JsonResource
             'auto'=>$this->auto?true:false,
             'title'=>$this->title??null,
             'comment'=>$this->comment,
-            'created_at'=> new Carbon($this->created_at)->format('d.m.Y H:i:s'),
-            'updated_at'=> $this->created_at!=$this->updated_at ? new Carbon($this->updated_at)->format('d.m.Y H:i:s') : null,
+            'created_at'=> (new Carbon($this->created_at))->format('d.m.Y H:i:s'),
+            'updated_at'=> $this->created_at!=$this->updated_at ? (new Carbon($this->updated_at))->format('d.m.Y H:i:s') : null,
         ];
     }
 }

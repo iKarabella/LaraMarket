@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Admin\Orders;
 
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +16,7 @@ class OrderCancelRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id'=>['numeric', 'required', Rule::exists('orders', 'id')->where(function (Builder $query) {
+            'order_id'=>['numeric', 'required', Rule::exists('orders', 'id')->where(function ($query) {
                 $query->whereIn('status', [5,6,8,10]);
             })],
             'goods_returned'=>'boolean|required',

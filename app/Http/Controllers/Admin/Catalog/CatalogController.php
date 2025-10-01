@@ -25,6 +25,12 @@ class CatalogController extends Controller
 {
     use MarketControllerTrait;
 
+    /**
+     * Управление каталогом
+     * 
+     * @param App\Http\Requests\Admin\Catalog\ManageRequest $request
+     * @return Response
+     */
     public function index(ManageRequest $request): Response
     {
         $products = Product::with(['offers', 'categories', 'offers', 'media']);
@@ -49,12 +55,24 @@ class CatalogController extends Controller
         Category::firstOrNew(['id'=>$validated['id']])->fill($validated)->save();
     }
 
-    public function deleteCat(DeleteCatRequest $request)
+    /**
+     * Удалить категорию
+     * 
+     * @param App\Http\Requests\Admin\Catalog\DeleteCatRequest $request
+     * @return void
+     */
+    public function deleteCat(DeleteCatRequest $request):void
     {
         Category::whereId($request->id)->delete();
     }
 
-    public function sortingCategory(SetCatSortRequest $request)
+    /**
+     * Изменить сортировку
+     * 
+     * @param App\Http\Requests\Admin\Catalog\SetCatSortRequest $request
+     * @return void
+     */
+    public function sortingCategory(SetCatSortRequest $request):void
     {
         Category::whereId($request->id)->update(['sort' => $request->sort]);
     }
@@ -91,6 +109,12 @@ class CatalogController extends Controller
         ]);
     }
 
+    /**
+     * Сохранить товар
+     * 
+     * @param App\Http\Requests\Admin\Catalog\StoreProductRequest $request
+     * @return RedirectResponse
+     */
     public function storeProduct(StoreProductRequest $request): RedirectResponse
     {
         $product = Product::whereId($request->id)->firstOrNew();
@@ -141,6 +165,12 @@ class CatalogController extends Controller
         ]);
     }
 
+    /**
+     * Сохранить торговое предложение
+     * 
+     * @param App\Http\Requests\Admin\Catalog\StoreOfferRequest $request
+     * @return RedirectResponse
+     */
     public function storeOffer(StoreOfferRequest $request):RedirectResponse
     {
         $product = Product::whereId($request->product_id)->first(['code']);

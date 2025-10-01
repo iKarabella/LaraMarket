@@ -14,6 +14,7 @@ class StoreOfferRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**@var Request $this */
         return [
             'id'=>'numeric|nullable|exists:offers',
             'product_id'=>['numeric','required','exists:products,id', Rule::excludeIf($this->id>0)],

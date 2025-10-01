@@ -4,7 +4,6 @@ namespace App\Services\ModulKassa;
 
 use App\Models\ModulkassaDocs;
 use App\Models\Order;
-use App\Services\Modulkassa\DTO\OrderDTO;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;

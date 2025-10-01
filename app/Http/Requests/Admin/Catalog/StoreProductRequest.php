@@ -14,6 +14,7 @@ class StoreProductRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**@var Request $this */
         return [
             'id'=>'numeric|nullable|exists:products',
             'title'=>'string|required|min:5',

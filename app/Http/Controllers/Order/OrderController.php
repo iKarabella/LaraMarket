@@ -32,6 +32,12 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * Сохранить заказ
+     * 
+     * @param App\Http\Requests\Catalog\StoreOrderRequest $request
+     * @return void
+     */
     public function store(StoreOrderRequest $request, OrderService $service):Response
     {
         $uuid = $service->storeOrder($request);

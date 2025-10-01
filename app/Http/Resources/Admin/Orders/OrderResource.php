@@ -35,8 +35,8 @@ class OrderResource extends JsonResource
             ]:null,
             'shippings'=>$this->shippings?ShippingResource::collection($this->shippings)->resolve():[],
             'comments' => $this->comments?OrderCommentResource::collection($this->comments)->resolve():[],
-            'created_at' => new Carbon($this->created_at??null)->format('d.m.Y H:i:s'),
-            'updated_at' => new Carbon($this->updated_at??null)->format('d.m.Y H:i:s'),
+            'created_at' => (new Carbon($this->created_at??null))->format('d.m.Y H:i:s'),
+            'updated_at' => (new Carbon($this->updated_at??null))->format('d.m.Y H:i:s'),
         ];
     }
 }

@@ -15,6 +15,7 @@ use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class WarehouseService
 {
@@ -82,7 +83,7 @@ class WarehouseService
     /**
      * Приход на склад
      * 
-     * @param StoreWarehouseReceiptRequest $request массив позиций для сохранения
+     * @param App\Http\Requests\Admin\Warehouses\StoreWarehouseReceiptRequest $request массив позиций для сохранения
      * @return void
      * @throws \Exception
      */
@@ -201,7 +202,7 @@ class WarehouseService
     /**
      * Списание со склада
      * 
-     * @param StoreWarehouseReceiptRequest $request запрос на списание
+     * @param App\Http\Requests\Admin\Warehouses\StoreWarehouseReceiptRequest $request запрос на списание
      * @return void
      * @throws \Exception
      */

@@ -25,8 +25,8 @@ class OrderResource extends JsonResource
             'body'       => $this->body??[],
             'customer'   => $this->customer??[],
             'delivery'   => $this->delivery??[],
-            'created_at' => new Carbon($this->created_at??null)->format('d.m.Y H:i'),
-            'updated_at' => new Carbon($this->updated_at??null)->format('d.m.Y H:i'),
+            'created_at' => (new Carbon($this->created_at??null))->format('d.m.Y H:i'),
+            'updated_at' => (new Carbon($this->updated_at??null))->format('d.m.Y H:i'),
         ];
     }
 }

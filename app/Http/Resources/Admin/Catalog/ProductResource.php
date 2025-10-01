@@ -28,8 +28,8 @@ class ProductResource extends JsonResource
             'offers'    => $this->offers??[],
             'media' => $this->media?ProductMediaResource::collection($this->media):[], //медиа
             'measure'   => $this->measure??null,
-            'created' => new Carbon($this->created_at)->format('d.m.Y H:i:s'), //создан
-            'updated' => new Carbon($this->updated_at)->format('d.m.Y H:i:s'), //обновлен
+            'created' => (new Carbon($this->created_at))->format('d.m.Y H:i:s'), //создан
+            'updated' => (new Carbon($this->updated_at))->format('d.m.Y H:i:s'), //обновлен
         ];
     }
 }

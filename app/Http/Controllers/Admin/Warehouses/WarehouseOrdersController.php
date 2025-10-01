@@ -39,7 +39,13 @@ class WarehouseOrdersController extends Controller
 {
     use MarketControllerTrait;
 
-    public function manage(OrdersListRequest $request, ?string $code=null)
+    /**
+     * Управление заказами
+     * 
+     * @param App\Http\Requests\Admin\Warehouses\OrdersListRequest $request
+     * @return Response
+     */
+    public function manage(OrdersListRequest $request, ?string $code=null):Response
     {
         $orders = Order::with(['status_info']);
 
@@ -54,7 +60,7 @@ class WarehouseOrdersController extends Controller
 
         $filters = $request->session()->get('whmanage.orders.filters', [
             'statuses' => EntityValue::whereIn('id', [8,10])->get()->map(function($arr){return ['status'=>$arr->id, 'name'=>$arr->value, 'on'=>true];}),
-            'dates' => [new Carbon()->subDays(7), new Carbon()->endOfDay()],
+            'dates' => [(new Carbon())->subDays(7), (new Carbon())->endOfDay()],
             'sortDesc' => true
         ]);
 
@@ -76,8 +82,8 @@ class WarehouseOrdersController extends Controller
         if($filters['statuses']) $orders->whereIn('status', $filters['statuses']->filter(function($f){return $f['on'];})->pluck('status'));
         if(isset($filters['dates']) && count($filters['dates'])) 
         {
-            if ($filters['dates'][0]) $orders->where('created_at', '>', new Carbon($filters['dates'][0])->startOfDay());
-            if ($filters['dates'][1]) $orders->where('created_at', '<', new Carbon($filters['dates'][1])->endOfDay());
+            if ($filters['dates'][0]) $orders->where('created_at', '>', (new Carbon($filters['dates'][0]))->startOfDay());
+            if ($filters['dates'][1]) $orders->where('created_at', '<', (new Carbon($filters['dates'][1]))->endOfDay());
         }
         if(isset($filters['sortDesc'])) 
         {
@@ -95,6 +101,12 @@ class WarehouseOrdersController extends Controller
         ]);
     }
 
+    /**
+     * Передать в доставку
+     * 
+     * @param App\Services\Shipping\Contract\SendToShippingRequest $request
+     * @return Response
+     */
     public function sentToShipping(SendToShippingRequest $request, string $code, string $uuid)
     {
         ShippingService::client($request->preparing_fields['shipping_code'])->create($request);

@@ -11,9 +11,6 @@ use App\Models\Order;
 use App\Models\OrderComment;
 use App\Models\StockReserve;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -78,6 +75,12 @@ class OrderService
         return $order;
     }
 
+    /**
+     * Сохранить заказ
+     * 
+     * @param App\Http\Requests\Catalog\StoreOrderRequest $request
+     * @return string|null
+     */
     public function storeOrder(StoreOrderRequest $request):string|null
     {
         $validated = $request->validated();

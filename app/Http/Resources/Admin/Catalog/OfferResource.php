@@ -31,8 +31,8 @@ class OfferResource extends JsonResource
             'height'    => $this->height??null,
             'width'    => $this->width??null,
             'media'=>ProductMediaResource::collection($this->media)->resolve(),
-            'created' => new Carbon($this->created_at??null)->format('d.m.Y H:i:s'), //создан
-            'updated' => new Carbon($this->updated_at??null)->format('d.m.Y H:i:s'), //обновлен
+            'created' => (new Carbon($this->created_at??null))->format('d.m.Y H:i:s'), //создан
+            'updated' => (new Carbon($this->updated_at??null))->format('d.m.Y H:i:s'), //обновлен
         ];
     }
 }

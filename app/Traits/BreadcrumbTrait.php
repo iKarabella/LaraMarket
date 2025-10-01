@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 trait BreadcrumbTrait
@@ -46,7 +45,7 @@ trait BreadcrumbTrait
 
             $catsTree = DB::select($rawSql, [$cat]);
 
-            $getCats = Category::where(function(Builder $query) use ($catsTree){
+            $getCats = Category::where(function($query) use ($catsTree){
                 $query->whereNull('parent');
                 if (count($catsTree)) $query->orWhereIn('parent', array_column($catsTree, 'id'));
             })->get(); //->whereVisibility(true)

@@ -12,6 +12,7 @@ class CreateOrderRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        /**@var Request $this */
         if(!$this->positions)
         {
             $saved_data = $this->session()->get('user.order_create', false);

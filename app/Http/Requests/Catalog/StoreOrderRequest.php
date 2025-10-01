@@ -19,6 +19,7 @@ class StoreOrderRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        /**@var Request $this */
         $saved_data = $this->session()->get('user.order_create', false);
         $errors=[];
         $total=0;

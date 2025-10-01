@@ -16,7 +16,13 @@ class ProductMediaController extends Controller
 {
     use MarketControllerTrait;
 
-    public function storeProductMedia(StoreProductMediaRequest $request)
+    /**
+     * Сохранить медиа
+     * 
+     * @param App\Http\Requests\Admin\Catalog\StoreProductMediaRequest $request
+     * @return void
+     */
+    public function storeProductMedia(StoreProductMediaRequest $request):void
     {
         $dir = 'images/'.(empty($request->product_id)?'offers':'products').'/'.(empty($request->product_id)?$request->offer_id:$request->product_id).'/';
         
@@ -56,6 +62,12 @@ class ProductMediaController extends Controller
         });
     }
 
+    /**
+     * Удалить медиа
+     * 
+     * @param App\Http\Requests\Admin\Catalog\RemoveMediaRequest $request
+     * @return void
+     */
     public function removeProductMedia(RemoveMediaRequest $request)
     {
         $file = ProductMedia::whereId($request->id)->first();

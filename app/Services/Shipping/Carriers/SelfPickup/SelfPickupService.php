@@ -6,7 +6,6 @@ use App\Services\Shipping\Contract\SendToShippingRequest;
 use App\Models\Shipping;
 use App\Models\Warehouse;
 use App\Services\Shipping\Contract\ShippingInterface;
-use App\Services\Shipping\Carriers\SelfPickup\Resources\WarehouseResource;
 use Illuminate\Support\Facades\Auth;
 
 class SelfPickupService implements ShippingInterface
