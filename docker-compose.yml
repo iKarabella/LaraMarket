@@ -47,6 +47,23 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
+    manticore:
+        image: manticoresearch/manticore
+        ports:
+            - 127.0.0.1:9306:9306
+            - 127.0.0.1:9308:9308
+        ulimits:
+            nproc: 65535
+            nofile:
+                soft: 65535
+                hard: 65535
+        # memlock: #TODO ошибка: validating /var/www/laramarket/docker-compose.yml: services.manticore Additional property memlock is not allowed
+        #     soft: -1
+        #     hard: -1
+        volumes:
+            - ./data:/var/lib/manticore
+        networks:
+            - sail
 networks:
     sail:
         driver: bridge
