@@ -1,8 +1,6 @@
 <script setup>
 import Positions from './Partials/Positions.vue';
 import Pagination from '@/Components/Pagination';
-import Checkbox from '@/Components/UI/Checkbox.vue';
-import InputLabel from '@/Components/UI/InputLabel.vue';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import FullLayout from '@/Layouts/FullLayout.vue';
 

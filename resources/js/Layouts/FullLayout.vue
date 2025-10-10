@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import SearchBlock from '@/Components/Elements/SearchBlock.vue';
+import SearchBlock from '@/Components/Elements/Search/SearchBlock.vue';
 import HeaderBlock from '@/Components/Elements/HeaderBlock.vue';
 import CatalogMenuBlock from '@/Components/Elements/CatalogMenu/CatalogMenuBlock.vue';
 

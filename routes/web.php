@@ -15,12 +15,16 @@ use App\Http\Controllers\Catalog\ProductController;
 use App\Http\Controllers\Catalog\UserCartController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Modulkassa\ModulKassaController;
+use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\PublicPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [CatalogController::class, 'index'])->name('home');
+
+Route::get('/search', [SearchController::class, 'searchProducts'])->name('searchProducts');
+Route::post('/search', [SearchController::class, 'searchProducts']);
 
 Route::get('/@{nick}', [PublicPageController::class, 'page'])->name('user.page');
 

@@ -18,4 +18,9 @@ class Category extends Model
     protected $casts = [
         'visibility' => 'boolean',
     ];
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_categories', 'category_id', 'product_id');
+    }
 }
