@@ -4,9 +4,10 @@ namespace App\Services\ManticoreSearch;
 
 class Builder
 {
-    private ?int $limit = null;
+    private ?string $limit = null;
     private array $columns = [];
     private array $where = [];
+    private string $match;
     private array $options = [
         'fuzzy'=>1, 
         //'layouts'=>'us,ru', 
@@ -21,14 +22,17 @@ class Builder
 
         $where = '';
 
+        if($this->match) $where.="WHERE MATCH('{$this->match}')";
+
         foreach ($this->where as $key=>$exp) 
         {
             if ($key>0) $exp->or ? $where.=' OR ':' AND ';
             $where.=$exp;
         }
+
         if (empty($where)) $where='1';
 
-        if ($this->limit) $where.='LIMIT '.$this->limit;
+        if ($this->limit) $where.=$this->limit;
 
         if (count($this->options))
         {
@@ -37,7 +41,7 @@ class Builder
             $where.=" OPTION ".implode(', ', $options);
         }
 
-        return "SELECT $columns FROM {$this->table} WHERE $where;";
+        return "SELECT $columns FROM {$this->table} $where;";
     }
 
     public function where($exp){
@@ -45,9 +49,12 @@ class Builder
         return $this;
     }
 
-    public function limit(int $limit)
+    public function limit(int $limit, ?int $page=null)
     {
-        $this->limit = $limit;
+        $this->limit = " LIMIT $limit";
+
+        if ($page>0) $this->limit.=' OFFSET '.($page>1 ? $page*$limit : 0);
+
         return $this;
     }
 
@@ -57,7 +64,7 @@ class Builder
 
     public function match($query)
     {
-        $this->where[]="MATCH ('$query')";
+        $this->match=$query;
         
         return $this;
     }
@@ -65,6 +72,16 @@ class Builder
     public function select(array $columns)
     {
         $this->columns = $columns;
+        return $this;
+    }
+
+    public function filters(?array $filters=null)
+    {
+        if ($filters) foreach ($filters as $filter=>$val)
+        {
+            //TODO фильтры в мантикоре
+        }
+        
         return $this;
     }
 }

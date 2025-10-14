@@ -41,7 +41,6 @@ class ManticoreService
     private function exec($sql)
     {
         if (!$this->ready) return null;
-
         try {
             return $this->client->exec($sql);
         }
@@ -50,18 +49,18 @@ class ManticoreService
         }
     }
 
-    public function get(Builder $query)
+    public function get(Builder $query):array
     {
-        if (!$this->ready) return null;
+        if (!$this->ready) throw new Exception('Клиент мантикоры не готов');
         
-        //TODO сделать билдер
-
-        try {
-            $result = $this->client->query($query->build());
-            return $result->fetchAll(PDO::FETCH_ASSOC);
+        try {            
+            return [
+                'found'=>$this->client->query($query->build())->fetchAll(PDO::FETCH_ASSOC),
+                'meta'=>$this->client->query('SHOW META;')->fetchAll(PDO::FETCH_ASSOC)
+            ];
         }
         catch(Exception $e){
-            return $e;
+            throw $e;
         }
     }
 }
