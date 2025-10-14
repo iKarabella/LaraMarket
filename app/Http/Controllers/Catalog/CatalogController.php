@@ -21,6 +21,8 @@ class CatalogController extends Controller
     {
         $products = Product::with(['offers', 'categories', 'media']);
 
+        if(!access_rights('catalog_manage')) $products->whereVisibility(true);
+
         if($category) 
         {
             $cat = Category::whereCode($category);
