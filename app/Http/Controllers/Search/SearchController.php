@@ -18,13 +18,14 @@ class SearchController extends Controller
      */
     public function searchProducts(SearchRequest $request, SearchService $service):Response|JsonResponse
     {
-        $result = $service->searchProducts($request->search, 'Product');
+        $results = $service->searchProducts($request);
 
-        if ($request->method()=='POST') return response()->json($result);
+        if ($request->method()=='POST') return response()->json($results);
         
         else return Inertia::render('Search/Search', [
             'status' => session('status'),
-            'results' => $result
+            'results'=> $results,
+            'search' => $request->search
         ]);
     }
 }

@@ -16,7 +16,7 @@ class SearchRequest extends FormRequest
         return [
             'search'=>'string|nullable',
             'filters'=>'array|nullable',
-            'resultPage'=>'boolean|nullable'
+            'page'=>'numeric|nullable'
         ];
     }
 }

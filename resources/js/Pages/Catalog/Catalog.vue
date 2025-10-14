@@ -1,5 +1,5 @@
 <script setup>
-import Positions from './Partials/Positions.vue';
+import Positions from '@/Components/Elements/CatalogPositions/Positions.vue';
 import Pagination from '@/Components/Pagination';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import FullLayout from '@/Layouts/FullLayout.vue';

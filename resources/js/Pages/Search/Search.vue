@@ -1,9 +1,23 @@
 <script setup>
 import FullLayout from '@/Layouts/FullLayout.vue';
-import { Head, router } from '@inertiajs/vue3';
+import Positions from '@/Components/Elements/CatalogPositions/Positions.vue';
+import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
-    search_result:{type:Object},
+    results:{type:Object, default: {
+        found:[],
+        categories:[],
+        recommended:[],
+        frequently:[],
+        autocomplete:[],
+        meta:{
+            current_page:1,
+            total:0,
+            total_pages:1,
+            per_page:0,
+        }
+    }},
+    search:'',
 });
 
 </script>
@@ -12,8 +26,13 @@ const props = defineProps({
 
     <FullLayout>
         <div class="py-4">
-            <div class="sm:px-6 lg:px-8">
-                {{ search_result }}
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg mb-2 pb-2">
+                    <Positions :positions="results.found" 
+                               :userCart="usercart"
+                               :auth="$page.props.auth"
+                    />
+                </div>
             </div>
         </div>
     </FullLayout>

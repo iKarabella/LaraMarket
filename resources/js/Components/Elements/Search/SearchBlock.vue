@@ -1,18 +1,19 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { usercart } from '@/Mixins/UserCart.js';
-import { useStorage } from '@vueuse/core'
-import { computed, ref } from 'vue';
+import { useStorage, onClickOutside } from '@vueuse/core'
+import { computed, ref, useTemplateRef } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const searchInputFocus = ref(false);
-const searchResults = ref({
+const defaultResults = {
     found:[],
     categories:[],
     autocomplete:[],
     recommended:[],
     frequently:[],
-});
+};
+const searchResults = ref(defaultResults);
 const searchStringRef = ref();
 const searchString = ref('');
 
@@ -48,12 +49,22 @@ const resetSearch = ()=>{
 
 const prevSearched = useStorage('previously_searched', [])
 
+const searchResultBlock = useTemplateRef('searchResultBlock');
+
+const searchInputInFocus = ()=>{
+    if (searchString.value.length>1) search();
+    searchInputFocus.value=true;
+};
+
+onClickOutside(searchResultBlock, event => {
+    searchResults.value = defaultResults;
+});
 </script>
 <template>
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto py-4">
         <div class="flex justify-between">
             <div class='mr-5'>
-                <Link :href="route('catalog')">
+                <Link :href="route('catalog')" class="whitespace-nowrap">
                     <i class="ri-menu-line"></i>
                     Каталог
                 </Link>
@@ -66,7 +77,7 @@ const prevSearched = useStorage('previously_searched', [])
                            type="search" 
                            name="search" 
                            placeholder="Поиск..." 
-                           @focus="searchInputFocus=true"
+                           @focus="searchInputInFocus"
                            @blur="searchInputFocus=false"
                            v-on:keyup="search()"
                            v-model="searchString"
@@ -82,9 +93,9 @@ const prevSearched = useStorage('previously_searched', [])
                             leave-from-class="opacity-100"
                             leave-to-class="opacity-0"
                 >
-                    <div v-show="showSearchBlock" class="absolute w-full bg-white rounded-b-sm p-2 z-50">
+                    <div v-show="showSearchBlock" ref="searchResultBlock" class="absolute w-full bg-white rounded-b-sm p-2 z-50">
                         <div>
-                            <div class="font-semibold italic">История</div>
+                            <div class="font-semibold italic text-sm">История</div>
                             <ul>
                                 <li v-for="(str, index) in prevSearched" :key="index">
                                     <Link :href="route('searchProducts')" :data="{search:str}">
@@ -95,12 +106,12 @@ const prevSearched = useStorage('previously_searched', [])
                             </ul>
                         </div>
                         <div v-show="searchResults.categories.length>0">
-                            <div class="font-semibold italic">Искать в категории</div>
+                            <div class="font-semibold italic text-sm">Искать в категории</div>
                             <div class="md:grid md:grid-cols-5 md:gap-2">                                
                                 <Link v-for="(cat, index) in searchResults.categories" 
                                       :key="index" 
                                       :href="route('searchProducts')" 
-                                      :data="{search:searchString, category:cat.id}"
+                                      :data="{search:searchString, filters:[{category:cat.id}]}"
                                       class="border border-orange-300 bg-orange-200 hover:bg-orange-300 rounded"
                                 >
                                     <i class="ri-menu-search-line"></i> 
@@ -109,7 +120,7 @@ const prevSearched = useStorage('previously_searched', [])
                             </div>
                         </div>
                         <div v-show="searchResults.found.length>0">
-                            <div class="font-semibold italic">Товары</div>
+                            <div class="font-semibold italic text-sm">Товары</div>
                             <div class="p-2 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-2">
                                 <div v-for="(position, index) in searchResults.found" :key="index" :position="position">
                                     <div>{{ position.title }}</div>
