@@ -38,12 +38,13 @@ class SearchService
         $autocomplete = collect();
         $found = [];
         $driver = 'database';
-        $limit = $request->method()=='POST'?10:3; //TODO 3=>30
+        $limit = $request->method()=='POST'?10:30;
         $meta = [
             'current_page'=>intval($request->page>0 ? $request->page : 1),
+            'total_products'=>0,
             'total'=>0,
-            'total_pages'=>0,
-            'per_page'=>$limit
+            'per_page'=>$limit,
+            'links'=>[],
         ];
 
         $catMap = function($c){
@@ -82,8 +83,8 @@ class SearchService
                 });
 
                 if ($meta_total) {
-                    $meta['total'] = (int) $meta_total['Value'];
-                    $meta['total_pages'] = (int) ceil($meta_total['Value']/$limit);
+                    $meta['total_products'] = (int) $meta_total['Value'];
+                    $meta['total'] = (int) ceil($meta_total['Value']/$limit);
                 }
 
                 $categories = Category::whereHas('products', function($query) use ($result) {
@@ -125,6 +126,8 @@ class SearchService
             'results' =>$found,
         ]);
 
+        $meta['links'] = $this->metaLinks($meta, $request->search);
+
         return [
             'found'=>$found,
             'categories'=>$categories->unique()->values(),
@@ -133,6 +136,31 @@ class SearchService
             'autocomplete'=>$autocomplete,
             'meta'=>$meta
         ];
+    }
+
+    private function metaLinks(array $meta, string $search):array
+    {
+        $arr=[
+            [
+                'url'=>$meta['current_page']>1 ? route('searchProducts', ['page'=>$meta['current_page']-1, 'search'=>$search]) : '',
+                'active'=>false,
+                'label'=>'«'
+            ]
+        ];
+
+        for ($i=1; $i<=$meta['total']; $i++) $arr[]=[
+            'url'=>route('searchProducts', ['page'=>$i, 'search'=>$search]),
+            'active'=>$meta['current_page']==$i,
+            'label'=>$i
+        ];
+
+        $arr[]=[
+            'url'=>$meta['current_page']<$meta['total'] ? route('searchProducts', ['page'=>$meta['current_page']+1, 'search'=>$search]) : '',
+            'active'=>false,
+            'label'=>'»'
+        ];
+
+        return $arr;
     }
 
     /**

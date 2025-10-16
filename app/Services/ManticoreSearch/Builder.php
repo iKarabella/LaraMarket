@@ -53,7 +53,7 @@ class Builder
     {
         $this->limit = " LIMIT $limit";
 
-        if ($page>0) $this->limit.=' OFFSET '.($page>1 ? $page*$limit : 0);
+        if ($page>1) $this->limit.=' OFFSET '.(($page-1)*$limit);
 
         return $this;
     }

@@ -52,8 +52,8 @@ class ManticoreService
     public function get(Builder $query):array
     {
         if (!$this->ready) throw new Exception('Клиент мантикоры не готов');
-        
-        try {            
+
+        try {
             return [
                 'found'=>$this->client->query($query->build())->fetchAll(PDO::FETCH_ASSOC),
                 'meta'=>$this->client->query('SHOW META;')->fetchAll(PDO::FETCH_ASSOC)

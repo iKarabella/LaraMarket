@@ -5,7 +5,7 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     paginator:{ 
         type:Object, 
-            default:{
+        default:{
             current_page:1,
             links:[], //TODO может быть, что ссылок будет дохрена?
             first_page_url: '',
