@@ -18,7 +18,12 @@ const props = defineProps({
                         Заказ #{{ order.id }}
                         <span>[{{ order.status.value }}]</span>
                     </div>
-                    {{ order }}
+                    <div v-for="(position, index) in order.body" :key="index" class="md:grid md:grid-cols-6 gap-2">
+                        <div class="md:col-span-3">{{ position.product_title }} {{ position.offer_title }}</div>
+                        <div>{{ position.quantity }} {{ position.measure }}</div>
+                        <div>{{ (position.price/100).toFixed(2) }} ₽</div>
+                        <div>{{ (position.total/100).toFixed(2) }} ₽</div>
+                    </div>
                 </div>
             </div>
         </div>

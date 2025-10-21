@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Order;
+namespace App\Http\Resources\User;
 
 use App\Http\Resources\EntityValueResource;
 use Carbon\Carbon;
@@ -10,11 +10,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class OrderResource extends JsonResource
 {
     /**
-     * Transform the resource collection into an array.
+     * Transform the resource into an array.
      *
-     * @return array<int|string, mixed>
+     * @return array<string, mixed>
      */
-    public function toArray(Request $request)
+    public function toArray(Request $request): array
     {
         return [
             'id'         => $this->id??null,

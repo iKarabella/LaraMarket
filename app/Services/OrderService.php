@@ -40,6 +40,7 @@ class OrderService
                     'position' => $find->product_id,
                     'offer' => $find->id,
                     'quantity' => $quantity,
+                    'product_code' => $find->product->code,
                     'product_title'=>$find->product->title,
                     'offer_title'=>$find->title,
                     'measure'=>$find->product->measure_value->value,

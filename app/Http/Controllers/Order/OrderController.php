@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Order;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Catalog\CreateOrderRequest;
 use App\Http\Requests\Catalog\StoreOrderRequest;
-use App\Http\Resources\Order\OrderResource;
+use App\Http\Resources\User\OrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\Shipping\ShippingService;

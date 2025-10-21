@@ -17,15 +17,17 @@ class ProductController extends Controller
     public function index(Request $request, string $code): Response
     {
         $product = Product::whereCode($code);
+        $canManage = access_rights('catalog_manage');
 
-        if (!access_rights('catalog_manage')) $product->whereVisibility(true);
+        if (!$canManage) $product->whereVisibility(true);
 
-        $product=$product->with(['categories', 'media', 'publicOffersWithRel', 'measure_value'])->firstOrFail();
+        $product = $product->with(['categories', 'media', 'publicOffersWithRel', 'measure_value'])->firstOrFail();
 
         return Inertia::render('Catalog/ProductCard', [
             'status' => session('status'),
-            'product'   => ProductResource::make($product)->resolve(),
-            'breadcrumb' => $this->getBreadcrumb($product)
+            'product'   => ProductResource::make($product),
+            'breadcrumb' => $this->getBreadcrumb($product),
+            'canManage' => $canManage
         ]);
     }
 }

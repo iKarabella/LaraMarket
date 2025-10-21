@@ -17,7 +17,7 @@ class UserCartResource extends JsonResource
         return [
             'id' => $this->id,               // id продукта
             'title' => $this->title,         // Название
-            'price'  => $this->price,
+            'price'  => round($this->price/100),
             'art'=>$this->art,
             'media' => $this->media?ProductMediaResource::collection($this->media):[], //медиа
             'available' => $this->available,
