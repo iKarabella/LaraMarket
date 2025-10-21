@@ -39,13 +39,12 @@ const position = computed(()=>{
 });
 
 const total_pos = computed(()=>{
-    let total = position.value.price*props.cartItem.quantity;
-    return total%100 != 0 ? (total/100).toFixed(2) : (total/100);
+    return position.value.price*props.cartItem.quantity;
 });
 </script>
 
 <template>
-    <div class="w-full md:grid md:grid-cols-6 p-2" v-if="position">
+    <div class="w-full md:grid md:grid-cols-7 p-2" v-if="position">
         <div v-if="position.media" class="max-w-[100px]">
             <label class="relative">
                 <img :src="position.media[0].preview" width="100"/>
@@ -59,7 +58,7 @@ const total_pos = computed(()=>{
             <div>{{ position.product_offersign }}: {{ position.title }}</div>
         </div>
         <div>
-            {{ total_pos }} ₽
+            {{ position.price }} ₽ / {{ position.measure }}
         </div>
         <div>
             <div class="flex justify-between items-center relative whitespace-nowrap font-semibold tracking-widest 
@@ -70,16 +69,16 @@ const total_pos = computed(()=>{
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M5 11a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2z"></path></svg>
                 </div>
-                <span>{{ cartItem.quantity }}</span>
+                <span>{{ cartItem.quantity }} {{ position.measure }}</span>
                 <div class="rounded-md w-9 h-9 flex justify-center items-center"
                     :class="{'bg-gray-100 text-gray-500':noMore, 'bg-indigo-200 hover:bg-indigo-100 text-indigo-700 cursor-pointer':!noMore}"
                     @click="changeCart()" title="+1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M12 4a1 1 0 0 0-1 1v6H5a1 1 0 1 0 0 2h6v6a1 1 0 1 0 2 0v-6h6a1 1 0 1 0 0-2h-6V5a1 1 0 0 0-1-1"></path></svg>
                 </div>
             </div>
-            <div v-show="position.quantity>1">
-                {{ position.price }} ₽ / {{ position.measure }}
-            </div>
+        </div>
+        <div>
+            {{ total_pos }} ₽
         </div>
     </div>
 </template>

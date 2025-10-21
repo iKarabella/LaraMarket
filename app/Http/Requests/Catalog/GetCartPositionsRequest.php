@@ -14,11 +14,11 @@ class GetCartPositionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'positions'=>'array|required|min:1',
-            'positions.*'=>'array|required',
-            'positions.*.position'=>'numeric|required|exists:products,id',
-            'positions.*.offer'=>'numeric|required|exists:offers,id',
-            'positions.*.quantity'=>'numeric|required|max:99999'
+            'positions'=>'array|required',
+            'positions.*'=>'array|nullable',
+            'positions.*.position'=>'numeric|nullable|exists:products,id',
+            'positions.*.offer'=>'numeric|nullable|exists:offers,id',
+            'positions.*.quantity'=>'numeric|nullable|max:99999'
         ];
     }
 

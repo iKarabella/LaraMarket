@@ -37,7 +37,10 @@ const getCartPositions = () => {
     axios.post(route('catalog.usercart.getPosition'), {
         positions:usercart.value
     })
-    .then(e=>cartPositions.value = e.data);
+    .then(e=>{
+        cartPositions.value = e.data;
+        console.log(e.data);
+    });
 };
 
 const total_summ = computed(()=>{
@@ -46,7 +49,7 @@ const total_summ = computed(()=>{
         let offer = cartPositions.value.find(arr=>arr.id==p.offer);
         if (offer) total+=offer.price*p.quantity;
     });
-    return total%100 != 0 ? (total/100).toFixed(2) : total/100;
+    return total;
 });
 
 const orderCreate = ()=>{

@@ -44,20 +44,21 @@ class UserCartController extends Controller
      */
     public function check(GetCartPositionsRequest $request):JsonResponse
     {
-        $offers = Offer::whereIn('id', array_column($request->positions, 'offer'))->get(['id']);
+        $offers = Offer::whereIn('id', array_column($request->positions, 'offer'))->get(['id', 'product_id']);
         $cleared = [];
-        foreach($request->positions as $position)
+
+        if (is_array($request->positions)) foreach($request->positions as $position)
         {
             $find = $offers->first(function($arr) use ($position) {
                 return $arr->id==$position['offer'];
             });
 
-            if($find){
+            if($find && !array_any($cleared, function($arr) use ($find){ return $arr['offer']==$find->id;})){
                 $cleared[]=[
-                    'position' => $position['position'],
-                    'offer' => $position['offer'],
-                    'quantity' => $find->available<$position['quantity'] ? $find->available : $position['quantity'],
-                    'toOrder' => $position['toOrder'],
+                    'position' => $find->product_id,
+                    'offer' => $find->id,
+                    'quantity' => $find->available < $position['quantity'] ? $find->available : $position['quantity'],
+                    'toOrder' => $position['toOrder']??false,
                 ];
             }
         }
