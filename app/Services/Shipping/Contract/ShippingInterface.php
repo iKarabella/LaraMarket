@@ -36,4 +36,9 @@ interface ShippingInterface
      * Метод, вызываемый при успешном завершении доставки.
      */
     public function delivered(Shipping &$shipping):void;
+
+    /**
+     * Метод, вызываемый при отмене доставки.
+     */
+    public function cancelled(Shipping &$shipping):void;
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Delivery\DeliveryActionRequest;
 use App\Http\Requests\Admin\Delivery\DeliveryListRequest;
 use App\Http\Resources\Admin\Delivery\ShippingResource;
 use App\Models\CashRegister;
+use App\Models\Order;
 use App\Models\Shipping;
 use App\Services\ModulKassa\ModulKassa;
 use App\Services\OrderService;
@@ -150,7 +151,14 @@ class DeliveryController extends Controller
      */
     public function cancelled(DeliveryActionRequest $request):void
     {
-        dd($request->toArray());
+        $shipping = Shipping::whereId($request->id)->with(['order_info'])->firstOrFail();
+        $status = $request->returned ? 10 : 11;
+
+        ShippingService::client($shipping->shipping)->cancelled($shipping);
+        
+        OrderService::setStatus($shipping->order_info, $status, null, $request->comment);
+        
+        (new ModulKassa())->cancelOrder($shipping->order_id);
     }
 
 

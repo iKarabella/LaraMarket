@@ -80,6 +80,12 @@ class OwnService implements ShippingInterface
         if (!$shipping->save()) throw new Exception('Не удалось сохранить изменение статуса доставки');
     }
 
+    public function cancelled(Shipping &$shipping):void
+    {
+        $shipping->cancelled = new Carbon();
+        if (!$shipping->save()) throw new Exception('Не удалось сохранить изменение статуса доставки');
+    }
+
     // public function returned(Shipping &$shipping):void
     // {
     //     //WarehouseService::returnPositionsFromShipping($shipping);

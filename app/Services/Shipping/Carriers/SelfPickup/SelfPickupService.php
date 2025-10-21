@@ -19,6 +19,8 @@ class SelfPickupService implements ShippingInterface
     {}
     public function delivered(Shipping &$shipping):void
     {}
+    public function cancelled(Shipping &$shipping):void
+    {}
 
     public function canCreateShipping():bool
     {
