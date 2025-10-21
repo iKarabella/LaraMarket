@@ -10,7 +10,6 @@ use App\Services\ModulKassa\ModulKassa;
 use App\Services\OrderService;
 use App\Services\WarehouseService\WarehouseService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class GetSales extends Command
 {
@@ -101,9 +100,18 @@ class GetSales extends Command
                                 ]);
                             }
                             break;
-                        //case 'RETURN': WarehouseService::returnPositions($positions, 1, $reason); break;
-                        case 'RETURN_BY_SALE': WarehouseService::otherWriteOff($positions, 1, $reason, true); break;
+                        // case 'RETURN': 
+                        //     if ($cashRegister->warehouse_id) WarehouseService::otherWriteOff($positions, $cashRegister->warehouse_id, $reason, true); 
+                        //     break;
+                        case 'RETURN_BY_SALE': 
+                            if ($cashRegister->warehouse_id) WarehouseService::otherWriteOff($positions, $cashRegister->warehouse_id, $reason, true); 
+                            break;
                         // case 'ORDER': break; //TODO работа с заказами
+                        default: Log::create([
+                            'author'=>'getSales',
+                            'message'=>'Неопределенный вызов',
+                            'object'=>$doc
+                        ]);
                     }
                 }
             }

@@ -229,7 +229,7 @@ class ModulKassa
 
         $docs->each(function($doc){
             $res = $this->delete("/v2/retail-point/{$doc->point}/order/$doc->guid");
-            if($res) $doc->delete();
+            if ($res) $doc->delete();
         });
     }
 
