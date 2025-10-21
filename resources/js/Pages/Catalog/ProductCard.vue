@@ -2,87 +2,58 @@
 import Breadcrumb from '@/Components/Breadcrumb.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import FullLayout from '@/Layouts/FullLayout.vue';
-</script>
-<script>
-    export default {
-        props:{
-            product:{type:Object, default:{}},
-            userCart:{type:Array, default:[]},
-            breadcrumb:{type:Array, default:[]}
-        },
-        data(){
-            return {
-                selectedOfferIndex:0,
-                currentImage:0,
-                usercart:[],
-            }
-        },
-        mounted(){
-            if (localStorage.getItem('user_cart')) {
-                try {
-                    this.usercart = JSON.parse(localStorage.getItem('user_cart'));
-                } catch(e) {
-                    localStorage.removeItem('user_cart');
-                }
-            }
+import NotifyAboutAdmission from '@/Components/Elements/NotifyAboutAdmission.vue';
+import { usercart, addToCart, removeFromCart } from '@/Mixins/UserCart.js';
+import { computed, ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
-            if (!this.usercart.length && Array.isArray(this.userCart) && this.userCart.length) this.usercart = this.userCart;
-        },
-        computed:{
-            cardImages:function(){
-                return this.product.media;//[...this.product.offers[this.selectedOfferIndex]?this.product.offers[this.selectedOfferIndex].media:[], ...this.product.media];
-            },
-            selectedOffer: function(){
-                return this.product.offers[this.selectedOfferIndex];
-            },
-            inCart: function(){
-                let find = this.usercart.find(a=>a.position == this.product.id && a.offer == this.product.offers[this.selectedOfferIndex].id);
-                return find?find:{};
-            }
-        },
-        methods:{
-            moveImg(next){
-                if(next){
-                    if (this.currentImage == this.cardImages.length-1) this.currentImage = 0;
-                    else this.currentImage++;
-                }
-                else {
-                    if (this.currentImage==0) this.currentImage = this.cardImages.length-1;
-                    else this.currentImage--;
-                }
-            },
-            selectOffer(index){
-                this.currentImage=0;
-                this.selectedOfferIndex=index;
-            },
-            addToCart()
-            {
-                let find = this.usercart.findIndex(a=>a.position == this.product.id && a.offer == this.product.offers[this.selectedOfferIndex].id);
+const props = defineProps({
+    product: {type:Object, default:{}}, 
+    breadcrumb:{type:Array, default:[]},
+    canManage:{type:Boolean, default:false}
+});
 
-                if (find>-1) this.usercart[find].quantity++;
-                else this.usercart.push({position:this.product.id, offer:this.product.offers[this.selectedOfferIndex].id, quantity:1});
+const currentImage = ref(0);
+const currentOffer = ref(0);
 
-                this.saveCart();
-            },
-            removeFromCart()
-            {
-                let find = this.usercart.findIndex(a=>a.position == this.product.id && a.offer == this.product.offers[this.selectedOfferIndex].id);
+const inCart = computed(() => {
+    if (!usercart || !usercart.value) return {};
+    
+    let find = usercart.value.find(a=>a.position == props.product.id && a.offer == props.product.offers[currentOffer.value].id);
+    return find?find:{};
+});
 
-                if (find>-1) {
-                    if (this.usercart[find].quantity>1) this.usercart[find].quantity--;
-                    else this.usercart.splice(find, 1);
-                }
+const noMore = computed(() => {
+    return inCart.value.quantity>=props.product.offers[currentOffer.value].available;
+});
 
-                this.saveCart();
-            },
-            saveCart()
-            {
-                const parsed = JSON.stringify(this.usercart);
-                localStorage.setItem('user_cart', parsed);
-                axios.post(route('market.saveCart'), {cart:this.usercart});
-            },
-        }
-    }
+const cardImages = computed(()=>{
+    return props.product.media; //[...this.product.offers[this.selectedOfferIndex]?this.product.offers[this.selectedOfferIndex].media:[], ...this.product.media];
+});
+
+const changeCart = (remove=false) => {
+    if(!remove && noMore.value) return false;
+    if(remove) removeFromCart({position:props.product.id, offer:props.product.offers[currentOffer.value].id});
+    else addToCart({position:props.product.id, offer:props.product.offers[currentOffer.value].id});
+}
+
+const showNotifyAboutAdmission = ref(null);
+
+const notifyAboutAdmission = () => {
+    showNotifyAboutAdmission.value = {
+        offer_id: props.product.offers[currentOffer.value].id,
+        product_id: props.product.id
+    };
+};
+
+const closeNotify = ()=>{
+    showNotifyAboutAdmission.value = null;
+};
+
+const selectOffer = (index)=>{
+    currentOffer.value = index;
+};
+
 </script>
 <template>
     <Head title="Marketzone" />
@@ -96,8 +67,12 @@ import FullLayout from '@/Layouts/FullLayout.vue';
                     <Breadcrumb v-if="breadcrumb" :breadcrumb="breadcrumb"/>
 
                     <!--Product main info-->
-                    <div class="md:flex w-full">
-                        
+                    <div class="md:flex w-full relative">
+                        <div class="absolute top-0 z-50 p-2" v-if="canManage">
+                            <Link :href="route('admin.products.edit', [product.code])">
+                                <i class="ri-settings-4-line"></i>
+                            </Link>
+                        </div>
                         <!--Images-->
                         <div class="min-w-[30%] relative mx-4 mt-4 overflow-hidden text-gray-700 bg-clip-border rounded-xl h-96">
                             <div class="relative">
@@ -141,7 +116,7 @@ import FullLayout from '@/Layouts/FullLayout.vue';
                                     <div v-for="(offer, index) in product.offers" 
                                          class="border border-opacity-0 border-gray-400 cursor-pointer"
                                         :key="index" 
-                                        :class="{'border-opacity-90':index==selectedOfferIndex}"
+                                        :class="{'border-opacity-90':index==currentOffer}"
                                         @click="selectOffer(index)"
                                     >
                                         {{ offer.title }}
@@ -149,21 +124,29 @@ import FullLayout from '@/Layouts/FullLayout.vue';
                                 </div>
                             </div>
                             <div>
-                                <div>{{ selectedOffer.price }}₽</div>
-                                <div class="m-4 bg-white">
-                                    <PrimaryButton v-show="!inCart.quantity" title="Добавить в корзину" @click="addToCart()" class="w-full">
+                                <div>{{ product.offers[currentOffer].price }}₽</div>
+                                <div v-show="product.offers[currentOffer].available" class="m-4 bg-white">
+                                    <PrimaryButton v-show="!inCart.quantity" title="Добавить в корзину" @click="changeCart()" class="w-full">
                                         <i class="ri-shopping-basket-2-line mr-2"></i> Добавить
                                     </PrimaryButton>
                                     <div v-show="inCart.quantity" class="flex justify-between items-center relative whitespace-nowrap font-semibold tracking-widest 
                                                                          transition ease-in-out duration-150 min-w-32">
-                                        <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center bg-indigo-200 text-indigo-700 hover:bg-indigo-100" @click="removeFromCart()" title="-1">
+                                        <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center bg-indigo-200 text-indigo-700 hover:bg-indigo-100" @click="changeCart(true)" title="-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M5 11a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2z"></path></svg>
                                         </div>
                                         <span>{{ inCart.quantity }}</span>
-                                        <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center bg-indigo-200 text-indigo-700 hover:bg-indigo-100" @click="addToCart()" title="+1">
+                                        <div class="rounded-md cursor-pointer w-9 h-9 flex justify-center items-center bg-indigo-200 text-indigo-700 hover:bg-indigo-100" @click="changeCart()" title="+1">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"><path fill="currentColor" d="M12 4a1 1 0 0 0-1 1v6H5a1 1 0 1 0 0 2h6v6a1 1 0 1 0 2 0v-6h6a1 1 0 1 0 0-2h-6V5a1 1 0 0 0-1-1"></path></svg>
                                         </div>
                                     </div>
+                                </div>
+                                <div v-show="!product.offers[currentOffer].available" class="m-4 bg-white">
+                                    <PrimaryButton v-if="product.offers[currentOffer].notify" title="Сообщим как только товар появится в продаже" class="w-full" :disabled="true">
+                                        <i class="ri-check-line mr-2"></i> Сообщим
+                                    </PrimaryButton>
+                                    <PrimaryButton v-else title="Сообщить, как только товар появится в продаже" class="w-full" @click="notifyAboutAdmission">
+                                        <i class="ri-notification-2-line mr-2"></i> Сообщить
+                                    </PrimaryButton>
                                 </div>
                             </div>
                         </div>
@@ -174,5 +157,6 @@ import FullLayout from '@/Layouts/FullLayout.vue';
                 </div>
             </div>
         </div>
+        <NotifyAboutAdmission :show="showNotifyAboutAdmission" @closeNotify="closeNotify" :auth="$page.props.auth"/>
     </FullLayout>
 </template>
