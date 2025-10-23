@@ -4,6 +4,7 @@ import { usercart } from '@/Mixins/UserCart.js';
 import { useStorage, onClickOutside } from '@vueuse/core'
 import { computed, ref, useTemplateRef } from 'vue';
 import { router } from '@inertiajs/vue3';
+import logo from '/resources/images/logo_header.svg';
 
 const searchInputFocus = ref(false);
 const defaultResults = {
@@ -63,6 +64,9 @@ onClickOutside(searchResultBlock, event => {
 <template>
     <div class="max-w-7xl mx-auto py-4">
         <div class="flex justify-between">
+            <div>
+                <img :src="logo"/>
+            </div>
             <div class='mr-5'>
                 <Link :href="route('catalog')" class="whitespace-nowrap">
                     <i class="ri-menu-line"></i>

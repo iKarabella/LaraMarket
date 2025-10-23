@@ -50,7 +50,7 @@ const priceTags = () => {
                 <div v-for="(position, index) in computedAct" class="md:grid md:grid-cols-10 md:gap-2">
                     <div>{{ index+1 }}</div>
                     <div class="col-span-5">
-                        <Link v-if="offersEditable" :href="route('admin.catalog.editOffer', position.offer_id)">
+                        <Link v-if="offersEditable" :href="route('admin.products.editOffer', ['*', position.offer_id])">
                             {{ position.title }}
                         </Link>
                         <template v-else>{{ position.title }}</template>

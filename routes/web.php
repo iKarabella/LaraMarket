@@ -93,8 +93,9 @@ Route::middleware('permission:catalog_manage')->group(function () {
     Route::get('admin/catalog/product/edit', [AdminCatalogController::class, 'products'])->name('admin.products.manage');
     Route::get('admin/catalog/product/edit/{code}', [AdminCatalogController::class, 'products'])->name('admin.products.edit');
     Route::post('admin/catalog/product/store', [AdminCatalogController::class, 'storeProduct'])->name('admin.products.store');
+    Route::delete('admin/catalog/product/store', [AdminCatalogController::class, 'deleteProduct']);
     Route::post('admin/catalog/product/offers/store', [AdminCatalogController::class, 'storeOffer'])->name('admin.products.offers.store');
-    Route::get('admin/catalog/product/offers/edit/{offer_id}', [AdminCatalogController::class, 'editOffer'])->name('admin.catalog.editOffer');
+    Route::delete('admin/catalog/products/{code}/offers/{offer_id}', [AdminCatalogController::class, 'deleteOffer'])->name('admin.products.offers.delete');
     Route::get('admin/catalog/products/{code}/offers/{offer_id}', [AdminCatalogController::class, 'offer'])->name('admin.products.editOffer');
     Route::get('admin/catalog/products/{code}/offers/', [AdminCatalogController::class, 'offer'])->name('admin.products.newOffer');
 
