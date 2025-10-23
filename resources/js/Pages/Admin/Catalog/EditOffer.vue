@@ -8,6 +8,8 @@ import SecondaryButton from '@/Components/UI/SecondaryButton.vue';
 import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
 import MediaManage from './Partials/MediaManage.vue';
+import OfferDelete from './Partials/OfferDelete.vue';
+import { nextTick, ref } from 'vue';
 
 const props = defineProps({
     product: {type: Object, default:{}},
@@ -30,7 +32,20 @@ const tradeOfferForm = useForm({
     height:props.offer.height??null,
     width:props.offer.width??null,
     media:props.offer.media??[],
+    product_code:null
 });
+
+const changeProductForOfferForm = ref(false);
+const productCodeInputRef = ref(null);
+
+const changeProductForOffer = (cancel=false)=>{
+    if (cancel) changeProductForOfferForm.value = false;
+    else {
+        tradeOfferForm.product_code=null;
+        changeProductForOfferForm.value=true;
+        nextTick(() => productCodeInputRef.value.focus());
+    }
+};
 
 const toFloat = (val)=>{
     return parseFloat(val).toFixed(2);
@@ -202,11 +217,44 @@ const saveOffer = () => {
             <div class="mt-2">
                 <MediaManage :media="offer.media" :offer="offer.id"/>
             </div>
-            <div class="text-right mt-2">
-                <Link class="mr-2" :href="route('admin.products.edit', [props.product.code])">
-                    <SecondaryButton>Отменить</SecondaryButton>
-                </Link>
-                <PrimaryButton class="mr-2" @click="saveOffer()">Сохранить</PrimaryButton>
+            <div class="mt-2">
+                <div v-show="!changeProductForOfferForm">
+                    Товар: <b>{{ product.title }}</b> 
+                    <SecondaryButton title="Изменить товар для этого предложения"
+                                     @click="changeProductForOffer()"
+                    >
+                        <i class="ri-edit-2-fill"></i>
+                    </SecondaryButton>
+                </div>
+                <div v-show="changeProductForOfferForm">
+                    <InputLabel for="product_code" value="Код товара"/>
+                    <div class="flex whitespace-nowrap">
+                        <TextInput
+                            type="text"
+                            ref="productCodeInputRef"
+                            id="product_code"
+                            name="product_code"
+                            class="w-full mt-1 block"
+                            v-model="tradeOfferForm.product_code"
+                            autocomplete="off"
+                        /> 
+                        <SecondaryButton @click="changeProductForOffer(true)">
+                            <i class="ri-close-large-line"></i>
+                        </SecondaryButton>
+                    </div>
+                    <InputError class="ml-2" :message="tradeOfferForm.errors.product_code" />
+                </div>
+            </div>
+            <div class="flex mt-2 w-full">
+                <div class="text-left w-6/12">
+                    <OfferDelete :offer_id="offer.id" :product_code="product.code"/>
+                </div>
+                <div class="text-right w-6/12">
+                    <Link class="mr-2" :href="route('admin.products.edit', [props.product.code])">
+                        <SecondaryButton>Отменить</SecondaryButton>
+                    </Link>
+                    <PrimaryButton class="mr-2" @click="saveOffer()">Сохранить</PrimaryButton>
+                </div>
             </div>
         </div>
     </MarketLayout>

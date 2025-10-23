@@ -10,6 +10,7 @@ import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 import Checkbox from '@/Components/UI/Checkbox.vue';
 import { ref } from 'vue';
 import MediaManage from './Partials/MediaManage.vue';
+import ProductDelete from './Partials/ProductDelete.vue';
 
 const props = defineProps({
     navigation: {type:Array, default:[]},
@@ -214,11 +215,16 @@ const storeProduct = ()=>{
                     </div>
                 </div>
             </div>
-            <div class="text-right mt-2">
-                <Link :href="route('admin.catalog.manage')" class="mr-2">
-                    <SecondaryButton>В каталог</SecondaryButton>
-                </Link>
-                <PrimaryButton @click="storeProduct">Сохранить</PrimaryButton>
+            <div class="flex w-full mt-2 whitespace-nowrap">
+                <div class="w-6/12 text-left">
+                    <ProductDelete v-show="!product.offers.length" :product_id="product.id"/>
+                </div>
+                <div class="w-6/12 text-right">
+                    <Link :href="route('admin.catalog.manage')" class="mr-2">
+                        <SecondaryButton>В каталог</SecondaryButton>
+                    </Link>
+                    <PrimaryButton @click="storeProduct">Сохранить</PrimaryButton>
+                </div>
             </div>
         </div>
     </MarketLayout>

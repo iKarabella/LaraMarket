@@ -29,6 +29,7 @@ class StoreOfferRequest extends FormRequest
             'length'=>'integer|nullable',
             'height'=>'integer|nullable',
             'width'=>'integer|nullable',
+            'product_code'=>'string|nullable|exists:products,code'
         ];
     }
 
@@ -55,6 +56,7 @@ class StoreOfferRequest extends FormRequest
         return [
             'price.decimal' => 'Число формата 0.00',
             'baseprice.decimal' => 'Число формата 0.00',
+            'product_code.exists' => 'Товар с таким кодом не найден'
         ];
     }
 }

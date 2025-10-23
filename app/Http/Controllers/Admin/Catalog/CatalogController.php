@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin\Catalog;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Catalog\DeleteCatRequest;
+use App\Http\Requests\Admin\Catalog\DeleteOfferRequest;
+use App\Http\Requests\Admin\Catalog\DeleteProductRequest;
 use App\Http\Requests\Admin\Catalog\ManageRequest;
 use App\Http\Requests\Admin\Catalog\SetCatSortRequest;
 use App\Http\Requests\Admin\Catalog\StoreCatRequest;
@@ -18,6 +20,7 @@ use App\Models\Product;
 use App\Traits\MarketControllerTrait;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -125,16 +128,16 @@ class CatalogController extends Controller
         return redirect()->route('admin.products.edit', [$product->code]);
     }
 
-    public function editOffer(Request $request, int $offer_id):Response
-    {
-        $offer = Offer::whereId($offer_id)->firstOrFail();
+    // public function editOffer(Request $request, int $offer_id):Response
+    // {
+    //     $offer = Offer::whereId($offer_id)->firstOrFail();
 
-        return Inertia::render('Admin/Catalog/EditOffer', [
-            'product'=>ProductResource::make($offer->product)->resolve(),
-            'offer'=>OfferResource::make($offer)->resolve(),
-            'navigation'=>$this->getNavigation('categories'),
-        ]);
-    }
+    //     return Inertia::render('Admin/Catalog/EditOffer', [
+    //         'product'=>ProductResource::make($offer->product)->resolve(),
+    //         'offer'=>OfferResource::make($offer)->resolve(),
+    //         'navigation'=>$this->getNavigation('categories'),
+    //     ]);
+    // }
     
     public function offer(Request $request, string $code, ?int $offer_id=null):Response
     {
@@ -175,7 +178,47 @@ class CatalogController extends Controller
     {
         $product = Product::whereId($request->product_id)->first(['code']);
         $offer = Offer::whereId($request->id)->firstOrNew();
-        $offer->fill($request->validated())->save();
+        $validated = $request->validated();
+
+        if($request->product_code)
+        {
+            $newProduct = Product::whereCode($request->product_code)->first(['id']);
+            if ($newProduct) $validated['product_id'] = $newProduct->id;
+        }
+
+        $offer->fill($validated)->save();
+
         return redirect()->route('admin.products.edit', [$product->code]);
+    }
+
+    /**
+     * Удалить торговое предложение
+     * 
+     * @param App\Http\Requests\Admin\Catalog\DeleteOfferRequest $request
+     * @param string $code код продукта
+     * @return RedirectResponse
+     */
+    public function deleteOffer(DeleteOfferRequest $request, string $code):RedirectResponse
+    {
+        Offer::whereId($request->id)->delete();
+
+        return redirect()->route('admin.products.edit', [$code]);
+    }
+
+    /**
+     * Удалить товар из каталога
+     * 
+     * @param App\Http\Requests\Admin\Catalog\DeleteProductRequest $request
+     * @return RedirectResponse
+     */
+    public function deleteProduct(DeleteProductRequest $request)
+    {
+        $product = Product::whereId($request->id)->with(['offers'])->firstOrFail();
+
+        if ($product->offers->count()) throw ValidationException::withMessages(['id'=>'Нельзя удалить товар с торговыми предложениями.']); 
+        
+        $product->delete();
+
+        return redirect()->route('admin.catalog.manage');
     }
 }
