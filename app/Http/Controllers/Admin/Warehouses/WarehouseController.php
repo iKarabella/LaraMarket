@@ -37,8 +37,11 @@ class WarehouseController extends Controller
         if ($code) 
         {
             $warehouse = Warehouse::whereCode($code)->firstOrFail();
-            $request->session()->put('admin.manage_warehouses.selectedWh', $warehouse->id);
+            $warehouseId = $warehouse->id;
         }
+        else $warehouseId=1; //По умолчанию
+        
+        $request->session()->put('admin.manage_warehouses.selectedWh', $warehouseId);
 
         return Inertia::render('Admin/Warehouses/Manage', [
             'navigation'=>$this->getNavigation('warehouses'),
