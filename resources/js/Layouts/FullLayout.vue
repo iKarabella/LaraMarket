@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue';
 import SearchBlock from '@/Components/Elements/Search/SearchBlock.vue';
 import HeaderBlock from '@/Components/Elements/HeaderBlock.vue';
 import CatalogMenuBlock from '@/Components/Elements/CatalogMenu/CatalogMenuBlock.vue';
+import Keller from './Partials/Keller.vue';
 
 </script>
 
@@ -18,6 +18,9 @@ import CatalogMenuBlock from '@/Components/Elements/CatalogMenu/CatalogMenuBlock
             <main>
                 <slot />
             </main>
+            <footer>
+                <Keller :catalog="$page.props.catalogMenu"/>
+            </footer>
         </div>
     </div>
 </template>
