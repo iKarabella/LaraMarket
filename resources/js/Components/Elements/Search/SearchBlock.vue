@@ -62,14 +62,14 @@ onClickOutside(searchResultBlock, event => {
 });
 </script>
 <template>
-    <div class="max-w-7xl mx-auto py-4">
+    <div class="max-w-7xl mx-auto py-4 sm:px-6 lg:px-8">
         <div class="flex justify-between">
-            <div>
+            <div class="my-auto">
                 <img :src="logo"/>
             </div>
-            <div class='mr-5'>
-                <Link :href="route('catalog')" class="whitespace-nowrap">
-                    <i class="ri-menu-line"></i>
+            <div class='mx-5 my-auto'>
+                <Link :href="route('catalog')" class="whitespace-nowrap text-orange-500 font-semibold text-lg">
+                    <i class="ri-menu-line text-green-700"></i>
                     Каталог
                 </Link>
             </div>
@@ -147,7 +147,7 @@ onClickOutside(searchResultBlock, event => {
                     </div>
                 </Transition>
             </div>
-            <div class="ml-5">
+            <div class="mx-5 my-auto">
                 <Link :href="route('user.cart')" class="rounded-md hover:bg-indigo-50 text-indigo-700 p-2 relative" title="Открыть корзину">
                     <i class="ri-shopping-basket-2-line text-xl m-2"></i>
                     <div v-show="usercart.length>0" class="absolute top-0 right-0">

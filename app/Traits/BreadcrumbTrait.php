@@ -18,7 +18,7 @@ trait BreadcrumbTrait
     private function getBreadcrumb(?Product $product=null, ?string $cat = null):array
     {
         $breadcrumb = [
-            ['title'=>'Catalog', 'link'=>route('catalog')],
+            //['title'=>'Каталог', 'link'=>route('catalog')],
         ];
 
         if($product!=null) 

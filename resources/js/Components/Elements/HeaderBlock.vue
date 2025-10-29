@@ -8,11 +8,11 @@
 <template>
     <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
         <!-- Главное навигационное меню -->
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <!-- Линейка ссылок -->
-                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <div class="hidden space-x-8 sm:-my-px sm:flex">
                         <NavLink :href="route('home')" :active="route().current('home')">
                             Бонус+
                         </NavLink>

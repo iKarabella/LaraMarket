@@ -46,7 +46,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $admin = User::firstOrCreate(['phone'=>79138248014], ['password'=>'$2y$12$qmOs0vsO8IVBVmQQzlE0G.vMfBvLEydeiYwf47za5FuH.n9uuHH9C', 'nickname'=>'karabella']);
+        $admin = User::firstOrCreate(['phone'=>79999999999], ['password'=>'$2y$12$5NyhOYuMkLp0xWzQhkrTn.IIrcPgQG1qbscUtjpdHEcHIR0OPQcZa', 'nickname'=>'Admin']);
         $adminRole = Role::whereName('Администратор')->first();
 
         $roles = [
