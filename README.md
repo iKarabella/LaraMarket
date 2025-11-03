@@ -1,6 +1,6 @@
 ## Laramarket - online store based on Laravel + Vue3
 
-## Copy
+## Get started
 
 ```bash
 git clone https://github.com/iKarabella/LaraMarket.git
@@ -17,7 +17,9 @@ npm install && run build
 
 ## Demo:
 
-Try live demo: https://laramarket.shimari.ru/
-Admin account: 
-    Login: +79999999999
+<p>Try live demo: https://laramarket.shimari.ru/</p>
+<p>
+    Admin account: <br/>
+    Login: +79999999999 <br/>
     Password: admin
+</p>
