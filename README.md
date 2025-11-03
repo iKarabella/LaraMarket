@@ -19,7 +19,6 @@ npm install && run build
 
 <p>Try live demo: https://laramarket.shimari.ru/</p>
 <p>
-    Admin account: <br/>
     Login: +79999999999 <br/>
     Password: admin
 </p>
