@@ -21,7 +21,8 @@ class StoreWarehouseRequest extends FormRequest
             'code'=>['string','required', Rule::unique('warehouses')->ignore($this->id, 'id')],
             'phone'=>'string|required',
             'address'=>'string|required',
-            'description'=>'string|nullable'
+            'description'=>'string|nullable',
+            'self_pickup'=>'boolean'
         ];
 
         return $rules;

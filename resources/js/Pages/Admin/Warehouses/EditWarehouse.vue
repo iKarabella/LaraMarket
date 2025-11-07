@@ -24,6 +24,7 @@ const warehouseForm = useForm({
     phone:props.warehouse.phone??'',
     caschier:props.warehouse.caschier??null,                   
     description:props.warehouse.description??'',
+    self_pickup:props.warehouse.self_pickup??false,
 });
 
 const storeWarehouse = ()=>{
@@ -146,6 +147,15 @@ const removeCashRegister = (guid)=>{
                     <InputError class="ml-2" :message="warehouseForm.errors.phone" />
                 </div>
             </div>
+
+            <div class="mt-2">
+                <label class="text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700">
+                    <Checkbox v-model="warehouseForm.self_pickup" :checked="warehouseForm.self_pickup"/> 
+                    - выдача заказов
+                </label>
+                <InputError class="ml-2" :message="warehouseForm.errors.self_pickup" />
+            </div>
+
             <div class="mt-2">
                 <span>Описание</span>
                 <Tiptap :content="warehouseForm.description" @updateContent="updateContent"/>

@@ -16,6 +16,10 @@ class Warehouse extends Model
         'self_pickup', //возможность самовывоза
     ];
 
+    protected $casts = [
+        'self_pickup' => 'boolean'
+    ];
+
     public function cash_registers()
     {
         return $this->hasMany(CashRegister::class, 'warehouse_id', 'id');
